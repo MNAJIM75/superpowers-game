@@ -19,6 +19,15 @@ export default class Camera extends ActorComponent {
   isOrthographic: boolean;
   projectionNeedsUpdate: boolean;
 
+  usePostProcessing: boolean;
+  renderTarget: THREE.WebGLRenderTarget;
+  tmpBuffer: THREE.WebGLRenderTarget;
+  camPass: THREE.OrthographicCamera;
+  scenePass: THREE.Scene;
+  quadPass: THREE.Mesh;
+  passes: Array<THREE.ShaderMaterial>;
+  copyMat: THREE.ShaderMaterial;
+
   constructor(actor: Actor) {
     super(actor, "Camera");
 
@@ -33,6 +42,32 @@ export default class Camera extends ActorComponent {
 
     this.computeAspectRatio();
     this.actor.gameInstance.on("resize", this.computeAspectRatio);
+
+    let size = this.actor.gameInstance.threeRenderer.getSize();
+    this.renderTarget = new THREE.WebGLRenderTarget(size.width, size.height);
+    this.tmpBuffer = this.renderTarget.clone();
+    this.camPass = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    this.scenePass = new THREE.Scene();
+    this.quadPass = new THREE.Mesh(new THREE.PlaneBufferGeometry(2, 2), null);
+    this.scenePass.add(this.quadPass);
+
+    this.copyMat = new THREE.ShaderMaterial({
+      uniforms: {
+        "tDiffuse": { value: null }
+      },
+      vertexShader: `
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+        }`,
+      fragmentShader: `
+        uniform sampler2D tDiffuse;
+        varying vec2 vUv;
+        void main() {
+          gl_FragColor = texture2D( tDiffuse, vUv );
+        }`
+    });
   }
 
   _destroy() {
@@ -42,6 +77,8 @@ export default class Camera extends ActorComponent {
     if (index !== -1) this.actor.gameInstance.renderComponents.splice(index, 1);
 
     this.threeCamera = null;
+    this.renderTarget.dispose();
+    this.tmpBuffer.dispose();
 
     super._destroy();
   }
@@ -50,6 +87,10 @@ export default class Camera extends ActorComponent {
     const canvas = this.actor.gameInstance.threeRenderer.domElement;
     this.cachedRatio = (canvas.clientWidth * this.viewport.width) / (canvas.clientHeight * this.viewport.height);
     this.projectionNeedsUpdate = true;
+    if (this.renderTarget) {
+      this.renderTarget.setSize(canvas.clientWidth * this.viewport.width, canvas.clientHeight * this.viewport.height);
+      this.tmpBuffer.setSize(canvas.clientWidth * this.viewport.width, canvas.clientHeight * this.viewport.height);
+    }
   }
 
   setIsLayerActive(active: boolean) { /* Nothing to render */ }
@@ -107,6 +148,28 @@ export default class Camera extends ActorComponent {
     this.projectionNeedsUpdate = true;
   }
 
+  setPostProcessing(use: boolean, assets: Array<any>) {
+    this.usePostProcessing = use;
+    if (use) {
+      this.passes = [];
+      for (let asset of assets) {
+        let unif: { [uniform: string]: any } = [];
+
+        for (let uniform of asset.__inner.uniforms) {
+          unif[uniform.name] = { value: uniform.value };
+        }
+
+        let passMat = new THREE.ShaderMaterial({
+          uniforms: unif,
+          vertexShader: asset.__inner.vertexShader.text,
+          fragmentShader: asset.__inner.fragmentShader.text
+        });
+
+        this.passes.push(passMat);
+      }
+    }
+  }
+
   start() { this.actor.gameInstance.renderComponents.push(this); }
 
   render() {
@@ -138,17 +201,45 @@ export default class Camera extends ActorComponent {
       this.viewport.width * canvas.width, this.viewport.height * canvas.height
     );
 
+    this.actor.gameInstance.threeScene.overrideMaterial = null;
+    this.actor.gameInstance.threeRenderer.clearTarget(this.renderTarget, true, true, true);
     if (this.layers.length > 0) {
       for (const layer of this.layers) {
         this.actor.gameInstance.setActiveLayer(layer);
-        this.actor.gameInstance.threeRenderer.render(this.actor.gameInstance.threeScene, this.threeCamera);
+        this.actor.gameInstance.threeRenderer.render(this.actor.gameInstance.threeScene, this.threeCamera, this.renderTarget);
       }
     } else {
       for (let layer = 0; layer < this.actor.gameInstance.layers.length; layer++) {
         this.actor.gameInstance.setActiveLayer(layer);
-        this.actor.gameInstance.threeRenderer.render(this.actor.gameInstance.threeScene, this.threeCamera);
+        this.actor.gameInstance.threeRenderer.render(this.actor.gameInstance.threeScene, this.threeCamera, this.renderTarget);
       }
     }
     this.actor.gameInstance.setActiveLayer(null);
+
+    if (this.usePostProcessing) {
+      this.actor.gameInstance.threeRenderer.clearTarget(this.tmpBuffer, true, true, true);
+      let buf1 = this.renderTarget;
+      let buf2 = this.tmpBuffer;
+
+      for (let p of this.passes) {
+        if (p.uniforms["tDiffuse"])
+          p.uniforms["tDiffuse"].value = buf1.texture;
+        if (p.uniforms["timer"])
+          p.uniforms["timer"].value += (1.0 / this.actor.gameInstance.framesPerSecond);
+        this.quadPass.material = p;
+        this.actor.gameInstance.threeRenderer.render(this.scenePass, this.camPass, buf2);
+
+        let tmp = buf1;
+        buf1 = buf2;
+        buf2 = tmp;
+      }
+
+      this.copyMat.uniforms["tDiffuse"].value = buf1.texture;
+    } else {
+      this.copyMat.uniforms["tDiffuse"].value = this.renderTarget.texture;
+    }
+
+    this.quadPass.material = this.copyMat;
+    this.actor.gameInstance.threeRenderer.render(this.scenePass, this.camPass);
   }
 }

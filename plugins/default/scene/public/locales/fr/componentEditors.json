@@ -17,6 +17,10 @@
       "title": "Fenêtre de rendu",
       "position": "Haut / Gauche",
       "size": "Largeur / Hauteur"
+    },
+    "postProcessing": {
+      "use": "Effet d'écran",
+      "stack": "Liste d'effets"
     }
   }
 }

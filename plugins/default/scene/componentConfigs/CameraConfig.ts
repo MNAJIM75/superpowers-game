@@ -6,6 +6,8 @@ export interface CameraConfigPub {
   orthographicScale: number;
   viewport: { x: number; y: number; width: number; height: number; };
   depth: number;
+  usePostProcessing: boolean;
+  shaders: Array<string>;
   nearClippingPlane: number;
   farClippingPlane: number;
 }
@@ -28,6 +30,11 @@ export default class CameraConfig extends SupCore.Data.Base.ComponentConfig {
       }
     },
     depth: { type: "number", mutable: true },
+    usePostProcessing: { type: "boolean", mutable: true },
+    shaders: {
+      type: "array", mutable: true, minLength: 0, maxLength: 8,
+      items: { type: "string?", min: 0, mutable: true }
+    },
     nearClippingPlane: { type: "number", min: 0.1, mutable: true },
     farClippingPlane: { type: "number", min: 0.1, mutable: true }
   };
@@ -41,13 +48,15 @@ export default class CameraConfig extends SupCore.Data.Base.ComponentConfig {
       orthographicScale: 10,
       viewport: { x: 0, y: 0, width: 1, height: 1 },
       depth: 0,
+      usePostProcessing: false,
+      shaders: [],
       nearClippingPlane: 0.1,
       farClippingPlane: 1000
     };
     return emptyConfig;
   }
 
-  static currentFormatVersion = 1;
+  static currentFormatVersion = 1.1;
   static migrate(pub: CameraConfigPub) {
     if (pub.formatVersion === CameraConfig.currentFormatVersion) return false;
 
@@ -59,6 +68,14 @@ export default class CameraConfig extends SupCore.Data.Base.ComponentConfig {
       // NOTE: New settings introduced in v0.7
       if (pub.nearClippingPlane == null) pub.nearClippingPlane = 0.1;
       if (pub.farClippingPlane == null) pub.farClippingPlane = 1000;
+    }
+
+    if (pub.formatVersion < 1.1) {
+      pub.formatVersion = 1.1;
+      if (pub.usePostProcessing == null)
+        pub.usePostProcessing = false;
+      if (pub.shaders == null)
+        pub.shaders = [];
     }
 
     return true;

@@ -18,6 +18,10 @@
       "title": "Viewport",
       "position": "Top / Left",
       "size": "Width / Height"
+    },
+    "postProcessing": {
+      "use": "Post-Effect",
+      "stack": "Post-Effect stack"
     }
   }
 }

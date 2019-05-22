@@ -1,3 +1,5 @@
+import CameraConfig from "../componentConfigs/CameraConfig";
+
 export default class CameraEditor {
   projectClient: SupClient.ProjectClient;
   editConfig: any;
@@ -11,6 +13,12 @@ export default class CameraEditor {
   nearClippingPlaneField: HTMLInputElement;
   farClippingPlaneField: HTMLInputElement;
   viewportFields: { x?: HTMLInputElement; y?: HTMLInputElement; width?: HTMLInputElement; height?: HTMLInputElement } = {};
+
+  usePostProcessingField: HTMLInputElement;
+  postProcessingRowParts: SupClient.table.RowParts;
+  postProcessingList: HTMLDivElement;
+  postProcessingLayers: string[];
+  newPostProcessFieldSubscriber: SupClient.table.AssetFieldSubscriber;
 
   constructor(tbody: HTMLTableSectionElement, config: any, projectClient: SupClient.ProjectClient, editConfig: any) {
     this.projectClient = projectClient;
@@ -57,6 +65,32 @@ export default class CameraEditor {
     [ this.viewportFields.width, this.viewportFields.height ] = SupClient.table.appendNumberFields(widthRow.valueCell, [ config.viewport.width, config.viewport.height ]
     , { min: 0, max: 1, step: 0.1 });
 
+    const usePostProcessingRow = SupClient.table.appendRow(tbody, SupClient.i18n.t("componentEditors:Camera.postProcessing.use"));
+    this.usePostProcessingField = SupClient.table.appendBooleanField(usePostProcessingRow.valueCell, config.usePostProcessing);
+
+    this.postProcessingRowParts = SupClient.table.appendRow(tbody, SupClient.i18n.t("componentEditors:Camera.postProcessing.stack"));
+    this.postProcessingList = document.createElement("div");
+    this.postProcessingList.className = "list";
+    this.postProcessingRowParts.valueCell.appendChild(this.postProcessingList);
+
+    if (config.usePostProcessing) this.postProcessingRowParts.row.style.display = "";
+    else this.postProcessingRowParts.row.style.display = "none";
+
+    this.postProcessingLayers = [];
+    for (let i = 0; i <= config.shaders.length; i++) {
+      let field: SupClient.table.AssetFieldSubscriber;
+
+      if (i < config.shaders.length) {
+        field = SupClient.table.appendAssetField(this.postProcessingList, config.shaders[i], "shader", projectClient);
+        this.postProcessingLayers.push(config.shaders[i]);
+      }
+      else if (i < CameraConfig.schema["shaders"].maxLength)
+        field = SupClient.table.appendAssetField(this.postProcessingList, null, "shader", projectClient);
+
+      if (field)
+        field.on("select", (assetId: string) => this.onPostProcessingLayerFieldChange(assetId, i));
+    }
+
     this.modeSelectBox.addEventListener("change", this.onChangeMode);
     this.fovField.addEventListener("input", this.onChangeFOV);
     this.orthographicScaleField.addEventListener("input", this.onChangeOrthographicScale);
@@ -67,6 +101,7 @@ export default class CameraEditor {
     this.viewportFields.y.addEventListener("change", this.onChangeViewportY);
     this.viewportFields.width.addEventListener("change", this.onChangeViewportWidth);
     this.viewportFields.height.addEventListener("change", this.onChangeViewportHeight);
+    this.usePostProcessingField.addEventListener("change", this.onChangePostProcessing);
   }
 
   destroy() { /* Nothing to do */ }
@@ -87,6 +122,31 @@ export default class CameraEditor {
       case "viewport.y": { this.viewportFields.y.value = value; } break;
       case "viewport.width": { this.viewportFields.width.value = value; } break;
       case "viewport.height": { this.viewportFields.height.value = value; } break;
+      case "usePostProcessing": {
+        this.usePostProcessingField.value = value;
+        this.postProcessingRowParts.row.style.display = value ? "" : "none";
+      } break;
+      case "shaders": {
+        this.postProcessingList.remove();
+        this.postProcessingList = document.createElement("div");
+        this.postProcessingList.className = "list";
+        this.postProcessingRowParts.valueCell.appendChild(this.postProcessingList);
+
+        this.postProcessingLayers = [];
+        for (let i = 0; i <= value.length; i++) {
+          let field: SupClient.table.AssetFieldSubscriber;
+
+          if (i < value.length) {
+            field = SupClient.table.appendAssetField(this.postProcessingList, value[i], "shader", this.projectClient);
+            this.postProcessingLayers.push(value[i]);
+          }
+          else if (i < CameraConfig.schema["shaders"].maxLength)
+            field = SupClient.table.appendAssetField(this.postProcessingList, null, "shader", this.projectClient);
+
+          if (field)
+            field.on("select", (assetId: string) => this.onPostProcessingLayerFieldChange(assetId, i));
+        }
+      } break;
     }
   }
 
@@ -100,4 +160,26 @@ export default class CameraEditor {
   private onChangeViewportY = (event: any) => { this.editConfig("setProperty", "viewport.y", parseFloat(event.target.value)); };
   private onChangeViewportWidth = (event: any) => { this.editConfig("setProperty", "viewport.width", parseFloat(event.target.value)); };
   private onChangeViewportHeight = (event: any) => { this.editConfig("setProperty", "viewport.height", parseFloat(event.target.value)); };
+  private onChangePostProcessing = (event: any) => { this.editConfig("setProperty", "usePostProcessing", event.target.checked); };
+  private onPostProcessingLayerFieldChange = (assetId: string, index: number) => {
+    if (index > this.postProcessingLayers.length) return;
+
+    if (index === this.postProcessingLayers.length) {
+      if (assetId === null) return;
+      this.postProcessingLayers.push(assetId);
+
+    } else {
+      if (assetId === null) {
+        if (index === this.postProcessingLayers.length - 1) {
+          this.postProcessingLayers.pop();
+        } else {
+          this.postProcessingLayers.splice(index, 1);
+        }
+      } else {
+        this.postProcessingLayers[index] = assetId;
+      }
+    }
+
+    this.editConfig("setProperty", "shaders", this.postProcessingLayers);
+  }
 }
