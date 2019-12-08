@@ -202,7 +202,7 @@ export default class BehaviorEditor {
       if (propertyValueInfo.type !== property.type) uiType = "incompatibleType";
     }
 
-    let propertyFields: HTMLInputElement[];
+    let propertyFields: HTMLElement[];
     switch (uiType) {
       case "incompatibleType": {
         let propertyField = <HTMLInputElement>propertySetting.valueCell.querySelector("input[type=text]");
@@ -247,10 +247,10 @@ export default class BehaviorEditor {
       } break;
 
       case "string": {
-        let propertyField = <HTMLInputElement>propertySetting.valueCell.querySelector("input[type=text]");
+        let propertyField = <HTMLTextAreaElement>propertySetting.valueCell.querySelector("input[type=text]");
         if (propertyField == null) {
           propertySetting.valueCell.innerHTML = "";
-          propertyField = SupClient.table.appendTextField(propertySetting.valueCell, "");
+          propertyField = SupClient.table.appendTextAreaField(propertySetting.valueCell, "");
           propertyField.addEventListener("change", this.onChangePropertyValue);
           propertyField.addEventListener("drop", this.onDropPropertyValue);
         }
@@ -277,10 +277,10 @@ export default class BehaviorEditor {
           propertyFields = Array.prototype.slice.call(vectorContainer.querySelectorAll("input"));
         }
 
-        propertyFields[0].value = (propertyValue != null) ? propertyValue.x : "";
-        propertyFields[1].value = (propertyValue != null) ? propertyValue.y : "";
-        if (uiType === "Sup.Math.Vector3") propertyFields[2].value = (propertyValue != null) ? propertyValue.z : "";
-        for (const field of propertyFields) field.disabled = propertyValueInfo == null;
+        (propertyFields[0] as HTMLInputElement).value = (propertyValue != null) ? propertyValue.x : "";
+        (propertyFields[1] as HTMLInputElement).value = (propertyValue != null) ? propertyValue.y : "";
+        if (uiType === "Sup.Math.Vector3") (propertyFields[2] as HTMLInputElement).value = (propertyValue != null) ? propertyValue.z : "";
+        for (const field of propertyFields) (field as HTMLInputElement).disabled = propertyValueInfo == null;
       } break;
 
       // TODO: Support more types
