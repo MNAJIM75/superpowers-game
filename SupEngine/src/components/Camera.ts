@@ -15,6 +15,9 @@ export default class Camera extends ActorComponent {
   nearClippingPlane = 0.1;
   farClippingPlane = 1000;
 
+  clearColor = 0x000000;
+  clearOpacity = 1;
+
   cachedRatio: number;
   isOrthographic: boolean;
   projectionNeedsUpdate: boolean;
@@ -68,6 +71,7 @@ export default class Camera extends ActorComponent {
           gl_FragColor = texture2D( tDiffuse, vUv );
         }`
     });
+    this.copyMat.transparent = true;
   }
 
   _destroy() {
@@ -148,6 +152,11 @@ export default class Camera extends ActorComponent {
     this.projectionNeedsUpdate = true;
   }
 
+  setClearColor(clearColor: number, clearOpacity: number) {
+    this.clearColor = clearColor;
+    this.clearOpacity = clearOpacity;
+  }
+
   setPostProcessing(use: boolean, assets: Array<any>) {
     this.usePostProcessing = use;
     if (use) {
@@ -201,7 +210,7 @@ export default class Camera extends ActorComponent {
       this.viewport.width * canvas.width, this.viewport.height * canvas.height
     );
 
-    this.actor.gameInstance.threeScene.overrideMaterial = null;
+    this.actor.gameInstance.threeRenderer.setClearColor(this.clearColor, this.clearOpacity);
     this.actor.gameInstance.threeRenderer.clearTarget(this.renderTarget, true, true, true);
     if (this.layers.length > 0) {
       for (const layer of this.layers) {

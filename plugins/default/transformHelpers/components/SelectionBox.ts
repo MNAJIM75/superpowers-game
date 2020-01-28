@@ -57,8 +57,9 @@ export default class SelectionBox extends SupEngine.ActorComponent {
 
         } else if (geometry instanceof THREE.BufferGeometry && (<any>geometry.attributes)["position"] != null) {
           const positions: Float32Array = (<any>geometry.attributes)["position"].array;
+          const len = Math.min(positions.length, geometry.drawRange.count * 2);
 
-          for (let i = 0, il = positions.length; i < il; i += 3) {
+          for (let i = 0, il = len; i < il; i += 3) {
             vec.set(positions[i], positions[i + 1], positions[i + 2]);
             vec.applyMatrix4(node.matrixWorld).applyMatrix4(inverseTargetMatrixWorld);
             box.expandByPoint(vec);

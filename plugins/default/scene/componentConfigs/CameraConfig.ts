@@ -10,6 +10,8 @@ export interface CameraConfigPub {
   shaders: Array<string>;
   nearClippingPlane: number;
   farClippingPlane: number;
+  clearColor: string;
+  clearOpacity: number;
 }
 
 export default class CameraConfig extends SupCore.Data.Base.ComponentConfig {
@@ -36,7 +38,9 @@ export default class CameraConfig extends SupCore.Data.Base.ComponentConfig {
       items: { type: "string?", min: 0, mutable: true }
     },
     nearClippingPlane: { type: "number", min: 0.1, mutable: true },
-    farClippingPlane: { type: "number", min: 0.1, mutable: true }
+    farClippingPlane: { type: "number", min: 0.1, mutable: true },
+    clearColor: { type: "string", length: 6, mutable: true },
+    clearOpacity: { type: "number", min: 0.0, max: 1.0, mutable: true },
   };
 
   static create() {
@@ -51,12 +55,14 @@ export default class CameraConfig extends SupCore.Data.Base.ComponentConfig {
       usePostProcessing: false,
       shaders: [],
       nearClippingPlane: 0.1,
-      farClippingPlane: 1000
+      farClippingPlane: 1000,
+      clearColor: "000000",
+      clearOpacity: 1
     };
     return emptyConfig;
   }
 
-  static currentFormatVersion = 1.1;
+  static currentFormatVersion = 1.2;
   static migrate(pub: CameraConfigPub) {
     if (pub.formatVersion === CameraConfig.currentFormatVersion) return false;
 
@@ -76,6 +82,12 @@ export default class CameraConfig extends SupCore.Data.Base.ComponentConfig {
         pub.usePostProcessing = false;
       if (pub.shaders == null)
         pub.shaders = [];
+    }
+
+    if (pub.formatVersion < 1.2) {
+      pub.formatVersion = 1.2;
+      if (pub.clearColor == null) pub.clearColor = "000000";
+      if (pub.clearOpacity == null) pub.clearOpacity = 1;
     }
 
     return true;

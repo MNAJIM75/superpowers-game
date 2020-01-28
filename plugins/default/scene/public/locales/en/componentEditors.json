@@ -14,6 +14,8 @@
     "layersTitle": "Which layers to be render and in which order",
     "nearPlane": "Near Plane",
     "farPlane": "Far Plane",
+    "clearColor": "Clear Color",
+    "clearOpacity": "Clear Opacity",
     "viewport": {
       "title": "Viewport",
       "position": "Top / Left",
