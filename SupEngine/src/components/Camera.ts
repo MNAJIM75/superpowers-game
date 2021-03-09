@@ -56,7 +56,7 @@ export default class Camera extends ActorComponent {
 
     this.copyMat = new THREE.ShaderMaterial({
       uniforms: {
-        "tDiffuse": { value: null }
+        "map": { value: null }
       },
       vertexShader: `
         varying vec2 vUv;
@@ -65,10 +65,10 @@ export default class Camera extends ActorComponent {
           gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
         }`,
       fragmentShader: `
-        uniform sampler2D tDiffuse;
+        uniform sampler2D map;
         varying vec2 vUv;
         void main() {
-          gl_FragColor = texture2D( tDiffuse, vUv );
+          gl_FragColor = texture2D( map, vUv );
         }`
     });
     this.copyMat.transparent = true;
@@ -231,8 +231,8 @@ export default class Camera extends ActorComponent {
       let buf2 = this.tmpBuffer;
 
       for (let p of this.passes) {
-        if (p.uniforms["tDiffuse"])
-          p.uniforms["tDiffuse"].value = buf1.texture;
+        if (p.uniforms["map"])
+          p.uniforms["map"].value = buf1.texture;
         if (p.uniforms["timer"])
           p.uniforms["timer"].value += (1.0 / this.actor.gameInstance.framesPerSecond);
         this.quadPass.material = p;
@@ -243,9 +243,9 @@ export default class Camera extends ActorComponent {
         buf2 = tmp;
       }
 
-      this.copyMat.uniforms["tDiffuse"].value = buf1.texture;
+      this.copyMat.uniforms["map"].value = buf1.texture;
     } else {
-      this.copyMat.uniforms["tDiffuse"].value = this.renderTarget.texture;
+      this.copyMat.uniforms["map"].value = this.renderTarget.texture;
     }
 
     this.quadPass.material = this.copyMat;
