@@ -6,7 +6,7 @@ export function setupComponent(player: SupRuntime.Player, component: any, config
   component.setNearClippingPlane(config.nearClippingPlane);
   component.setFarClippingPlane(config.farClippingPlane);
   component.setViewport(config.viewport.x, config.viewport.y, config.viewport.width, config.viewport.height);
-  component.setClearColor(parseInt(config.clearColor, 16), config.clearOpacity);
+  component.setClearColor(parseInt(config.clearColor, 16));
 
   if (config.usePostProcessing) {
     let passes = [];

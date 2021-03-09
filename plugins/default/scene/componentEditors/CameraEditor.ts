@@ -13,7 +13,6 @@ export default class CameraEditor {
   nearClippingPlaneField: HTMLInputElement;
   farClippingPlaneField: HTMLInputElement;
   clearColorField: SupClient.table.ColorField;
-  clearOpacityField: HTMLInputElement;
   viewportFields: { x?: HTMLInputElement; y?: HTMLInputElement; width?: HTMLInputElement; height?: HTMLInputElement } = {};
 
   usePostProcessingField: HTMLInputElement;
@@ -60,8 +59,6 @@ export default class CameraEditor {
 
     const clearColorRow = SupClient.table.appendRow(tbody, SupClient.i18n.t("componentEditors:Camera.clearColor"));
     this.clearColorField = SupClient.table.appendColorField(clearColorRow.valueCell, config.clearColor);
-    const colorOpacityRow = SupClient.table.appendRow(tbody, SupClient.i18n.t("componentEditors:Camera.clearOpacity"));
-    this.clearOpacityField = SupClient.table.appendNumberField(colorOpacityRow.valueCell, config.clearOpacity, { min: 0.0, max: 1.0 });
 
     SupClient.table.appendHeader(tbody, SupClient.i18n.t("componentEditors:Camera.viewport.title"));
     const viewportXRow = SupClient.table.appendRow(tbody, SupClient.i18n.t("componentEditors:Camera.viewport.position"));
@@ -105,7 +102,6 @@ export default class CameraEditor {
     this.nearClippingPlaneField.addEventListener("change", this.onChangeNearClippingPlane);
     this.farClippingPlaneField.addEventListener("change", this.onChangeFarClippingPlane);
     this.clearColorField.addListener("change", this.onChangeClearColor);
-    this.clearOpacityField.addEventListener("change", this.onChangeClearOpacity);
     this.viewportFields.x.addEventListener("change", this.onChangeViewportX);
     this.viewportFields.y.addEventListener("change", this.onChangeViewportY);
     this.viewportFields.width.addEventListener("change", this.onChangeViewportWidth);
@@ -132,7 +128,6 @@ export default class CameraEditor {
       case "viewport.width": { this.viewportFields.width.value = value; } break;
       case "viewport.height": { this.viewportFields.height.value = value; } break;
       case "clearColor": { this.clearColorField.setValue(value); } break;
-      case "clearOpacity": { this.clearOpacityField.value = value; } break;
       case "usePostProcessing": {
         this.usePostProcessingField.value = value;
         this.postProcessingRowParts.row.style.display = value ? "" : "none";
@@ -168,7 +163,6 @@ export default class CameraEditor {
   private onChangeNearClippingPlane = (event: any) => { this.editConfig("setProperty", "nearClippingPlane", parseFloat(event.target.value)); };
   private onChangeFarClippingPlane = (event: any) => { this.editConfig("setProperty", "farClippingPlane", parseFloat(event.target.value)); };
   private onChangeClearColor = (color: any) => { this.editConfig("setProperty", "clearColor", color); };
-  private onChangeClearOpacity = (event: any) => { this.editConfig("setProperty", "clearOpacity", parseFloat(event.target.value)); };
   private onChangeViewportX = (event: any) => { this.editConfig("setProperty", "viewport.x", parseFloat(event.target.value)); };
   private onChangeViewportY = (event: any) => { this.editConfig("setProperty", "viewport.y", parseFloat(event.target.value)); };
   private onChangeViewportWidth = (event: any) => { this.editConfig("setProperty", "viewport.width", parseFloat(event.target.value)); };

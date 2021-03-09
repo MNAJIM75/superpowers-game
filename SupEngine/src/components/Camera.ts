@@ -16,7 +16,6 @@ export default class Camera extends ActorComponent {
   farClippingPlane = 1000;
 
   clearColor = 0x000000;
-  clearOpacity = 1;
 
   cachedRatio: number;
   isOrthographic: boolean;
@@ -152,9 +151,8 @@ export default class Camera extends ActorComponent {
     this.projectionNeedsUpdate = true;
   }
 
-  setClearColor(clearColor: number, clearOpacity?: number) {
+  setClearColor(clearColor: number) {
     this.clearColor = clearColor;
-    if (this.clearOpacity !== null) this.clearOpacity = clearOpacity;
   }
 
   setPostProcessing(use: boolean, assets: Array<any>) {
@@ -210,7 +208,7 @@ export default class Camera extends ActorComponent {
       this.viewport.width * canvas.width, this.viewport.height * canvas.height
     );
 
-    this.actor.gameInstance.threeRenderer.setClearColor(this.clearColor, this.clearOpacity);
+    this.actor.gameInstance.threeRenderer.setClearColor(this.clearColor);
     this.actor.gameInstance.threeRenderer.clearTarget(this.renderTarget, true, true, true);
     if (this.layers.length > 0) {
       for (const layer of this.layers) {
