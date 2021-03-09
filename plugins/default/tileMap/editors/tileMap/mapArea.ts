@@ -37,12 +37,12 @@ const mapArea: {
 export default mapArea;
 
 mapArea.gameInstance = new SupEngine.GameInstance(<HTMLCanvasElement>document.querySelector("canvas.map"));
-mapArea.gameInstance.threeRenderer.setClearColor(0xbbbbbb);
 
 const cameraActor = new SupEngine.Actor(mapArea.gameInstance, "Camera");
 cameraActor.setLocalPosition(new SupEngine.THREE.Vector3(0, 0, 100));
 mapArea.cameraComponent = new SupEngine.componentClasses["Camera"](cameraActor);
 mapArea.cameraComponent.setOrthographicMode(true);
+mapArea.cameraComponent.setClearColor(0xbbbbbb);
 mapArea.cameraControls = new SupEngine.editorComponentClasses["Camera2DControls"](
   cameraActor, mapArea.cameraComponent,
   { zoomSpeed: 1.5, zoomMin: 0.1, zoomMax: 10000 },

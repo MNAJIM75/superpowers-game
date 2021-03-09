@@ -152,9 +152,9 @@ export default class Camera extends ActorComponent {
     this.projectionNeedsUpdate = true;
   }
 
-  setClearColor(clearColor: number, clearOpacity: number) {
+  setClearColor(clearColor: number, clearOpacity?: number) {
     this.clearColor = clearColor;
-    this.clearOpacity = clearOpacity;
+    if (this.clearOpacity !== null) this.clearOpacity = clearOpacity;
   }
 
   setPostProcessing(use: boolean, assets: Array<any>) {
@@ -163,7 +163,7 @@ export default class Camera extends ActorComponent {
       this.passes = [];
       for (let asset of assets) {
         let unif: { [uniform: string]: any } = [];
-
+        unif["time"] = { value: 0 };
         for (let uniform of asset.__inner.uniforms) {
           unif[uniform.name] = { value: uniform.value };
         }
@@ -233,8 +233,8 @@ export default class Camera extends ActorComponent {
       for (let p of this.passes) {
         if (p.uniforms["map"])
           p.uniforms["map"].value = buf1.texture;
-        if (p.uniforms["timer"])
-          p.uniforms["timer"].value += (1.0 / this.actor.gameInstance.framesPerSecond);
+        if (p.uniforms["time"])
+          p.uniforms["time"].value += (1.0 / this.actor.gameInstance.framesPerSecond);
         this.quadPass.material = p;
         this.actor.gameInstance.threeRenderer.render(this.scenePass, this.camPass, buf2);
 

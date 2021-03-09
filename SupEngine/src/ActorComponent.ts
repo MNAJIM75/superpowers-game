@@ -27,6 +27,7 @@ abstract class ActorComponent {
   awake() { /* Nothing here */ }
   start() { /* Nothing here */ }
   update() { /* Nothing here */ }
+  lateUpdate() { /* Nothing here */ }
 
   // You must override it in your child class and hide your stuff when active is false
   abstract setIsLayerActive(active: boolean): void;

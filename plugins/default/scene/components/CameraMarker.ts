@@ -14,8 +14,6 @@ export default  class CameraMarker extends SupEngine.ActorComponent {
   fov: number;
   orthographicScale: number;
   ratio: number;
-  clearColor: number;
-  clearOpacity: number;
 
   projectionNeedsUpdate: boolean;
   line: THREE.LineSegments;
@@ -44,7 +42,6 @@ export default  class CameraMarker extends SupEngine.ActorComponent {
     this.setViewport(config.viewport.x, config.viewport.y, config.viewport.width, config.viewport.height);
     this.setNearClippingPlane(config.nearClippingPlane);
     this.setFarClippingPlane(config.farClippingPlane);
-    this.setClearColor(config.clearColor, config.clearOpacity);
 
     this.projectionNeedsUpdate = false;
     this._resetGeometry();
@@ -81,11 +78,6 @@ export default  class CameraMarker extends SupEngine.ActorComponent {
   setFarClippingPlane(farClippingPlane: number) {
     this.farClippingPlane = farClippingPlane;
     this.projectionNeedsUpdate = true;
-  }
-
-  setClearColor(clearColor: number, clearOpacity: number) {
-    this.clearColor = clearColor;
-    this.clearOpacity = clearOpacity;
   }
 
   setRatio(ratio: number) {

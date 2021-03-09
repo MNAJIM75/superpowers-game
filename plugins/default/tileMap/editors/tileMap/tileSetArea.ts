@@ -16,12 +16,12 @@ const tileSetArea: {
 } = {};
 
 tileSetArea.gameInstance = new SupEngine.GameInstance(<HTMLCanvasElement>document.querySelector("canvas.tileSet"));
-tileSetArea.gameInstance.threeRenderer.setClearColor(0xbbbbbb);
 
 const cameraActor = new SupEngine.Actor(tileSetArea.gameInstance, "Camera");
 cameraActor.setLocalPosition(new SupEngine.THREE.Vector3(0, 0, 10));
 tileSetArea.cameraComponent = new SupEngine.componentClasses["Camera"](cameraActor);
 tileSetArea.cameraComponent.setOrthographicMode(true);
+tileSetArea.cameraComponent.setClearColor(0xbbbbbb);
 new SupEngine.editorComponentClasses["Camera2DControls"](
   cameraActor, tileSetArea.cameraComponent,
   { zoomSpeed: 1.5, zoomMin: 0.1, zoomMax: 10000 },

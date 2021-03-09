@@ -107,6 +107,7 @@ export default class GameInstance extends EventEmitter {
 
     // Update all actors
     this.cachedActors.forEach((actor) => { actor.update(); });
+    this.cachedActors.forEach((actor) => { actor.lateUpdate(); });
 
     // Apply pending component / actor destructions
     this.componentsToBeDestroyed.forEach((component) => { this._doComponentDestruction(component); });

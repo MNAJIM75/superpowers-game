@@ -55,6 +55,13 @@ export default class Actor {
     }
   }
 
+  lateUpdate() {
+    if (this.pendingForDestruction) return;
+    for (const component of this.components.slice()) {
+      if (!component.pendingForDestruction) component.lateUpdate();
+    }
+  }
+
   // Transform
   getGlobalMatrix(matrix: THREE.Matrix4) { return matrix.copy(this.threeObject.matrixWorld); }
   getGlobalPosition(position: THREE.Vector3) { return position.setFromMatrixPosition(this.threeObject.matrixWorld); }

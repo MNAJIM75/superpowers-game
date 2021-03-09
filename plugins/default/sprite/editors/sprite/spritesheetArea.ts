@@ -15,13 +15,13 @@ const spritesheetArea: {
 export default spritesheetArea;
 
 spritesheetArea.gameInstance = new SupEngine.GameInstance(<HTMLCanvasElement>document.querySelector(".spritesheet-container canvas"));
-spritesheetArea.gameInstance.threeRenderer.setClearColor(0xbbbbbb);
 
 const cameraActor = new SupEngine.Actor(spritesheetArea.gameInstance, "Camera");
 cameraActor.setLocalPosition(new SupEngine.THREE.Vector3(0, 0, 10));
 const cameraComponent = new SupEngine.componentClasses["Camera"](cameraActor);
 cameraComponent.setOrthographicMode(true);
 cameraComponent.setOrthographicScale(10);
+cameraComponent.setClearColor(0xbbbbbb);
 
 spritesheetArea.cameraControls = new SupEngine.editorComponentClasses["Camera2DControls"](cameraActor, cameraComponent,
   { zoomSpeed: 1.5, zoomMin: 0.1, zoomMax: 10000 },

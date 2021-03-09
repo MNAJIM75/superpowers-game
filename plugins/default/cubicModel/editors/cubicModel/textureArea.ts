@@ -69,13 +69,13 @@ document.addEventListener("paste", (event: ClipboardEvent) => {
 });
 
 textureArea.gameInstance = new SupEngine.GameInstance(canvas);
-textureArea.gameInstance.threeRenderer.setClearColor(0xbbbbbb);
 
 const cameraActor = new SupEngine.Actor(textureArea.gameInstance, "Camera");
 cameraActor.setLocalPosition(new SupEngine.THREE.Vector3(0, 0, 10));
 const cameraComponent = new SupEngine.componentClasses["Camera"](cameraActor);
 cameraComponent.setOrthographicMode(true);
 cameraComponent.setOrthographicScale(10);
+cameraComponent.setClearColor(0xbbbbbb);
 textureArea.cameraControls = new SupEngine.editorComponentClasses["Camera2DControls"](cameraActor, cameraComponent,
   { zoomSpeed: 1.5, zoomMin: 1, zoomMax: 200 });
 

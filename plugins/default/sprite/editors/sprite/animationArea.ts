@@ -15,13 +15,13 @@ export default animationArea;
 new ResizeHandle(document.querySelector(".animation-container") as HTMLDivElement, "bottom");
 
 animationArea.gameInstance = new SupEngine.GameInstance(<HTMLCanvasElement>document.querySelector(".animation-container canvas"));
-animationArea.gameInstance.threeRenderer.setClearColor(0xbbbbbb);
 
 const cameraActor = new SupEngine.Actor(animationArea.gameInstance, "Camera");
 cameraActor.setLocalPosition(new SupEngine.THREE.Vector3(0, 0, 10));
 const cameraComponent = new SupEngine.componentClasses["Camera"](cameraActor);
 cameraComponent.setOrthographicMode(true);
 cameraComponent.setOrthographicScale(10);
+cameraComponent.setClearColor(0xbbbbbb);
 animationArea.cameraControls = new SupEngine.editorComponentClasses["Camera2DControls"](cameraActor, cameraComponent,
   { zoomSpeed: 1.5, zoomMin: 0.1, zoomMax: 10000 });
 

@@ -39,12 +39,12 @@ function start() {
 
   // Drawing
   ui.gameInstance = new SupEngine.GameInstance(<HTMLCanvasElement>document.querySelector("canvas"));
-  ui.gameInstance.threeRenderer.setClearColor(0xbbbbbb);
 
   const cameraActor = new SupEngine.Actor(ui.gameInstance, "Camera");
   cameraActor.setLocalPosition(new SupEngine.THREE.Vector3(0, 0, 10));
   ui.cameraComponent = new SupEngine.componentClasses["Camera"](cameraActor);
   ui.cameraComponent.setOrthographicMode(true);
+  ui.cameraComponent.setClearColor(0xbbbbbb);
   ui.cameraControls = new SupEngine.editorComponentClasses["Camera2DControls"](
     cameraActor, ui.cameraComponent,
     { zoomSpeed: 1.5, zoomMin: 0.1, zoomMax: 10000 },
