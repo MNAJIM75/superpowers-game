@@ -229,10 +229,12 @@ export default class Camera extends ActorComponent {
       let buf2 = this.tmpBuffer;
 
       for (let p of this.passes) {
-        if (p.uniforms["map"])
-          p.uniforms["map"].value = buf1.texture;
         if (p.uniforms["time"])
           p.uniforms["time"].value += (1.0 / this.actor.gameInstance.framesPerSecond);
+        if (p.uniforms["map"])
+          p.uniforms["map"].value = buf1.texture;
+        if (p.uniforms["mapSize"])
+          p.uniforms["mapSize"].value = new THREE.Vector2(buf1.width, buf1.height);
         this.quadPass.material = p;
         this.actor.gameInstance.threeRenderer.render(this.scenePass, this.camPass, buf2);
 

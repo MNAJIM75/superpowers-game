@@ -10,15 +10,31 @@ const gameInstance = new SupEngine.GameInstance(canvasElt);
 const cameraActor = new SupEngine.Actor(gameInstance, "Camera");
 cameraActor.setLocalPosition(new THREE.Vector3(0, 0, 10));
 const cameraComponent = new SupEngine.componentClasses["Camera"](cameraActor);
-new SupEngine.editorComponentClasses["Camera3DControls"](cameraActor, cameraComponent);
+let cameraControl = new SupEngine.editorComponentClasses["Camera3DControls"](cameraActor, cameraComponent);
 
 const loader = new THREE.TextureLoader();
 const leonardTexture = loader.load("leonard.png", undefined);
 leonardTexture.magFilter = THREE.NearestFilter;
 leonardTexture.minFilter = THREE.NearestFilter;
+const testPatternTexture = loader.load("mire.png", undefined);
+testPatternTexture.magFilter = THREE.NearestFilter;
+testPatternTexture.minFilter = THREE.NearestFilter;
 
 let previewActor: SupEngine.Actor;
 let material: THREE.ShaderMaterial;
+
+function controlPreview(type: string) {
+  if (type === "Screen" && cameraControl !== null) {
+    gameInstance.destroyComponent(cameraControl);
+    cameraComponent.setOrthographicMode(true);
+    cameraComponent.setOrthographicScale(4);
+    cameraActor.setLocalPosition(new THREE.Vector3(0, 0, 10));
+    cameraControl = null;
+  } else if (type !== "Screen" && cameraControl === null) {
+    cameraControl = new SupEngine.editorComponentClasses["Camera3DControls"](cameraActor, cameraComponent);
+    cameraComponent.setOrthographicMode(false);
+  }
+}
 
 export function setupPreview(options = { useDraft: false }) {
   if (previewActor != null) {
@@ -33,11 +49,12 @@ export function setupPreview(options = { useDraft: false }) {
     material.dispose();
     material = null;
   }
-
+  controlPreview(ui.previewTypeSelect.value);
   if (ui.previewTypeSelect.value === "Asset" && ui.previewEntry == null) return;
 
   previewActor = new SupEngine.Actor(gameInstance, "Preview");
   let previewGeometry: THREE.BufferGeometry;
+  let texture = leonardTexture;
   switch (ui.previewTypeSelect.value) {
     case "Plane":
       previewGeometry = new THREE.PlaneBufferGeometry(2, 2);
@@ -47,6 +64,10 @@ export function setupPreview(options = { useDraft: false }) {
       break;
     case "Sphere":
       previewGeometry = new THREE.BufferGeometry().fromGeometry(new THREE.SphereGeometry(2, 12, 12));
+      break;
+    case "Screen":
+      previewGeometry = new THREE.PlaneBufferGeometry(5.33, 4);
+      texture = testPatternTexture;
       break;
     case "Asset":
       let componentClassName: string;
@@ -64,7 +85,7 @@ export function setupPreview(options = { useDraft: false }) {
       data.previewComponentUpdater = new componentClass.Updater(data.projectClient, component, config);
       return;
   }
-  material = createShaderMaterial(data.shaderAsset.pub, { map: leonardTexture }, previewGeometry, options);
+  material = createShaderMaterial(data.shaderAsset.pub, { map: texture }, previewGeometry, options);
   previewActor.threeObject.add(new THREE.Mesh(previewGeometry, material));
   gameInstance.update();
   gameInstance.draw();

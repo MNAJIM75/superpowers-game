@@ -53,10 +53,11 @@ html
           .info= t("shaderEditor:preview")
           .settings
             select
-              option= t("shaderEditor:plane")
-              option= t("shaderEditor:box")
-              option= t("shaderEditor:sphere")
-              option= t("shaderEditor:asset")
+              option(value="Plane")= t("shaderEditor:plane")
+              option(value="Box")= t("shaderEditor:box")
+              option(value="Sphere")= t("shaderEditor:sphere")
+              option(value="Screen")= t("shaderEditor:screen")
+              option(value="Asset")= t("shaderEditor:asset")
             input.preview-asset-path(type="text",placeholder= t("shaderEditor:assetPath"),hidden)
         canvas(tabindex="0")
 

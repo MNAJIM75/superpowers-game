@@ -11,6 +11,7 @@
   "plane": "Plane",
   "box" : "Box",
   "sphere": "Sphere",
+  "screen": "Screen",
   "asset": "Asset",
   "assetPath": "Asset path",
   "vertexShader": "Vertex Shader",
