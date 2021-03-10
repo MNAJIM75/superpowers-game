@@ -179,7 +179,7 @@ onEditCommands["moveNode"] = (id: string, parentId: string, index: number) => {
   if (isInspected) {
     const node = data.sceneUpdater.sceneAsset.nodes.byId[id];
     setInspectorPosition(<THREE.Vector3>node.position);
-    setInspectorOrientation(<THREE.Quaternion>node.orientation);
+    setInspectorOrientation(new THREE.Quaternion(node.orientation.x, node.orientation.y, node.orientation.z, node.orientation.w));
     setInspectorScale(<THREE.Vector3>node.scale);
   }
 
@@ -200,7 +200,7 @@ onEditCommands["setNodeProperty"] = (id: string, path: string, value: any) => {
       if (isInspected) setInspectorPosition(<THREE.Vector3>node.position);
       break;
     case "orientation":
-      if (isInspected) setInspectorOrientation(<THREE.Quaternion>node.orientation);
+      if (isInspected) setInspectorOrientation(new THREE.Quaternion(node.orientation.x, node.orientation.y, node.orientation.z, node.orientation.w));
       break;
     case "scale":
       if (isInspected) setInspectorScale(<THREE.Vector3>node.scale);

@@ -198,7 +198,7 @@ export default class ModelRendererUpdater {
 
       case "receiveShadow":
         this.modelRenderer.threeMesh.receiveShadow = value;
-        this.modelRenderer.threeMesh.material.needsUpdate = true;
+        (this.modelRenderer.threeMesh.material as THREE.Material).needsUpdate = true;
         break;
 
       case "overrideOpacity":

@@ -77,14 +77,13 @@ export default class GridRenderer extends ActorComponent {
       y += 1;
     }
 
-    geometry.computeLineDistances();
-
     const material = new THREE.LineDashedMaterial({
       color: 0x000000, transparent: true, opacity: 0.4,
       dashSize: 5 / 1000, gapSize: 5 / 1000, scale: 1 / this.orthographicScale
     });
 
     this.mesh = new THREE.LineSegments(geometry, material);
+    (this.mesh as any).computeLineDistances();
     this.actor.threeObject.add(this.mesh);
     this.mesh.updateMatrixWorld(false);
   }

@@ -47,7 +47,11 @@ export default class Camera extends ActorComponent {
 
     let size = this.actor.gameInstance.threeRenderer.getSize();
     this.renderTarget = new THREE.WebGLRenderTarget(size.width, size.height);
+    this.renderTarget.texture.magFilter = THREE.NearestFilter;
+    this.renderTarget.texture.minFilter = THREE.NearestFilter;
     this.tmpBuffer = this.renderTarget.clone();
+    this.tmpBuffer.texture.magFilter = THREE.NearestFilter;
+    this.tmpBuffer.texture.minFilter = THREE.NearestFilter;
     this.camPass = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
     this.scenePass = new THREE.Scene();
     this.quadPass = new THREE.Mesh(new THREE.PlaneBufferGeometry(2, 2), null);
@@ -180,8 +184,8 @@ export default class Camera extends ActorComponent {
   start() { this.actor.gameInstance.renderComponents.push(this); }
 
   render() {
-    this.threeCamera.position.copy(this.actor.threeObject.getWorldPosition());
-    this.threeCamera.quaternion.copy(this.actor.threeObject.getWorldQuaternion());
+    this.actor.threeObject.getWorldPosition(this.threeCamera.position);
+    this.actor.threeObject.getWorldQuaternion(this.threeCamera.quaternion);
 
     if (this.projectionNeedsUpdate) {
       this.projectionNeedsUpdate = false;

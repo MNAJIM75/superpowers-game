@@ -24,3 +24,8 @@ interface GridHelper extends SupEngine.ActorComponent {
   setup(size: number, step: number): void;
   setVisible(visible: boolean): void;
 }
+
+interface SkyHelper extends SupEngine.ActorComponent {
+  setup(): void;
+  setVisible(visible: boolean): void;
+}

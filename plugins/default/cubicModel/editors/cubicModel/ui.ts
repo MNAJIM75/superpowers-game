@@ -232,7 +232,7 @@ export function setupSelectedNode() {
 
   const node = data.cubicModelUpdater.cubicModelAsset.nodes.byId[nodeElt.dataset["id"]];
   setInspectorPosition(<THREE.Vector3>node.position);
-  setInspectorOrientation(<THREE.Quaternion>node.orientation);
+  setInspectorOrientation(new THREE.Quaternion(node.orientation.x, node.orientation.y, node.orientation.z, node.orientation.w));
 
   // Setup shape editor
   ui.inspectorFields.shape.type.value = node.shape.type;

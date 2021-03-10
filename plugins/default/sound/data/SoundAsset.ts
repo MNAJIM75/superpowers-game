@@ -26,7 +26,7 @@ export default class SoundAsset extends SupCore.Data.Base.Asset {
   }
 
   init(options: any, callback: Function) {
-    this.pub = { formatVersion: SoundAsset.currentFormatVersion, sound: new Buffer(0), streaming: false };
+    this.pub = { formatVersion: SoundAsset.currentFormatVersion, sound: Buffer.alloc(0), streaming: false };
     super.init(options, callback);
   }
 
@@ -79,7 +79,7 @@ export default class SoundAsset extends SupCore.Data.Base.Asset {
     const  json = JSON.stringify(this.pub, null, 2);
     this.pub.sound = buffer;
 
-    if (buffer instanceof ArrayBuffer) buffer = new Buffer(buffer);
+    if (buffer instanceof ArrayBuffer) buffer = Buffer.from(buffer);
 
     writeFile(path.join(assetPath, "sound.json"), json, { encoding: "utf8" }, () => {
       writeFile(path.join(assetPath, "sound.dat"), buffer, callback);

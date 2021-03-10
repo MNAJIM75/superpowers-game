@@ -71,12 +71,12 @@ export default class FontAsset extends SupCore.Data.Base.Asset {
       filtering: "pixelated",
       pixelsPerUnit: 20,
 
-      font: new Buffer(0),
+      font: Buffer.alloc(0),
       size: 32,
       color: "ffffff",
       opacity: null,
 
-      bitmap: new Buffer(0),
+      bitmap: Buffer.alloc(0),
       gridWidth: 16,
       gridHeight: 16,
       charset: null,
@@ -141,8 +141,8 @@ export default class FontAsset extends SupCore.Data.Base.Asset {
     this.pub.bitmap = bitmap;
     this.pub.texture = texture;
 
-    if (font instanceof ArrayBuffer) font = new Buffer(font);
-    if (bitmap instanceof ArrayBuffer) bitmap = new Buffer(bitmap);
+    if (font instanceof ArrayBuffer) font = Buffer.from(font);
+    if (bitmap instanceof ArrayBuffer) bitmap = Buffer.from(bitmap);
 
     writeFile(path.join(outputPath, "asset.json"), json, { encoding: "utf8" }, () => {
       writeFile(path.join(outputPath, "font.dat"), font, () => {

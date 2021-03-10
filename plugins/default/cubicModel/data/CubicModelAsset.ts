@@ -190,7 +190,7 @@ export default class CubicModelAsset extends SupCore.Data.Base.Asset {
         const value = maps[mapName];
         if (value == null) { cb(); return; }
 
-        writeFile(path.join(outputPath, `map-${mapName}.dat`), new Buffer(value), cb);
+        writeFile(path.join(outputPath, `map-${mapName}.dat`), Buffer.from(value), cb);
       }, writeCallback);
     });
   }
@@ -433,7 +433,11 @@ export default class CubicModelAsset extends SupCore.Data.Base.Asset {
 
   computeGlobalMatrix(node: Node, includeShapeOffset = false) {
     const defaultScale = new THREE.Vector3(1, 1, 1);
-    const matrix = new THREE.Matrix4().compose(<THREE.Vector3>node.position, <THREE.Quaternion>node.orientation, defaultScale);
+    const matrix = new THREE.Matrix4().compose(
+      <THREE.Vector3>node.position,
+      new THREE.Quaternion(node.orientation.x, node.orientation.y, node.orientation.z, node.orientation.w),
+      defaultScale
+    );
 
     let parentNode = this.nodes.parentNodesById[node.id];
     const parentMatrix = new THREE.Matrix4();
@@ -444,7 +448,11 @@ export default class CubicModelAsset extends SupCore.Data.Base.Asset {
       parentOffset.set(parentNode.shape.offset.x, parentNode.shape.offset.y, parentNode.shape.offset.z);
       parentOffset.applyQuaternion(<THREE.Quaternion>parentNode.orientation);
       parentPosition.add(parentOffset);
-      parentMatrix.identity().compose(parentPosition, <THREE.Quaternion>parentNode.orientation, defaultScale);
+      parentMatrix.identity().compose(
+        parentPosition,
+        new THREE.Quaternion(node.orientation.x, node.orientation.y, node.orientation.z, node.orientation.w),
+        defaultScale
+      );
       matrix.multiplyMatrices(parentMatrix, matrix);
       parentNode = this.nodes.parentNodesById[parentNode.id];
     }
@@ -464,7 +472,11 @@ export default class CubicModelAsset extends SupCore.Data.Base.Asset {
       parentOffset.set(parentNode.shape.offset.x, parentNode.shape.offset.y, parentNode.shape.offset.z);
       parentOffset.applyQuaternion(<THREE.Quaternion>parentNode.orientation);
       parentPosition.add(parentOffset);
-      parentMatrix.identity().compose(parentPosition, <THREE.Quaternion>parentNode.orientation, defaultScale);
+      parentMatrix.identity().compose(
+        parentPosition,
+        new THREE.Quaternion(node.orientation.x, node.orientation.y, node.orientation.z, node.orientation.w),
+        defaultScale
+      );
       parentGlobalMatrix.multiplyMatrices(parentMatrix, parentGlobalMatrix);
       parentNode = this.nodes.parentNodesById[parentNode.id];
     }

@@ -45,14 +45,15 @@ export default class TextRenderer extends SupEngine.ActorComponent {
     this.opacity = opacity;
 
     for (const mesh of this.threeMeshes) {
+      let mat = mesh.material as THREE.Material;
       if (this.opacity != null) {
-        mesh.material.transparent = true;
-        mesh.material.opacity = this.opacity;
+        mat.transparent = true;
+        mat.opacity = this.opacity;
       } else {
-        mesh.material.transparent = false;
-        mesh.material.opacity = 1;
+        mat.transparent = false;
+        mat.opacity = 1;
       }
-      mesh.material.needsUpdate = true;
+      mat.needsUpdate = true;
     }
   }
 
@@ -200,7 +201,7 @@ export default class TextRenderer extends SupEngine.ActorComponent {
     for (const threeMesh of this.threeMeshes) {
       this.actor.threeObject.remove(threeMesh);
       threeMesh.geometry.dispose();
-      threeMesh.material.dispose();
+      (threeMesh.material as THREE.Material).dispose();
     }
     this.threeMeshes.length = 0;
 

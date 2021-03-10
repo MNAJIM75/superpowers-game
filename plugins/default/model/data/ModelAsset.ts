@@ -132,7 +132,7 @@ export default class ModelAsset extends SupCore.Data.Base.Asset {
         skinWeight: null
       },
       bones: null,
-      maps: { map: new Buffer(0) },
+      maps: { map: Buffer.alloc(0) },
       filtering: "pixelated",
       wrapping: "clampToEdge",
       animations: [],
@@ -331,7 +331,7 @@ export default class ModelAsset extends SupCore.Data.Base.Asset {
         async.each(Object.keys(ModelAsset.schema["attributes"].properties), (key, cb) => {
           let value = attributes[key];
           if (value == null) { cb(); return; }
-          if (value instanceof ArrayBuffer) value = new Buffer(value);
+          if (value instanceof ArrayBuffer) value = Buffer.from(value);
 
           writeFile(path.join(outputPath, `attr-${key}.dat`), value, cb);
         }, callback);
@@ -494,13 +494,13 @@ export default class ModelAsset extends SupCore.Data.Base.Asset {
     if (name == null || typeof name !== "string") { callback("Name of the map must be a string"); return; }
     if (this.pub.maps[name] != null) { callback(`The map ${name} already exists`); return; }
 
-    this.pub.maps[name] = new Buffer(0);
+    this.pub.maps[name] = Buffer.alloc(0);
     callback(null, null, name);
     this.emit("change");
   }
 
   client_newMap(name: string) {
-    this.pub.maps[name] = new Buffer(0);
+    this.pub.maps[name] = Buffer.alloc(0);
   }
 
   server_deleteMap(client: SupCore.RemoteClient, name: string, callback: DeleteMapCallback) {

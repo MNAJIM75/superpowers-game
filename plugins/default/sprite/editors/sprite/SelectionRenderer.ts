@@ -44,7 +44,7 @@ export default class SelectionRenderer extends SupEngine.ActorComponent {
   clearMesh() {
     for (const mesh of this.meshes) {
       mesh.geometry.dispose();
-      mesh.material.dispose();
+      (mesh.material as THREE.Material).dispose();
       this.actor.threeObject.remove(mesh);
     }
     this.meshes.length = 0;

@@ -234,7 +234,7 @@ export default class SpriteRendererUpdater {
       case "receiveShadow":
         this.spriteRenderer.receiveShadow = value;
         this.spriteRenderer.threeMesh.receiveShadow = value;
-        this.spriteRenderer.threeMesh.material.needsUpdate = true;
+        (this.spriteRenderer.threeMesh.material as THREE.Material).needsUpdate = true;
         break;
 
       case "color":

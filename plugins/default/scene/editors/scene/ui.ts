@@ -370,7 +370,7 @@ export function setupSelectedNode() {
 
   const node = data.sceneUpdater.sceneAsset.nodes.byId[nodeElt.dataset["id"]];
   setInspectorPosition(node.position as THREE.Vector3);
-  setInspectorOrientation(node.orientation as THREE.Quaternion);
+  setInspectorOrientation(new THREE.Quaternion(node.orientation.x, node.orientation.y, node.orientation.z, node.orientation.w));
   setInspectorScale(node.scale as THREE.Vector3);
 
   ui.visibleCheckbox.checked = node.visible;
@@ -827,7 +827,7 @@ function onActorDrop(event: DragEvent) {
   const planePosition = engine.cameraActor.getGlobalPosition(new THREE.Vector3()).add(offset);
   plane.setFromNormalAndCoplanarPoint(offset.normalize(), planePosition);
 
-  const position = raycaster.ray.intersectPlane(plane);
+  const position = raycaster.ray.intersectPlane(plane, new THREE.Vector3());
 
   const options = { transform: { position }, prefab: false };
   plugin.content.importActor(entry, data.projectClient, options, (err: string, nodeId: string) => {

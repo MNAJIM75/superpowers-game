@@ -29,6 +29,7 @@ function controlPreview(type: string) {
     cameraComponent.setOrthographicMode(true);
     cameraComponent.setOrthographicScale(4);
     cameraActor.setLocalPosition(new THREE.Vector3(0, 0, 10));
+    cameraActor.setLocalOrientation(new THREE.Quaternion());
     cameraControl = null;
   } else if (type !== "Screen" && cameraControl === null) {
     cameraControl = new SupEngine.editorComponentClasses["Camera3DControls"](cameraActor, cameraComponent);

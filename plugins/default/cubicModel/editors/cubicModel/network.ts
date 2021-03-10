@@ -25,6 +25,7 @@ SupClient.i18n.load([{ root: `${window.location.pathname}/../..`, name: "cubicMo
   socket.on("disconnect", SupClient.onDisconnected);
 });
 
+const THREE = SupEngine.THREE;
 const onEditCommands: { [command: string]: Function; } = {};
 function onConnected() {
   data = {};
@@ -91,7 +92,7 @@ onEditCommands["moveNode"] = (id: string, parentId: string, index: number) => {
   if (isInspected) {
     const node = data.cubicModelUpdater.cubicModelAsset.nodes.byId[id];
     setInspectorPosition(<THREE.Vector3>node.position);
-    setInspectorOrientation(<THREE.Quaternion>node.orientation);
+    setInspectorOrientation(new THREE.Quaternion(node.orientation.x, node.orientation.y, node.orientation.z, node.orientation.w));
   }
 
   // TODO: Only refresh if selection is affected
@@ -105,7 +106,7 @@ onEditCommands["moveNodePivot"] = (id: string, value: { x: number; y: number; z:
 
   if (isInspected) {
     setInspectorPosition(<THREE.Vector3>node.position);
-    setInspectorOrientation(<THREE.Quaternion>node.orientation);
+    setInspectorOrientation(new THREE.Quaternion(node.orientation.x, node.orientation.y, node.orientation.z, node.orientation.w));
     setInspectorShapeOffset(<THREE.Vector3>node.shape.offset);
   }
 
@@ -127,7 +128,7 @@ onEditCommands["setNodeProperty"] = (id: string, path: string, value: any) => {
       if (isInspected) setInspectorPosition(<THREE.Vector3>node.position);
       break;
     case "orientation":
-      if (isInspected) setInspectorOrientation(<THREE.Quaternion>node.orientation);
+      if (isInspected) setInspectorOrientation(new THREE.Quaternion(node.orientation.x, node.orientation.y, node.orientation.z, node.orientation.w));
       break;
 
     case "shape.offset":

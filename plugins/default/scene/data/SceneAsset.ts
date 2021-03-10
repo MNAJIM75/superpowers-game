@@ -246,7 +246,11 @@ export default class SceneAsset extends SupCore.Data.Base.Asset {
   }
 
   computeGlobalMatrix(node: Node) {
-    const matrix = new THREE.Matrix4().compose(<THREE.Vector3>node.position, <THREE.Quaternion>node.orientation, <THREE.Vector3>node.scale);
+    const matrix = new THREE.Matrix4().compose(
+      <THREE.Vector3>node.position,
+      new THREE.Quaternion(node.orientation.x, node.orientation.y, node.orientation.z, node.orientation.w),
+      <THREE.Vector3>node.scale
+    );
 
     const parentNode = this.nodes.parentNodesById[node.id];
     if (parentNode != null) {

@@ -78,7 +78,7 @@ export default class P2BodyMarker extends SupEngine.ActorComponent {
   _clearRenderer() {
     this.markerActor.threeObject.remove(this.mesh);
     this.mesh.geometry.dispose();
-    this.mesh.material.dispose();
+    (this.mesh.material as THREE.Material).dispose();
     this.mesh = null;
   }
 

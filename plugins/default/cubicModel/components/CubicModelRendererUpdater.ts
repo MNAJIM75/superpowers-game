@@ -199,7 +199,7 @@ export default class CubicModelRendererUpdater {
 
     rendererNode.shape.parent.remove(rendererNode.shape);
     rendererNode.shape.geometry.dispose();
-    rendererNode.shape.material.dispose();
+    (rendererNode.shape.material as THREE.Material).dispose();
 
     rendererNode.pivot.parent.remove(rendererNode.pivot);
 

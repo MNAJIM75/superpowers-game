@@ -179,7 +179,7 @@ export default class Light extends SupEngine.ActorComponent {
     if (right != null) this.shadow.camera.right = right;
     if (this.type !== "directional") return;
 
-    const camera = (<THREE.OrthographicCamera>(<THREE.SpotLight>this.light).shadow.camera);
+    const camera = (<THREE.OrthographicCamera>((<THREE.SpotLight>this.light).shadow.camera as any));
     camera.top = this.shadow.camera.top;
     camera.bottom = this.shadow.camera.bottom;
     camera.left = this.shadow.camera.left;

@@ -163,7 +163,7 @@ export default class SpriteRenderer extends SupEngine.ActorComponent {
     if (this.threeMesh == null) return;
     this.actor.threeObject.remove(this.threeMesh);
     this.threeMesh.geometry.dispose();
-    this.threeMesh.material.dispose();
+    (this.threeMesh.material as THREE.Material).dispose();
     this.threeMesh = null;
     this.material = null;
   }

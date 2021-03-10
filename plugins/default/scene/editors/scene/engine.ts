@@ -14,6 +14,7 @@ const engine: {
   selectionBoxComponent: SelectionBox;
   transformHandleComponent: TransformHandle;
   gridHelperComponent: GridHelper;
+  skyHelperComponent: SkyHelper;
 
   ambientLight: THREE.AmbientLight;
 } = <any>{};
@@ -30,9 +31,8 @@ engine.cameraComponent = new SupEngine.componentClasses["Camera"](engine.cameraA
 engine.cameraComponent.layers = [ 0, -1 ];
 engine.cameraControls = new SupEngine.editorComponentClasses["Camera3DControls"](engine.cameraActor, engine.cameraComponent);
 
-engine.ambientLight = new THREE.AmbientLight(0xcfcfcf);
-
 const gridActor = new SupEngine.Actor(engine.gameInstance, "Grid", null, { layer: 0 });
+const skyActor = new SupEngine.Actor(engine.gameInstance, "Sky", null, { layer: 0 });
 const selectionActor = new SupEngine.Actor(engine.gameInstance, "Selection Box", null, { layer: -1 });
 const transformHandlesActor = new SupEngine.Actor(engine.gameInstance, "Transform Handles", null, { layer: -1 });
 
@@ -72,6 +72,9 @@ export function start() {
 
   engine.gridHelperComponent = new SupEngine.editorComponentClasses["GridHelper"](gridActor, ui.gridSize, ui.gridStep);
   engine.gridHelperComponent.setVisible(false);
+
+  engine.skyHelperComponent = new SupEngine.editorComponentClasses["SkyHelper"](skyActor);
+  engine.skyHelperComponent.setVisible(true);
 
   hasStarted = true;
   onChangeActive();
@@ -209,7 +212,7 @@ function mouseUp() {
 }
 
 export function focusActor(selectedNodeId: string) {
-  const position = new THREE.Box3().setFromObject(data.sceneUpdater.bySceneNodeId[selectedNodeId].actor.threeObject).getCenter();
+  const position = new THREE.Box3().setFromObject(data.sceneUpdater.bySceneNodeId[selectedNodeId].actor.threeObject).getCenter(new THREE.Vector3());
   if (ui.cameraMode === "2D") position.z = engine.cameraActor.getLocalPosition(new THREE.Vector3()).z;
   engine.cameraActor.setLocalPosition(position);
   if (ui.cameraMode === "3D") engine.cameraActor.moveOriented(new THREE.Vector3(0, 0, 20));
@@ -240,7 +243,7 @@ function onTransformChange() {
     case "translate": {
       transformType = "position";
 
-      const position = object.getWorldPosition();
+      const position = object.getWorldPosition(new THREE.Vector3());
       if (target.parent != null) {
         const mtx = target.parent.getGlobalMatrix(new THREE.Matrix4());
         mtx.getInverse(mtx);
@@ -252,7 +255,7 @@ function onTransformChange() {
     case "rotate": {
       transformType = "orientation";
 
-      const orientation = object.getWorldQuaternion();
+      const orientation = object.getWorldQuaternion(new THREE.Quaternion());
       if (target.parent != null) {
         const q = target.parent.getGlobalOrientation(new THREE.Quaternion()).inverse();
         orientation.multiply(q);

@@ -29,15 +29,19 @@ export default class SelectionBox extends SupEngine.ActorComponent {
   }
 
   move() {
-    this.actor.threeObject.position.copy(this.target.getWorldPosition());
-    this.actor.threeObject.quaternion.copy(this.target.getWorldQuaternion());
+    this.target.getWorldPosition(this.actor.threeObject.position);
+    this.target.getWorldQuaternion(this.actor.threeObject.quaternion);
     this.actor.threeObject.updateMatrixWorld(false);
   }
 
   resize() {
     const vec = new THREE.Vector3();
     const box = new THREE.Box3();
-    const inverseTargetMatrixWorld = new THREE.Matrix4().compose(this.target.getWorldPosition(), this.target.getWorldQuaternion(), <THREE.Vector3>{ x: 1, y: 1, z: 1 });
+    const inverseTargetMatrixWorld = new THREE.Matrix4().compose(
+      this.target.getWorldPosition(new THREE.Vector3()),
+      this.target.getWorldQuaternion(new THREE.Quaternion()),
+      <THREE.Vector3>{ x: 1, y: 1, z: 1 }
+    );
 
     inverseTargetMatrixWorld.getInverse(inverseTargetMatrixWorld);
 

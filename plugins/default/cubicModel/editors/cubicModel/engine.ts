@@ -220,14 +220,10 @@ function onTransformChange() {
         case "pivot": transformType = "pivotPosition"; break;
       }
 
-      const position = object.getWorldPosition();
+      const position = new THREE.Vector3();
+      object.getWorldPosition(position);
       const parent = target.parent;
       const pixelsPerUnit = data.cubicModelUpdater.cubicModelAsset.pub.pixelsPerUnit;
-
-      /*if (ui.translateMode === "all") {
-        position.sub(target.getWorldPosition().sub(parent.getWorldPosition()));
-        parent = parent.parent;
-      }*/
 
       if (parent.userData.cubicNodeId != null) {
         const inverseParentMatrix = parent.matrixWorld.clone();
@@ -252,9 +248,9 @@ function onTransformChange() {
 
       transformType = "orientation";
 
-      const orientation = object.getWorldQuaternion();
+      const orientation = object.getWorldQuaternion(new THREE.Quaternion());
       if (target.parent != null) {
-        const q = target.parent.getWorldQuaternion().inverse();
+        const q = target.parent.getWorldQuaternion(new THREE.Quaternion()).inverse();
         orientation.multiply(q);
       }
       value = { x: orientation.x, y: orientation.y, z: orientation.z, w: orientation.w };

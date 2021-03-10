@@ -186,8 +186,7 @@ export default class ModelRenderer extends SupEngine.ActorComponent {
 
       this.threeMesh.updateMatrixWorld(true);
 
-      const useVertexTexture = false;
-      (<THREE.SkinnedMesh>this.threeMesh).bind(new THREE.Skeleton(bones, undefined, useVertexTexture));
+      (<THREE.SkinnedMesh>this.threeMesh).bind(new THREE.Skeleton(bones, undefined));
       this.material.skinning = true;
 
 
@@ -201,6 +200,7 @@ export default class ModelRenderer extends SupEngine.ActorComponent {
     this.actor.threeObject.add(this.threeMesh);
     if (geometry.getAttribute("normal") == null) this.threeMesh.geometry.computeVertexNormals();
     this.threeMesh.updateMatrixWorld(false);
+    if (this.skeletonHelper != null) this.skeletonHelper.updateMatrixWorld(true);
   }
 
   setCastShadow(castShadow: boolean) {
@@ -238,6 +238,7 @@ export default class ModelRenderer extends SupEngine.ActorComponent {
      const ratio = 1 / unitRatio;
      this.threeMesh.scale.set(ratio, ratio, ratio);
      this.threeMesh.updateMatrixWorld(false);
+     if (this.skeletonHelper != null) this.skeletonHelper.updateMatrixWorld(true);
    }
 
   setShowSkeleton(show: boolean) {
@@ -249,16 +250,16 @@ export default class ModelRenderer extends SupEngine.ActorComponent {
         const upAxisMatrix = new THREE.Matrix4().fromArray(this.asset.upAxisMatrix);
         this.skeletonHelper.root = this.skeletonHelper;
         this.skeletonHelper.applyMatrix(upAxisMatrix);
-        this.skeletonHelper.update();
       }
       (<THREE.LineBasicMaterial>this.skeletonHelper.material).linewidth = 3;
-      this.actor.threeObject.add(this.skeletonHelper);
+      this.threeMesh.add(this.skeletonHelper);
     } else {
-      this.actor.threeObject.remove(this.skeletonHelper);
+      this.threeMesh.remove(this.skeletonHelper);
       this.skeletonHelper = null;
     }
 
     if (this.threeMesh != null) this.threeMesh.updateMatrixWorld(true);
+    if (this.skeletonHelper != null) this.skeletonHelper.updateMatrixWorld(true);
   }
 
   updateAnimationsByName() {
@@ -324,7 +325,7 @@ export default class ModelRenderer extends SupEngine.ActorComponent {
     }
 
     this.threeMesh.updateMatrixWorld(false);
-    if (this.skeletonHelper != null) this.skeletonHelper.update();
+    if (this.skeletonHelper != null) this.skeletonHelper.updateMatrixWorld(true);
   }
 
   getBoneTransform(name: string) {
@@ -384,7 +385,6 @@ export default class ModelRenderer extends SupEngine.ActorComponent {
     }
 
     this.threeMesh.updateMatrixWorld(false);
-    if (this.skeletonHelper != null) this.skeletonHelper.update();
   }
 
   update() {

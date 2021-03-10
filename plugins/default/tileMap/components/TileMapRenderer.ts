@@ -70,7 +70,7 @@ export default class TileMapRenderer extends SupEngine.ActorComponent {
   _clearLayerMeshes() {
     for (const layerMesh of this.layerMeshes) {
       layerMesh.geometry.dispose();
-      layerMesh.material.dispose();
+      (layerMesh.material as THREE.Material).dispose();
       this.actor.threeObject.remove(layerMesh);
     }
 
@@ -193,7 +193,7 @@ export default class TileMapRenderer extends SupEngine.ActorComponent {
     this.receiveShadow = receiveShadow;
     for (const layerMesh of this.layerMeshes) {
       layerMesh.receiveShadow = receiveShadow;
-      layerMesh.material.needsUpdate = true;
+      (layerMesh.material as THREE.Material).needsUpdate = true;
     }
   }
 
