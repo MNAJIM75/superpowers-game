@@ -12,8 +12,12 @@ Make 2D and 3D games in live collaboration with [Superpowers](http://superpowers
  - Post-processing on camera
  - [Add BMFont compatibility](https://github.com/Togimaro/superpowers-game-bmfont-plugin)
 
+### Breaking change :
+ - Update Three.js to r92, many plugins need some minor adjustement & type disambiguation
+
 ### Roadmap / Ideas :
  - Improve Sup.Text performance & add more rendering options
+ - Add more 3d model importer: gltf2, fbx, obj?
  - Add pixel-perfect camera
  - 9 Sliced sprite
  - Animated tilemap

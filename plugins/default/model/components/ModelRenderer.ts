@@ -171,7 +171,7 @@ export default class ModelRenderer extends SupEngine.ActorComponent {
       this.bonesByName = {};
 
       for (const boneInfo of this.asset.bones) {
-        const bone = new THREE.Bone(<THREE.SkinnedMesh>this.threeMesh);
+        const bone = new THREE.Bone();
         bone.name = boneInfo.name;
         this.bonesByName[bone.name] = bone;
         bone.applyMatrix(tmpBoneMatrix.fromArray(boneInfo.matrix));

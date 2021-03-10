@@ -19,14 +19,14 @@ export default class LightMarker extends Light {
         this.lightMarker = null;
         break;
       case "point":
-        this.lightMarker = new THREE.PointLightHelper(this.light, 1);
+        this.lightMarker = new THREE.PointLightHelper(this.light as THREE.PointLight, 1);
         break;
       case "spot":
-        this.lightMarker = new THREE.SpotLightHelper(this.light);
+        this.lightMarker = new THREE.SpotLightHelper(this.light as THREE.SpotLight);
         // if (this.castShadow) this.cameraHelper = new THREE.CameraHelper((<THREE.SpotLight>this.light).shadowCamera);
         break;
       case "directional":
-        this.lightMarker = new THREE.DirectionalLightHelper(this.light, 1);
+        this.lightMarker = new THREE.DirectionalLightHelper(this.light as THREE.DirectionalLight, 1);
         // if (this.castShadow) this.cameraHelper = new THREE.CameraHelper((<THREE.DirectionalLight>this.light).shadowCamera);
         break;
     }
