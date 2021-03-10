@@ -10,15 +10,14 @@ Make 2D and 3D games in live collaboration with [Superpowers](http://superpowers
 
 ### New features :
  - Post-processing on camera
+ - [Add BMFont compatibility](https://github.com/Togimaro/superpowers-game-bmfont-plugin)
 
 ### Roadmap / Ideas :
- - Add real pixel-perfect
- - Add text rendering option (rich text, line spacing etc)
- - Improve text performance
+ - Improve Sup.Text performance & add more rendering options
+ - Add pixel-perfect camera
  - 9 Sliced sprite
  - Animated tilemap
  - Test FMOD integration
- - Add BMFont compatibility
  
 ## How to install
 
