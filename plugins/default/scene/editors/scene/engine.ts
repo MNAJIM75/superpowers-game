@@ -29,10 +29,11 @@ engine.cameraActor.setLocalPosition(new THREE.Vector3(0, 0, 10));
 
 engine.cameraComponent = new SupEngine.componentClasses["Camera"](engine.cameraActor);
 engine.cameraComponent.layers = [ 0, -1 ];
+engine.cameraComponent.setFarClippingPlane(510);
 engine.cameraControls = new SupEngine.editorComponentClasses["Camera3DControls"](engine.cameraActor, engine.cameraComponent);
 
 const gridActor = new SupEngine.Actor(engine.gameInstance, "Grid", null, { layer: 0 });
-const skyActor = new SupEngine.Actor(engine.gameInstance, "Sky", null, { layer: 0 });
+const skyActor = new SupEngine.Actor(engine.gameInstance, "Sky", engine.cameraActor, { layer: 0 });
 const selectionActor = new SupEngine.Actor(engine.gameInstance, "Selection Box", null, { layer: -1 });
 const transformHandlesActor = new SupEngine.Actor(engine.gameInstance, "Transform Handles", null, { layer: -1 });
 
@@ -206,7 +207,7 @@ function mouseUp() {
   setupHelpers();
 
   if (engine.gameInstance.input.mouseButtons[0].doubleClicked) {
-    focusActor(selectedNodeId);
+    if (selectedNodeId != null) focusActor(selectedNodeId);
     engine.gameInstance.input.mouseButtons[0].doubleClicked = false;
   }
 }
