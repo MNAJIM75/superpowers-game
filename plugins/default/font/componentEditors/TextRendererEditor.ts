@@ -127,9 +127,14 @@ export default class TextRendererEditor {
       this.editConfig("setProperty", "opacity", parseFloat(event.target.value));
     });
     this.updateOpacityField();
+
+    if (this.fontAssetId != null) this.projectClient.subAsset(this.fontAssetId, "font", this);
   }
 
-  destroy() { this.fontFieldSubscriber.destroy(); }
+  destroy() {
+    this.fontFieldSubscriber.destroy();
+    if (this.fontAssetId != null) this.projectClient.unsubAsset(this.fontAssetId, this);
+  }
 
   config_setProperty(path: string, value: any) {
     if (path === "fontAssetId") {

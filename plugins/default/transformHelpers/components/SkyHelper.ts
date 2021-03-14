@@ -22,8 +22,10 @@ export default class SkyHelper extends SupEngine.ActorComponent {
     const skyGeo = new THREE.SphereGeometry(500);
     const skyMat = new THREE.RawShaderMaterial({
       uniforms: {
-        topColor: { value: new THREE.Color(0x0077ff) },
-        bottomColor: { value: new THREE.Color(0xfbf4e7) },
+        topColor: { value: new THREE.Color(0x8d8d8d) },
+        bottomColor: { value: new THREE.Color(0x424242) },
+        skyTopColor: { value: new THREE.Color(0x0077ff) },
+        skyBottomColor: { value: new THREE.Color(0xfbf4e7) },
         exponent: { value: 0.5 }
       },
       vertexShader:
@@ -47,13 +49,16 @@ precision mediump int;
 #define SHADER_NAME SkyShader
 uniform vec3 topColor;
 uniform vec3 bottomColor;
+uniform vec3 skyTopColor;
+uniform vec3 skyBottomColor;
 uniform float exponent;
 
 varying vec3 vWorldPosition;
 
 void main() {
   float h = normalize(vWorldPosition).y;
-  gl_FragColor = vec4(mix(bottomColor,topColor, max(pow(max(h, 0.0), exponent), 0.0)), 1.0);
+  // gl_FragColor = vec4(mix(skyBottomColor, skyTopColor, max(pow(max(h, 0.0), exponent), 0.0)), 1.0);
+  gl_FragColor = vec4(mix(bottomColor, topColor, h / 2.0 + 0.5), 1.0);
 }`,
       side: THREE.BackSide
     });
