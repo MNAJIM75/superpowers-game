@@ -45,6 +45,7 @@ export default class GameSettingsEditor {
     this.customLayersRow.valueCell.appendChild(this.layerContainers);
     this.fields["defaultLayer"] = SupClient.table.appendTextField(this.layerContainers, "Default");
     this.fields["defaultLayer"].readOnly = true;
+    this.fields["defaultLayer"].onfocus = () => { this.fields["defaultLayer"].blur(); };
 
     for (let i = 0; i < GameSettingsResource.schema["customLayers"].maxLength; i++) {
       const field = this.fields[`customLayer${i}`] = SupClient.table.appendTextField(this.layerContainers, "");

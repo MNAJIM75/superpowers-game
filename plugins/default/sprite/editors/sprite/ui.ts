@@ -462,6 +462,7 @@ export function setupAnimation(animation: any, index: number) {
 
   const speedInput = document.createElement("input");
   speedInput.type = "number";
+  speedInput.step = "any";
   speedInput.className = "speed";
   speedInput.value = animation.speed;
   liElt.appendChild(speedInput);

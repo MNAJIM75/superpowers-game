@@ -52,10 +52,10 @@ export default class CameraEditor {
     layersField.placeholder = "(not yet customizable)";
 
     const nearClippingPlaneRow = SupClient.table.appendRow(tbody, SupClient.i18n.t("componentEditors:Camera.nearPlane"));
-    this.nearClippingPlaneField = SupClient.table.appendNumberField(nearClippingPlaneRow.valueCell, config.nearClippingPlane, { min: 0.1 });
+    this.nearClippingPlaneField = SupClient.table.appendNumberField(nearClippingPlaneRow.valueCell, config.nearClippingPlane, { min: 0.1, step: "any" });
 
     const farClippingPlaneRow = SupClient.table.appendRow(tbody, SupClient.i18n.t("componentEditors:Camera.farPlane"));
-    this.farClippingPlaneField = SupClient.table.appendNumberField(farClippingPlaneRow.valueCell, config.farClippingPlane, { min: 0.1 });
+    this.farClippingPlaneField = SupClient.table.appendNumberField(farClippingPlaneRow.valueCell, config.farClippingPlane, { min: 0.1, step: "any" });
 
     const clearColorRow = SupClient.table.appendRow(tbody, SupClient.i18n.t("componentEditors:Camera.clearColor"));
     this.clearColorField = SupClient.table.appendColorField(clearColorRow.valueCell, config.clearColor);
@@ -63,11 +63,11 @@ export default class CameraEditor {
     SupClient.table.appendHeader(tbody, SupClient.i18n.t("componentEditors:Camera.viewport.title"));
     const viewportXRow = SupClient.table.appendRow(tbody, SupClient.i18n.t("componentEditors:Camera.viewport.position"));
     [ this.viewportFields.x, this.viewportFields.y ] = SupClient.table.appendNumberFields(viewportXRow.valueCell, [ config.viewport.x, config.viewport.y ]
-    , { min: 0, max: 1, step: 0.1 });
+    , { min: 0, max: 1, step: 0.01 });
 
     const widthRow = SupClient.table.appendRow(tbody, SupClient.i18n.t("componentEditors:Camera.viewport.size"));
     [ this.viewportFields.width, this.viewportFields.height ] = SupClient.table.appendNumberFields(widthRow.valueCell, [ config.viewport.width, config.viewport.height ]
-    , { min: 0, max: 1, step: 0.1 });
+    , { min: 0, max: 1, step: 0.01 });
 
     const usePostProcessingRow = SupClient.table.appendRow(tbody, SupClient.i18n.t("componentEditors:Camera.postProcessing.use"));
     this.usePostProcessingField = SupClient.table.appendBooleanField(usePostProcessingRow.valueCell, config.usePostProcessing);

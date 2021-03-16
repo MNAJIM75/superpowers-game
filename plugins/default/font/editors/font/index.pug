@@ -43,7 +43,7 @@ html
             th= t("fontEditor:color")
             td
               .inputs
-                input.color.property-color
+                input(pattern="[0-9A-Fa-f]{6}").color.property-color
                 input(type="color").color-picker
           tr
             th= t("fontEditor:opacity")
@@ -53,7 +53,7 @@ html
                 option(value="transparent")= t("fontEditor:transparent")
               .inputs(hidden)
                 input(type="range",min="0",max="1",step="0.01",style="flex: 2;").opacity-slider
-                input(type="number",min="0",max="1",step="0.1").property-opacity
+                input(type="number",min="0",max="1",step="0.01").property-opacity
           tr
             th(colspan="2")= t("fontEditor:settings")
 

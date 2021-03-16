@@ -72,6 +72,7 @@ export function setUniformValueInputs(id: string) {
     case "f":
       const floatInputElt = document.createElement("input");
       floatInputElt.type = "number";
+      floatInputElt.step = "any";
       floatInputElt.classList.add("float");
       floatInputElt.addEventListener("change", (event: any) => {
         data.projectClient.editAsset(SupClient.query.asset, "setUniformProperty", id, "value", parseFloat(event.target.value));

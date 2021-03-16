@@ -35,7 +35,7 @@ export default class ArcadeBody2DEditor {
     });
 
     const sizeRow = SupClient.table.appendRow(this.tbody, SupClient.i18n.t("componentEditors:ArcadeBody2D.size"));
-    const sizeFields = SupClient.table.appendNumberFields(sizeRow.valueCell, [config.width, config.height]);
+    const sizeFields = SupClient.table.appendNumberFields(sizeRow.valueCell, [config.width, config.height], {step: "any"});
     this.boxFields["width"] = sizeFields[0];
     this.boxFields["width"].addEventListener("change", (event: any) => {
       this.editConfig("setProperty", "width", parseFloat(event.target.value));
@@ -46,7 +46,7 @@ export default class ArcadeBody2DEditor {
     });
 
     const offsetRow = SupClient.table.appendRow(this.tbody, SupClient.i18n.t("componentEditors:ArcadeBody2D.offset"));
-    const offsetFields = SupClient.table.appendNumberFields(offsetRow.valueCell, [config.offset.x, config.offset.y]);
+    const offsetFields = SupClient.table.appendNumberFields(offsetRow.valueCell, [config.offset.x, config.offset.y], {step: "any"});
     this.boxFields["offset.x"] = offsetFields[0];
     this.boxFields["offset.x"].addEventListener("change", (event: any) => {
       this.editConfig("setProperty", "offset.x", parseFloat(event.target.value));
@@ -58,7 +58,7 @@ export default class ArcadeBody2DEditor {
     });
 
     const bounceRow = SupClient.table.appendRow(this.tbody, SupClient.i18n.t("componentEditors:ArcadeBody2D.bounce"));
-    const bounceFields = SupClient.table.appendNumberFields(bounceRow.valueCell, [config.bounce.x, config.bounce.y]);
+    const bounceFields = SupClient.table.appendNumberFields(bounceRow.valueCell, [config.bounce.x, config.bounce.y], {step: "any"});
     this.boxFields["bounce.x"] = bounceFields[0];
     this.boxFields["bounce.x"].addEventListener("change", (event: any) => {
       this.editConfig("setProperty", "bounce.x", parseFloat(event.target.value));

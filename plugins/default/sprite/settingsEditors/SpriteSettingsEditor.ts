@@ -30,7 +30,7 @@ export default class SpriteSettingsEditor {
     this.fields["pixelsPerUnit"] = SupClient.table.appendNumberField(this.pixelsPerUnitRow.valueCell, "");
 
     this.alphaTestRow = SupClient.table.appendRow(tbody, SupClient.i18n.t("settingsEditors:Sprite.alphaTesting"));
-    this.fields["alphaTest"] = SupClient.table.appendNumberField(this.alphaTestRow.valueCell, "");
+    this.fields["alphaTest"] = SupClient.table.appendNumberField(this.alphaTestRow.valueCell, "", { step: "any" });
 
     this.fields["filtering"].addEventListener("change", (event: any) => {
       this.projectClient.editResource("spriteSettings", "setProperty", "filtering", event.target.value);
