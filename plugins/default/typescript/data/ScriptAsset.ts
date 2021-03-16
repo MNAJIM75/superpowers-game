@@ -127,7 +127,7 @@ Sup.registerBehavior(${behaviorName});
         this.server.data.resources.release("behaviorProperties", null);
 
         if (behaviorProperties.pub.behaviors[behaviorName] == null) {
-          const behaviors: { [behaviorName: string]: { line: number, properties: { name: string; type: string; defaultValue: string; }[]; parentBehavior: string; } } = {};
+          const behaviors: { [behaviorName: string]: { line: number, properties: { name: string; type: string; defaultValue: string[]; }[]; parentBehavior: string; } } = {};
           behaviors[behaviorName] = { line: 0, properties: [], parentBehavior: null };
           behaviorProperties.setScriptBehaviors(this.id, behaviors);
         }
@@ -304,7 +304,7 @@ Sup.registerBehavior(${behaviorName});
         supTypeSymbols["Sup.Math.Vector3"]
       ];
 
-      const behaviors: { [behaviorName: string]: { line: number, properties: Array<{ name: string, type: string, defaultValue: string }>; parentBehavior: string } } = {};
+      const behaviors: { [behaviorName: string]: { line: number, properties: Array<{ name: string, type: string, defaultValue: string[] }>; parentBehavior: string } } = {};
 
       const file = results.program.getSourceFile(ownScriptName);
       const ownLocals = <ts.SymbolTable>(<any>file).locals;
@@ -327,7 +327,7 @@ Sup.registerBehavior(${behaviorName});
 
         if (baseTypeSymbol !== supTypeSymbols["Sup.Behavior"]) continue;
 
-        const properties: Array<{ name: string, type: string, defaultValue: string }> = [];
+        const properties: Array<{ name: string, type: string, defaultValue: string[] }> = [];
 
         let parentBehavior: string = null;
         if (parentTypeSymbol !== supTypeSymbols["Sup.Behavior"])
@@ -340,14 +340,15 @@ Sup.registerBehavior(${behaviorName});
 
           // Skip non-properties
           if ((member.flags & ts.SymbolFlags.Property) !== ts.SymbolFlags.Property) continue;
+          const propertyDecl = (member.valueDeclaration as ts.PropertyDeclaration);
 
           // Skip static, private and protected members
-          const modifierFlags = (member.valueDeclaration.modifiers != null) ? member.valueDeclaration.modifiers.flags : null;
+          const modifierFlags = (propertyDecl.modifiers != null) ? propertyDecl.modifiers.flags : null;
           if (modifierFlags != null && (modifierFlags & (ts.NodeFlags.Private | ts.NodeFlags.Protected | ts.NodeFlags.Static)) !== 0) continue;
 
           // TODO: skip members annotated as "non-customizable"
 
-          const type = results.typeChecker.getTypeAtLocation(member.valueDeclaration);
+          const type = results.typeChecker.getTypeAtLocation(propertyDecl);
           let typeName: any; // "unknown"
           const typeSymbol = type.getSymbol();
           if (supportedSupPropertyTypes.indexOf(typeSymbol) !== -1) {
@@ -360,16 +361,19 @@ Sup.registerBehavior(${behaviorName});
           }
           else if ((<any>type).intrinsicName != null) typeName = (<any>type).intrinsicName;
 
-          let defaultValue: string = null;
-          const propertyDeclaration = (member.valueDeclaration as ts.PropertyDeclaration);
-          if (propertyDeclaration !== null && propertyDeclaration.initializer != null) {
-            let typeNode = (propertyDeclaration.type as ts.TypeReferenceNode);
-            if (typeNode != null && typeNode.typeName != null)
-              typeName = typeNode.typeName.getText();
-            defaultValue = propertyDeclaration.initializer.getText();
+          if (typeName == null) continue;
+
+          let defaultValue: Array<string> = null;
+          if (propertyDecl.initializer != null) {
+            defaultValue = [];
+            let args = (propertyDecl.initializer as ts.CallExpression).arguments;
+            if (args !== undefined)
+              for (let a of args) defaultValue.push(a.getText());
+            else
+              defaultValue.push(propertyDecl.initializer.getText());
           }
           console.log({ name: member.name, type: typeName, defaultValue: defaultValue});
-          if (typeName != null) properties.push({ name: member.name, type: typeName, defaultValue: defaultValue});
+          properties.push({ name: member.name, type: typeName, defaultValue: defaultValue});
         }
       }
       this.server.data.resources.acquire("behaviorProperties", null, (err: Error, behaviorProperties: BehaviorPropertiesResource) => {

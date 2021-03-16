@@ -148,7 +148,7 @@ export default class BehaviorEditor {
     // TODO: Display and allow cleaning up left-over property values
   }
 
-  _createPropertySetting(property: {name: string; type: string; defaultValue: string}) {
+  _createPropertySetting(property: { name: string; type: string; defaultValue: string[] }) {
     const propertySetting = SupClient.table.appendRow(this.tbody, property.name, { checkbox: true, title: `${property.name} (${property.type})` });
     this.propertySettingsByName[property.name] = propertySetting;
     this._createPropertyField(property.name);
@@ -163,11 +163,42 @@ export default class BehaviorEditor {
       // defaultValue = property.value someday
       let defaultValue: any;
       switch (property.type) {
-        case "boolean": defaultValue = false; break;
-        case "number": defaultValue = 0; break;
-        case "string": defaultValue = ""; break;
-        case "Sup.Math.Vector2": defaultValue = { x: 0, y: 0 }; break;
-        case "Sup.Math.Vector3": defaultValue = { x: 0, y: 0, z: 0 }; break;
+        case "boolean": defaultValue = property.defaultValue == null ? false : (property.defaultValue[0] === "true"); break;
+        case "number":
+          let defaultNum: number;
+          if (property.defaultValue == null) defaultNum = 0;
+          else defaultNum = Number(property.defaultValue[0]); // support integer, hexadecimal notation & floating point numbers
+          defaultValue = isNaN(defaultNum) ? 0 : defaultNum;
+          break;
+        case "string": defaultValue = property.defaultValue == null ? "" : property.defaultValue[0].slice(1, -1); break;
+        case "Sup.Math.Vector2": {
+          if (property.defaultValue == null && property.defaultValue.length !== 2) {
+            defaultValue = { x: 0, y: 0 };
+            break;
+          }
+          let xNum = Number(property.defaultValue[0]);
+          let yNum = Number(property.defaultValue[1]);
+          defaultValue = {
+            x: isNaN(xNum) ? 0 : xNum,
+            y: isNaN(yNum) ? 0 : yNum
+          };
+          break;
+        }
+        case "Sup.Math.Vector3": {
+          if (property.defaultValue == null) {
+            defaultValue = { x: 0, y: 0, z: 0 };
+            break;
+          }
+          let xNum = Number(property.defaultValue[0]);
+          let yNum = Number(property.defaultValue[1]);
+          let zNum = Number(property.defaultValue[2]);
+          defaultValue = {
+            x: isNaN(xNum) ? 0 : xNum,
+            y: isNaN(yNum) ? 0 : yNum,
+            z: isNaN(zNum) ? 0 : zNum
+          };
+          break;
+        }
         // TODO: Support more types
         default: defaultValue = null; break;
       }
@@ -266,8 +297,11 @@ export default class BehaviorEditor {
         const vectorContainer = <HTMLDivElement>propertySetting.valueCell.querySelector(".inputs");
         if (vectorContainer == null) {
           propertySetting.valueCell.innerHTML = "";
-          const defaultValues = uiType === "Sup.Math.Vector3" ? [ 0, 0, 0 ] : [ 0, 0 ];
-          propertyFields = SupClient.table.appendNumberFields(propertySetting.valueCell, defaultValues, {step: "any"});
+          propertyFields = SupClient.table.appendNumberFields(
+            propertySetting.valueCell,
+            uiType === "Sup.Math.Vector3" ? [ 0, 0, 0 ] : [ 0, 0 ],
+            {step: "any"}
+          );
 
           for (const field of propertyFields) {
             field.addEventListener("change", this.onChangePropertyValue);
