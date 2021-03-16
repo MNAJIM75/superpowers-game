@@ -127,7 +127,7 @@ Sup.registerBehavior(${behaviorName});
         this.server.data.resources.release("behaviorProperties", null);
 
         if (behaviorProperties.pub.behaviors[behaviorName] == null) {
-          const behaviors: { [behaviorName: string]: { line: number, properties: { name: string; type: string; }[]; parentBehavior: string; } } = {};
+          const behaviors: { [behaviorName: string]: { line: number, properties: { name: string; type: string; defaultValue: string; }[]; parentBehavior: string; } } = {};
           behaviors[behaviorName] = { line: 0, properties: [], parentBehavior: null };
           behaviorProperties.setScriptBehaviors(this.id, behaviors);
         }
@@ -304,7 +304,7 @@ Sup.registerBehavior(${behaviorName});
         supTypeSymbols["Sup.Math.Vector3"]
       ];
 
-      const behaviors: { [behaviorName: string]: { line: number, properties: Array<{ name: string, type: string }>; parentBehavior: string } } = {};
+      const behaviors: { [behaviorName: string]: { line: number, properties: Array<{ name: string, type: string, defaultValue: string }>; parentBehavior: string } } = {};
 
       const file = results.program.getSourceFile(ownScriptName);
       const ownLocals = <ts.SymbolTable>(<any>file).locals;
@@ -327,7 +327,7 @@ Sup.registerBehavior(${behaviorName});
 
         if (baseTypeSymbol !== supTypeSymbols["Sup.Behavior"]) continue;
 
-        const properties: Array<{ name: string, type: string }> = [];
+        const properties: Array<{ name: string, type: string, defaultValue: string }> = [];
 
         let parentBehavior: string = null;
         if (parentTypeSymbol !== supTypeSymbols["Sup.Behavior"])
@@ -360,7 +360,16 @@ Sup.registerBehavior(${behaviorName});
           }
           else if ((<any>type).intrinsicName != null) typeName = (<any>type).intrinsicName;
 
-          if (typeName != null) properties.push({ name: member.name, type: typeName });
+          let defaultValue: string = null;
+          const propertyDeclaration = (member.valueDeclaration as ts.PropertyDeclaration);
+          if (propertyDeclaration !== null && propertyDeclaration.initializer != null) {
+            let typeNode = (propertyDeclaration.type as ts.TypeReferenceNode);
+            if (typeNode != null && typeNode.typeName != null)
+              typeName = typeNode.typeName.getText();
+            defaultValue = propertyDeclaration.initializer.getText();
+          }
+          console.log({ name: member.name, type: typeName, defaultValue: defaultValue});
+          if (typeName != null) properties.push({ name: member.name, type: typeName, defaultValue: defaultValue});
         }
       }
       this.server.data.resources.acquire("behaviorProperties", null, (err: Error, behaviorProperties: BehaviorPropertiesResource) => {

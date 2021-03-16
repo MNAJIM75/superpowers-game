@@ -148,7 +148,7 @@ export default class BehaviorEditor {
     // TODO: Display and allow cleaning up left-over property values
   }
 
-  _createPropertySetting(property: {name: string; type: string}) {
+  _createPropertySetting(property: {name: string; type: string; defaultValue: string}) {
     const propertySetting = SupClient.table.appendRow(this.tbody, property.name, { checkbox: true, title: `${property.name} (${property.type})` });
     this.propertySettingsByName[property.name] = propertySetting;
     this._createPropertyField(property.name);
@@ -235,7 +235,7 @@ export default class BehaviorEditor {
         let propertyField = <HTMLInputElement>propertySetting.valueCell.querySelector("input[type=number]");
         if (propertyField == null) {
           propertySetting.valueCell.innerHTML = "";
-          propertyField = SupClient.table.appendNumberField(propertySetting.valueCell, 0);
+          propertyField = SupClient.table.appendNumberField(propertySetting.valueCell, 0, {step: "any"});
           propertyField.addEventListener("change", this.onChangePropertyValue);
           propertyField.addEventListener("drop", this.onDropPropertyValue);
         }
@@ -267,7 +267,7 @@ export default class BehaviorEditor {
         if (vectorContainer == null) {
           propertySetting.valueCell.innerHTML = "";
           const defaultValues = uiType === "Sup.Math.Vector3" ? [ 0, 0, 0 ] : [ 0, 0 ];
-          propertyFields = SupClient.table.appendNumberFields(propertySetting.valueCell, defaultValues);
+          propertyFields = SupClient.table.appendNumberFields(propertySetting.valueCell, defaultValues, {step: "any"});
 
           for (const field of propertyFields) {
             field.addEventListener("change", this.onChangePropertyValue);

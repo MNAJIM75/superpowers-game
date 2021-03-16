@@ -59,4 +59,6 @@ namespace Sup {
   }
 }
 
+type MultilineString = string;
+
 window.Sup = Sup;

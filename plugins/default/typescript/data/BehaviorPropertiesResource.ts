@@ -3,6 +3,7 @@ import * as path from "path";
 export interface BehaviorProperty {
   name: string;
   type: string;
+  defaultValue: string;
 }
 
 export interface BehaviorPropertiesResourcePub {
@@ -32,7 +33,8 @@ export default class BehaviorPropertiesResource extends SupCore.Data.Base.Resour
               type: "hash",
               properties: {
                 name: { type: "string" },
-                type: { type: "string" }
+                type: { type: "string" },
+                defaultValue: { type: "string" }
               }
             }
           }

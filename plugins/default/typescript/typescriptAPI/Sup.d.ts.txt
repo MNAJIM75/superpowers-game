@@ -23,3 +23,5 @@ declare namespace Sup {
   function get(path: string, options?: { "ignoreMissing": boolean; }): Asset;
   function get<T extends Asset>(path: string, type: new(inner: { [key:string]: any; }) => T, options?: { "ignoreMissing": boolean; }): T;
 }
+
+type MultilineString = string;
