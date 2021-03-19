@@ -367,10 +367,19 @@ Sup.registerBehavior(${behaviorName});
           if (propertyDecl.initializer != null) {
             defaultValue = [];
             let args = (propertyDecl.initializer as ts.CallExpression).arguments;
+            let safeEval = (code: string) => {
+              return Function(
+              `"use strict";
+              try {
+                return (` + code + `);
+              } catch {
+                return "";
+              }`)();
+            };
             if (args !== undefined)
-              for (let a of args) defaultValue.push(a.getText());
+              for (let a of args) defaultValue.push("" + safeEval(a.getText()));
             else
-              defaultValue.push(propertyDecl.initializer.getText());
+              defaultValue.push("" + safeEval(propertyDecl.initializer.getText()));
           }
           console.log({ name: member.name, type: typeName, defaultValue: defaultValue});
           properties.push({ name: member.name, type: typeName, defaultValue: defaultValue});

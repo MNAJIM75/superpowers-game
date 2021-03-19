@@ -11,19 +11,24 @@ Make 2D and 3D games in live collaboration with [Superpowers](http://superpowers
 ### New features :
  - Post-processing on camera
  - [Add BMFont compatibility](https://github.com/Togimaro/superpowers-game-bmfont-plugin)
- - Basic default value detection for Behavior (work-in-progress, has some quirks)
+ - Default value detection for Behavior with initializer evaluation
 
 ### Breaking change :
  - Update Three.js to r92, many plugins need some minor adjustement & type disambiguation
 
-### Roadmap / Ideas :
+## Roadmap / Ideas :
  - Improve Sup.Text performance & add more rendering options
- - Improve Behavior: better default value detection (add expression evaluation) & more types (ie Array, simple interface)
+ - Improve Behavior Editor: add more types (ie Array, simple interface) & Component reference
  - Add more 3d model importer: gltf2, fbx, obj?
+ - Add layer rendering on camera
  - Add pixel-perfect camera
  - 9 Sliced sprite
  - Animated tilemap
  - Test FMOD integration
+
+## Todo :
+ - Example projects
+ - Screenshots of the new features
  
 ## How to install
 

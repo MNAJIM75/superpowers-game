@@ -167,25 +167,25 @@ export default class BehaviorEditor {
         case "number":
           let defaultNum: number;
           if (property.defaultValue == null) defaultNum = 0;
-          else defaultNum = Number(property.defaultValue[0]); // support integer, hexadecimal notation & floating point numbers
-          defaultValue = isNaN(defaultNum) ? 0 : defaultNum;
+          else defaultNum = Number(property.defaultValue[0]);
+          defaultValue = isFinite(defaultNum) ? defaultNum : 0;
           break;
-        case "string": defaultValue = property.defaultValue == null ? "" : property.defaultValue[0].slice(1, -1); break;
+        case "string": defaultValue = property.defaultValue == null ? "" : property.defaultValue[0]; break;
         case "Sup.Math.Vector2": {
-          if (property.defaultValue == null && property.defaultValue.length !== 2) {
+          if (property.defaultValue == null || property.defaultValue.length !== 2) {
             defaultValue = { x: 0, y: 0 };
             break;
           }
           let xNum = Number(property.defaultValue[0]);
           let yNum = Number(property.defaultValue[1]);
           defaultValue = {
-            x: isNaN(xNum) ? 0 : xNum,
-            y: isNaN(yNum) ? 0 : yNum
+            x: isFinite(xNum) ? xNum : 0,
+            y: isFinite(yNum) ? yNum : 0
           };
           break;
         }
         case "Sup.Math.Vector3": {
-          if (property.defaultValue == null) {
+          if (property.defaultValue == null || property.defaultValue.length !== 3) {
             defaultValue = { x: 0, y: 0, z: 0 };
             break;
           }
@@ -193,9 +193,9 @@ export default class BehaviorEditor {
           let yNum = Number(property.defaultValue[1]);
           let zNum = Number(property.defaultValue[2]);
           defaultValue = {
-            x: isNaN(xNum) ? 0 : xNum,
-            y: isNaN(yNum) ? 0 : yNum,
-            z: isNaN(zNum) ? 0 : zNum
+            x: isFinite(xNum) ? xNum : 0,
+            y: isFinite(yNum) ? yNum : 0,
+            z: isFinite(zNum) ? zNum : 0
           };
           break;
         }
