@@ -246,9 +246,9 @@ export default class ModelRenderer extends SupEngine.ActorComponent {
 
     if (show) {
       this.skeletonHelper = new THREE.SkeletonHelper(this.threeMesh);
+      this.skeletonHelper.root = this.skeletonHelper;
       if (this.asset.upAxisMatrix != null) {
         const upAxisMatrix = new THREE.Matrix4().fromArray(this.asset.upAxisMatrix);
-        this.skeletonHelper.root = this.skeletonHelper;
         this.skeletonHelper.applyMatrix(upAxisMatrix);
       }
       (<THREE.LineBasicMaterial>this.skeletonHelper.material).linewidth = 3;

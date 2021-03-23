@@ -34,7 +34,7 @@ html
           td
             button.upload= t("common:actions.upload")
             form(style="display: none")
-              input.file-select(type="file",multiple)
+              input.file-select(type="file",multiple, accept=".obj,.gltf,.bin")
 
         tr.map
           th= t("modelEditor:sidebar.settings.texture")
@@ -68,7 +68,7 @@ html
           th
             span= t("modelEditor:sidebar.settings.unitRatio")
           td
-            input(type="number" min="0" step="any").property-unitRatio
+            input(type="number" min="0.0001" step="any").property-unitRatio
 
         tr
           th= t("modelEditor:sidebar.settings.opacity.title")

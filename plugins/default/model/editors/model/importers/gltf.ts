@@ -1,8 +1,9 @@
 import * as async from "async";
-import { ImportCallback, createLogError, createLogInfo } from "./index";
+import { ImportCallback, createLogError, createLogInfo, ImportLogEntry, createLogWarning } from "./index";
 
 const THREE = SupEngine.THREE;
 
+//#region GLTF 1
 enum GLTFConst {
   UNSIGNED_SHORT = 5123,
   FLOAT = 5126
@@ -83,6 +84,177 @@ interface GLTFNode {
   skin?: string;
   jointName?: string;
 }
+//#endregion
+
+//#region GLTF2
+enum GLTF2Const {
+  BYTE = 5120,
+  UNSIGNED_BYTE = 5121,
+  SHORT = 5122,
+  UNSIGNED_SHORT = 5123,
+  UNSIGNED_INT = 5125,
+  FLOAT = 5126
+}
+
+interface GLTF2File {
+  accessors?: GLTF2Accessor[];
+  animations?: GLTF2Animation[];
+  asset: GLTF2Asset;
+  buffers?: GLTF2Buffer[];
+  bufferViews?: GLTF2BufferView[];
+  meshes?: GLTF2Mesh[];
+  nodes?: GLTF2Node[];
+  scene?: number;
+  scenes?: GLTF2Scene[];
+  skins?: GLTF2Skin[];
+}
+
+interface GLTF2Accessor {
+  bufferView?: number;
+  byteOffset?: number;
+  componentType: number;
+  normalized?: boolean;
+  count: number;
+  type: string;
+  min?: number[];
+  max?: number[];
+  sparse?: { [name: string]: GLTF2Sparse; };
+  name?: string;
+  extensions?: { [name: string]: any; };
+  extras?: any;
+}
+
+interface GLTF2Animation {
+  channels: GLTF2Channel[];
+  samplers: GLTF2AnimationSampler[];
+  name?: string;
+  extensions?: { [name: string]: any; };
+  extras?: any;
+}
+
+interface GLTF2Channel {
+  sampler: number;
+  target: GLTF2Target;
+  extensions?: { [name: string]: any; };
+  extras?: any;
+}
+
+interface GLTF2Target {
+  node?: number;
+  path: string;
+  extensions?: { [name: string]: any; };
+  extras?: any;
+}
+
+interface GLTF2AnimationSampler {
+  input: number;
+  interpolation?: string;
+  output: number;
+  extensions?: { [name: string]: any; };
+  extras?: any;
+}
+
+interface GLTF2Asset {
+  copyright?: string;
+  generator?: string;
+  version: string;
+  minVersion?: string;
+  extensions?: { [name: string]: any; };
+  extras?: any;
+}
+
+interface GLTF2Buffer {
+  uri?: string;
+  byteLength: number;
+  name?: string;
+  extensions?: { [name: string]: any; };
+  extras?: any;
+}
+
+interface GLTF2BufferView {
+  buffer: number;
+  byteOffset?: number;
+  byteLength: number;
+  byteStride?: number;
+  target?: number;
+  name?: string;
+  extensions?: { [name: string]: any; };
+  extras?: any;
+}
+
+interface GLTF2Mesh {
+  primitives: GLTF2MeshPrimitive[];
+  weights?: number[];
+  name?: string;
+  extensions?: { [name: string]: any; };
+  extras?: any;
+}
+
+interface GLTF2MeshPrimitive {
+  attributes?: { [name: string]: number; };
+  indices?: number;
+  material?: number;
+  mode?: GLTFPrimitiveMode;
+  targets?: any;
+  extensions?: { [name: string]: any; };
+  extras?: any;
+}
+
+interface GLTF2Node {
+  camera?: number;
+  children?: number[];
+  skin?: number;
+  matrix?: number[];
+  mesh?: number;
+  rotation?: number[];
+  scale?: number[];
+  translation?: number[];
+  weight?: number[];
+  name?: string;
+  extensions?: { [name: string]: any; };
+  extras?: any;
+}
+
+interface GLTF2Scene {
+  nodes?: number[];
+  name?: string;
+  extensions?: { [name: string]: any; };
+  extras?: any;
+}
+
+interface GLTF2Skin {
+  inverseBindMatrices?: number;
+  skeleton?: number;
+  joints?: number[];
+  name?: string;
+  extensions?: { [name: string]: any; };
+  extras?: any;
+}
+
+interface GLTF2SparseIndices {
+  bufferView: number;
+  byteOffset?: number;
+  componentType: number;
+  extensions?: { [name: string]: any; };
+  extras?: any;
+}
+
+interface GLTF2SparseValues {
+  bufferView: number;
+  byteOffset?: number;
+  extensions?: { [name: string]: any; };
+  extras?: any;
+}
+
+interface GLTF2Sparse {
+  count: number;
+  indices: { [name: string]: GLTF2SparseIndices; };
+  values: { [name: string]: GLTF2SparseValues; };
+  extensions?: { [name: string]: any; };
+  extras?: any;
+}
+
+//#endregion
 
 function convertAxisAngleToQuaternionArray(rotations: Float32Array, count: number) {
   const q = new THREE.Quaternion;
@@ -120,11 +292,24 @@ function getNodeMatrix(node: GLTFNode, version: string): THREE.Matrix4 {
   );
 }
 
+function getNodeMatrixGLTF2(node: GLTF2Node): THREE.Matrix4 {
+  const matrix = new THREE.Matrix4;
+  if (node.matrix != null) return matrix.fromArray(node.matrix);
+
+  let translation = node.translation != null ? node.translation : [0, 0, 0];
+  let rotation = node.rotation != null ? node.rotation : [0, 0, 0, 1];
+  let scale = node.scale != null ? node.scale : [1, 1, 1];
+  return matrix.compose(
+    new THREE.Vector3(translation[0], translation[1], translation[2]),
+    new THREE.Quaternion().fromArray(rotation),
+    new THREE.Vector3(scale[0], scale[1], scale[2])
+  );
+}
+
 export function importModel(files: File[], callback: ImportCallback) {
   let gltfFile: File = null;
   const bufferFiles: { [name: string]: File } = {};
   const imageFiles: { [name: string]: File } = {};
-  const buffers: { [name: string]: ArrayBuffer } = {};
 
   for (const file of files) {
     const filename = file.name;
@@ -151,22 +336,309 @@ export function importModel(files: File[], callback: ImportCallback) {
     }
   }
 
-  const onGLTFRead = (err: Error, gltf: GLTFFile) => {
+  const onFileRead = (err: Error, gltf: any) => {
     if (err != null) { callback([ createLogError("Could not parse as JSON", gltfFile.name) ]); return; }
-
-    const meshNames = Object.keys(gltf.meshes);
-    if (meshNames.length > 1) { callback([ createLogError("Only a single mesh is supported") ], gltfFile.name); return; }
 
     // Used to be a number before 1.0, now it's a string, so let's normalize it
     gltf.asset.version = gltf.asset.version.toString();
     if (gltf.asset.version === "1") gltf.asset.version = "1.0";
 
-    const supportedVersions = [ "0.8", "1.0" ];
-    if (supportedVersions.indexOf(gltf.asset.version) === -1) {
-      callback([ createLogError(`Unsupported glTF format version: ${gltf.asset.version}. Supported versions are: ${supportedVersions.join(", ")}.`) ], gltfFile.name);
+    const gltf1Versions = [ "0.8", "1.0" ];
+    if (gltf1Versions.indexOf(gltf.asset.version) !== -1) {
+      onGLTFRead(err, gltf);
       return;
     }
 
+    if (gltf.asset.version === "2.0") {
+      onGLTF2Read(err, gltf);
+      return;
+    }
+    callback([ createLogError(`Unsupported glTF format version: ${gltf.asset.version}. Supported versions are: 0.8, 1.0, 2.0.`) ], gltfFile.name);
+  };
+
+  const onGLTF2Read = (err: Error, gltf: GLTF2File) => {
+    if (gltf.meshes.length > 1) { callback([ createLogError("Only a single mesh is supported") ], gltfFile.name); return; }
+
+    let logEntries: ImportLogEntry[] = [];
+    logEntries.push(createLogWarning(`glTF version 2.0 WIP`, gltfFile.name));
+
+    const buffers: { [id: number]: ArrayBuffer } = {};
+    const rootNode = gltf.nodes[ gltf.scenes[gltf.scene].nodes[0] ];
+    // Check if the model has its up-axis pointing in the wrong direction
+    let upAxisMatrix: THREE.Matrix4 = null;
+
+    if (rootNode.name === "Y_UP_Transform")
+      upAxisMatrix = new THREE.Matrix4().fromArray(rootNode.matrix);
+
+    let mesh: number = null;
+    let skin: GLTF2Skin = null;
+
+    const walkNode = (rootNode: GLTF2Node) => {
+      if (mesh == null) {
+        if (rootNode != null && rootNode.mesh != null) {
+          mesh = rootNode.mesh;
+          skin = gltf.skins[rootNode.skin];
+        }
+      }
+      if (rootNode.children == null) return;
+      for (const child of rootNode.children) {
+        walkNode(gltf.nodes[child]);
+      }
+    };
+
+    for (const rootNodeName of gltf.scenes[gltf.scene].nodes) walkNode(gltf.nodes[rootNodeName]);
+
+    if (mesh == null && gltf.meshes.length > 0) {
+      // For some reason, sometimes the mesh won't be attached to a node,
+      // So let's just pick it up from gltf.meshes
+      mesh = 0;
+      // And look for a skin, too
+      if (gltf.skins.length === 1) skin = gltf.skins[0];
+    }
+    if (mesh == null) { callback([ createLogError("No mesh found", gltfFile.name) ]); return; }
+
+    const meshInfo = gltf.meshes[mesh];
+    if (meshInfo.primitives.length !== 1) { callback([ createLogError("Only a single primitive is supported", gltfFile.name) ]); return; }
+
+    let mode = meshInfo.primitives[0].mode;
+    if (mode == null) mode = GLTFPrimitiveMode.TRIANGLES;
+    if (mode !== GLTFPrimitiveMode.TRIANGLES) { callback([ createLogError("Only triangles are supported", gltfFile.name) ]); return; }
+
+    async.forEachOf(gltf.buffers, (bufferInfo: GLTF2Buffer, index: number, cb) => {
+      // Remove path info from the URI
+      let filename = decodeURI(bufferInfo.uri);
+      if (filename.indexOf("/") !== -1) filename = filename.substring(filename.lastIndexOf("/") + 1);
+      else if (filename.indexOf("\\") !== -1) filename = filename.substring(filename.lastIndexOf("\\") + 1);
+
+      const bufferFile = bufferFiles[filename];
+      if (bufferFile == null) { cb(new Error(`Missing buffer file: ${filename} (${bufferInfo.uri})`)); return; }
+
+      SupClient.readFile(bufferFile, "arraybuffer", (err: Error, buffer: ArrayBuffer) => {
+        if (err != null) { cb(new Error(`Could not read buffer file: ${filename} (${bufferInfo.uri})`)); return; }
+        buffers[index] = buffer;
+        cb(null);
+      });
+    }, (err: Error) => {
+      if (err != null) { callback([ createLogError(err.message) ]); return; }
+
+      const primitive = meshInfo.primitives[0];
+      const attributes: { [name: string]: ArrayBuffer } = {};
+
+      // Indices
+      if (primitive.indices != null) {
+        const indexAccessor: GLTF2Accessor = gltf.accessors[primitive.indices];
+        if (indexAccessor.componentType !== GLTFConst.UNSIGNED_SHORT) {
+          callback([ createLogError(`Unsupported component type for index accessor: ${indexAccessor.componentType}`) ]);
+          return;
+        }
+
+        const indexBufferView: GLTF2BufferView = gltf.bufferViews[indexAccessor.bufferView];
+        const start =
+          indexBufferView.byteOffset != null ? indexBufferView.byteOffset : 0 +
+          indexAccessor.byteOffset != null ? indexAccessor.byteOffset : 0;
+        attributes["index"] = buffers[indexBufferView.buffer].slice(start, start + indexAccessor.count * 2);
+      }
+
+      const positionAccessor: GLTF2Accessor = gltf.accessors[primitive.attributes["POSITION"]];
+      {
+        if (positionAccessor.componentType !== GLTFConst.FLOAT) {
+          callback([ createLogError(`Unsupported component type for position accessor: ${positionAccessor.componentType}`) ]);
+          return;
+        }
+
+        const positionBufferView: GLTF2BufferView = gltf.bufferViews[positionAccessor.bufferView];
+        const start =
+          positionBufferView.byteOffset != null ? positionBufferView.byteOffset : 0 +
+          positionAccessor.byteOffset != null ? positionAccessor.byteOffset : 0;
+        attributes["position"] = buffers[positionBufferView.buffer].slice(start, start + positionAccessor.count * 4 * 3);
+      }
+
+      // Normal
+      const normalAccessor: GLTF2Accessor = gltf.accessors[primitive.attributes["NORMAL"]];
+      if (normalAccessor != null) {
+        if (normalAccessor.componentType !== GLTFConst.FLOAT) {
+          callback([ createLogError(`Unsupported component type for normal accessor: ${normalAccessor.componentType}`) ]);
+          return;
+        }
+
+        const normalBufferView: GLTF2BufferView = gltf.bufferViews[normalAccessor.bufferView];
+        const start =
+          normalBufferView.byteOffset != null ? normalBufferView.byteOffset : 0 +
+          normalAccessor.byteOffset != null ? normalAccessor.byteOffset : 0;
+        attributes["normal"] = buffers[normalBufferView.buffer].slice(start, start + normalAccessor.count * 4 * 3);
+      }
+
+      // UV
+      const uvAccessor: GLTF2Accessor = gltf.accessors[primitive.attributes["TEXCOORD_0"]];
+      if (uvAccessor != null) {
+        if (uvAccessor.componentType !== GLTFConst.FLOAT) {
+          callback([ createLogError(`Unsupported component type for UV accessor: ${uvAccessor.componentType}`) ]);
+          return;
+        }
+
+        const uvBufferView: GLTF2BufferView = gltf.bufferViews[uvAccessor.bufferView];
+        const start =
+          uvBufferView.byteOffset != null ? uvBufferView.byteOffset : 0 +
+          uvAccessor.byteOffset != null ? uvAccessor.byteOffset : 0;
+        const uvArray = new Float32Array(buffers[uvBufferView.buffer], start, uvAccessor.count * 2);
+
+        for (let i = 0; i < uvAccessor.count; i++) {
+          uvArray[i * 2 + 1] = 1 - uvArray[i * 2 + 1];
+        }
+
+        attributes["uv"] = buffers[uvBufferView.buffer].slice(start, start + uvAccessor.count * 4 * 2);
+      }
+
+      // Skin indices
+      const skinIndexAccessor: GLTF2Accessor = gltf.accessors[primitive.attributes["JOINTS_0"]];
+      if (skinIndexAccessor != null) {
+        if (skinIndexAccessor.componentType !== GLTFConst.UNSIGNED_SHORT) {
+          callback([ createLogError(`Unsupported component type for skin index accessor: ${skinIndexAccessor.componentType}`) ]);
+          return;
+        }
+
+        const skinIndexBufferView: GLTF2BufferView = gltf.bufferViews[skinIndexAccessor.bufferView];
+        const start =
+          skinIndexBufferView.byteOffset != null ? skinIndexBufferView.byteOffset : 0 +
+          skinIndexAccessor.byteOffset != null ? skinIndexAccessor.byteOffset : 0;
+        attributes["skinIndex"] = buffers[skinIndexBufferView.buffer].slice(start, start + skinIndexAccessor.count * 2 * 4);
+      }
+
+      // Skin weights
+      const skinWeightAccessor: GLTF2Accessor = gltf.accessors[primitive.attributes["WEIGHTS_0"]];
+      if (skinWeightAccessor != null) {
+        if (skinWeightAccessor.componentType !== GLTFConst.FLOAT) {
+          callback([ createLogError(`Unsupported component type for skin weight accessor: ${skinWeightAccessor.componentType}`) ]);
+          return;
+        }
+
+        const skinWeightBufferView: GLTF2BufferView = gltf.bufferViews[skinWeightAccessor.bufferView];
+        const start =
+          skinWeightBufferView.byteOffset != null ? skinWeightBufferView.byteOffset : 0 +
+          skinWeightAccessor.byteOffset != null ? skinWeightAccessor.byteOffset : 0;
+        attributes["skinWeight"] = buffers[skinWeightBufferView.buffer].slice(start, start + skinWeightAccessor.count * 4 * 4);
+      }
+
+      // Bones
+      let bones: { name: string; matrix: number[]; parentIndex: number }[] = null;
+      if (skin != null) {
+        bones = [];
+        /*const matrixAccessor: GLTF2Accessor = gltf.accessors[skin.inverseBindMatrices];
+        const matrixBufferView: GLTF2BufferView = gltf.bufferViews[matrixAccessor.bufferView];
+        const start =
+          matrixBufferView.byteOffset != null ? matrixBufferView.byteOffset : 0 +
+          matrixAccessor.byteOffset != null ? matrixAccessor.byteOffset : 0;
+        const matrixArray = new Float32Array(buffers[matrixBufferView.buffer], start, matrixAccessor.count * 16);
+        console.log(matrixArray);*/
+        for (let i = 0; i < skin.joints.length; i++) {
+          const jointId = skin.joints[i];
+          const boneNode = gltf.nodes[jointId];
+          const bone = { name: boneNode.name, matrix: getNodeMatrixGLTF2(boneNode).toArray(), parentIndex: <number>null };
+          bones.push(bone);
+        }
+
+        for (let i = 0; i < skin.joints.length; i++) {
+          const jointId = skin.joints[i];
+          if (gltf.nodes[jointId].children == null) continue;
+          for (const childJointId of gltf.nodes[jointId].children) {
+            const boneIndex = skin.joints.indexOf(childJointId);
+            if (boneIndex !== -1) bones[boneIndex].parentIndex = i;
+          }
+        }
+      }
+
+      // Animation
+      let animation: { duration: number; keyFrames: { [jointName: string]: any } } = null;
+      if (Object.keys(gltf.animations).length > 0) {
+        animation = { duration: 0, keyFrames: {} };
+
+        /*for (const gltfAnimName in gltf.animations) */ {
+          const gltfAnim = gltf.animations[0];
+          // gltfAnim.count = keyframe count
+
+          // gltfAnim.channels gives bone name + path (scale, rotation, position)
+          for (const gltfChannelName in gltfAnim.channels) {
+            const gltfChannel = gltfAnim.channels[gltfChannelName];
+
+            const jointName = gltf.nodes[gltfChannel.target.node].name;
+            // TODO: get skin.jointNames.indexOf(jointName) and work with IDs instead of jointName?
+
+            let boneAnim = animation.keyFrames[jointName];
+            if (boneAnim == null) boneAnim = animation.keyFrames[jointName] = {};
+
+            if (boneAnim[gltfChannel.target.path] != null) {
+              callback([ createLogError(`Found multiple animations for ${gltfChannel.target.path} of ${jointName} bone`) ]);
+              return;
+            }
+
+            let boneTransformAnim = boneAnim[gltfChannel.target.path];
+            if (boneTransformAnim == null) boneTransformAnim = boneAnim[gltfChannel.target.path] = [];
+
+            const inputParameterId = gltfAnim.samplers[gltfChannel.sampler].input;
+            const timeAccessor: GLTF2Accessor = gltf.accessors[inputParameterId];
+            if (timeAccessor.componentType !== GLTFConst.FLOAT) {
+              callback([ createLogError(`Unsupported component type for animation time accessor: ${timeAccessor.componentType}`) ]);
+              return;
+            }
+
+            const timeBufferView: GLTF2BufferView = gltf.bufferViews[timeAccessor.bufferView];
+            const startTime =
+              timeBufferView.byteOffset != null ? timeBufferView.byteOffset : 0 +
+              timeAccessor.byteOffset != null ? timeAccessor.byteOffset : 0;
+            const timeArray = new Float32Array(buffers[timeBufferView.buffer], startTime, timeAccessor.count);
+
+            const outputParameterId = gltfAnim.samplers[gltfChannel.sampler].output;
+            const outputAccessor: GLTF2Accessor = gltf.accessors[outputParameterId];
+            if (outputAccessor.componentType !== GLTFConst.FLOAT) {
+              callback([ createLogError(`Unsupported component type for animation output accessor: ${outputAccessor.componentType}`) ]);
+              return;
+            }
+
+            const componentsCount = (outputAccessor.type === "VEC3") ? 3 : 4;
+
+            const outputBufferView: GLTF2BufferView = gltf.bufferViews[outputAccessor.bufferView];
+            const startOutput =
+              outputBufferView.byteOffset != null ? outputBufferView.byteOffset : 0 +
+              outputAccessor.byteOffset != null ? outputAccessor.byteOffset : 0;
+            const outputArray = new Float32Array(buffers[outputBufferView.buffer], startOutput, outputAccessor.count * componentsCount);
+
+            for (let i = 0; i < timeArray.length; i++) {
+              const time = timeArray[i];
+
+              const value: number[] = [];
+              for (let j = 0; j < componentsCount; j++) value.push(outputArray[i * componentsCount + j]);
+              if (gltfChannel.target.path === "scale") console.log(outputArray);
+              if (gltfChannel.target.path === "scale") console.log(value);
+              boneTransformAnim.push({ time, value });
+              animation.duration = Math.max(animation.duration, time);
+            }
+          }
+        }
+      }
+      console.log(animation);
+
+      logEntries.push(createLogInfo(`Imported glTF model v${gltf.asset.version}, ${attributes["position"].byteLength / 4 / 3} vertices.`, gltfFile.name));
+
+      // Maps
+      const maps: { [name: string]: ArrayBuffer } = {};
+
+      if (Object.keys(imageFiles).length === 0) {
+        callback(logEntries, { attributes, bones, maps, animation, upAxisMatrix: (upAxisMatrix != null) ? upAxisMatrix.toArray() : null });
+        return;
+      }
+
+      SupClient.readFile(imageFiles[Object.keys(imageFiles)[0]], "arraybuffer", (err, data) => {
+        maps["map"] = data;
+        callback(logEntries, { attributes, bones, maps, animation, upAxisMatrix: (upAxisMatrix != null) ? upAxisMatrix.toArray() : null });
+      });
+    });
+  };
+
+  const onGLTFRead = (err: Error, gltf: GLTFFile) => {
+    const meshNames = Object.keys(gltf.meshes);
+    if (meshNames.length > 1) { callback([ createLogError("Only a single mesh is supported") ], gltfFile.name); return; }
+
+    const buffers: { [name: string]: ArrayBuffer } = {};
     const rootNode = gltf.nodes[ gltf.scenes[gltf.scene].nodes[0] ];
 
     // Check if the model has its up-axis pointing in the wrong direction
@@ -451,5 +923,5 @@ export function importModel(files: File[], callback: ImportCallback) {
     });
   };
 
-  SupClient.readFile(gltfFile, "json", onGLTFRead);
+  SupClient.readFile(gltfFile, "json", onFileRead);
 }

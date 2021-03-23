@@ -19,7 +19,7 @@ Make 2D and 3D games in live collaboration with [Superpowers](http://superpowers
 ## Roadmap / Ideas :
  - Improve Sup.Text performance & add more rendering options
  - Improve Behavior Editor: add more types (ie Array, simple interface) & Component reference
- - Add more 3d model importer: gltf2, fbx, obj?
+ - Add more 3d model importer: gltf2, fbx, blend?
  - Add layer rendering on camera
  - Add pixel-perfect camera
  - 9 Sliced sprite
