@@ -75,6 +75,21 @@ html
         .text-editor-container
           textarea(disabled).text-editor
 
+    .text-editor.resize-handle.bottom
+    .error-pane.collapsable.collapsed
+      .header
+        .info= t("shaderEditor:status.noErrors")
+
+      .content(disabled, hidden)
+        table
+          thead
+            tr
+              th= t("shaderEditor:status.type")
+              th= t("shaderEditor:status.file")
+              th= t("shaderEditor:status.line")
+              th= t("shaderEditor:status.message")
+          tbody
+
     script(src="/SupCore.js")
     script(src="../../../../../SupEngine.js")
     script(src="/SupClient.js")

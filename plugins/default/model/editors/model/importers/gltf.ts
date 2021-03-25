@@ -96,6 +96,12 @@ enum GLTF2Const {
   FLOAT = 5126
 }
 
+enum GLTF2Interpolation {
+  LINEAR = "LINEAR",
+  STEP = "STEP",
+  CUBICSPLINE = "CUBICSPLINE"
+}
+
 interface GLTF2File {
   accessors?: GLTF2Accessor[];
   animations?: GLTF2Animation[];
@@ -427,7 +433,7 @@ export function importModel(files: File[], callback: ImportCallback) {
       // Indices
       if (primitive.indices != null) {
         const indexAccessor: GLTF2Accessor = gltf.accessors[primitive.indices];
-        if (indexAccessor.componentType !== GLTFConst.UNSIGNED_SHORT) {
+        if (indexAccessor.componentType !== GLTF2Const.UNSIGNED_SHORT) {
           callback([ createLogError(`Unsupported component type for index accessor: ${indexAccessor.componentType}`) ]);
           return;
         }
@@ -441,7 +447,7 @@ export function importModel(files: File[], callback: ImportCallback) {
 
       const positionAccessor: GLTF2Accessor = gltf.accessors[primitive.attributes["POSITION"]];
       {
-        if (positionAccessor.componentType !== GLTFConst.FLOAT) {
+        if (positionAccessor.componentType !== GLTF2Const.FLOAT) {
           callback([ createLogError(`Unsupported component type for position accessor: ${positionAccessor.componentType}`) ]);
           return;
         }
@@ -456,7 +462,7 @@ export function importModel(files: File[], callback: ImportCallback) {
       // Normal
       const normalAccessor: GLTF2Accessor = gltf.accessors[primitive.attributes["NORMAL"]];
       if (normalAccessor != null) {
-        if (normalAccessor.componentType !== GLTFConst.FLOAT) {
+        if (normalAccessor.componentType !== GLTF2Const.FLOAT) {
           callback([ createLogError(`Unsupported component type for normal accessor: ${normalAccessor.componentType}`) ]);
           return;
         }
@@ -471,7 +477,7 @@ export function importModel(files: File[], callback: ImportCallback) {
       // UV
       const uvAccessor: GLTF2Accessor = gltf.accessors[primitive.attributes["TEXCOORD_0"]];
       if (uvAccessor != null) {
-        if (uvAccessor.componentType !== GLTFConst.FLOAT) {
+        if (uvAccessor.componentType !== GLTF2Const.FLOAT) {
           callback([ createLogError(`Unsupported component type for UV accessor: ${uvAccessor.componentType}`) ]);
           return;
         }
@@ -492,7 +498,7 @@ export function importModel(files: File[], callback: ImportCallback) {
       // Skin indices
       const skinIndexAccessor: GLTF2Accessor = gltf.accessors[primitive.attributes["JOINTS_0"]];
       if (skinIndexAccessor != null) {
-        if (skinIndexAccessor.componentType !== GLTFConst.UNSIGNED_SHORT) {
+        if (skinIndexAccessor.componentType !== GLTF2Const.UNSIGNED_SHORT) {
           callback([ createLogError(`Unsupported component type for skin index accessor: ${skinIndexAccessor.componentType}`) ]);
           return;
         }
@@ -501,13 +507,17 @@ export function importModel(files: File[], callback: ImportCallback) {
         const start =
           skinIndexBufferView.byteOffset != null ? skinIndexBufferView.byteOffset : 0 +
           skinIndexAccessor.byteOffset != null ? skinIndexAccessor.byteOffset : 0;
-        attributes["skinIndex"] = buffers[skinIndexBufferView.buffer].slice(start, start + skinIndexAccessor.count * 2 * 4);
+        const indexArray = new Uint16Array(buffers[skinIndexBufferView.buffer], start, skinIndexAccessor.count * 4);
+        let floatIndex = [];
+        for (let i = 0; i < skinIndexAccessor.count * 4; i++)
+          floatIndex.push(indexArray[i]);
+        attributes["skinIndex"] = Float32Array.from(floatIndex).buffer;
       }
 
       // Skin weights
       const skinWeightAccessor: GLTF2Accessor = gltf.accessors[primitive.attributes["WEIGHTS_0"]];
       if (skinWeightAccessor != null) {
-        if (skinWeightAccessor.componentType !== GLTFConst.FLOAT) {
+        if (skinWeightAccessor.componentType !== GLTF2Const.FLOAT) {
           callback([ createLogError(`Unsupported component type for skin weight accessor: ${skinWeightAccessor.componentType}`) ]);
           return;
         }
@@ -523,13 +533,6 @@ export function importModel(files: File[], callback: ImportCallback) {
       let bones: { name: string; matrix: number[]; parentIndex: number }[] = null;
       if (skin != null) {
         bones = [];
-        /*const matrixAccessor: GLTF2Accessor = gltf.accessors[skin.inverseBindMatrices];
-        const matrixBufferView: GLTF2BufferView = gltf.bufferViews[matrixAccessor.bufferView];
-        const start =
-          matrixBufferView.byteOffset != null ? matrixBufferView.byteOffset : 0 +
-          matrixAccessor.byteOffset != null ? matrixAccessor.byteOffset : 0;
-        const matrixArray = new Float32Array(buffers[matrixBufferView.buffer], start, matrixAccessor.count * 16);
-        console.log(matrixArray);*/
         for (let i = 0; i < skin.joints.length; i++) {
           const jointId = skin.joints[i];
           const boneNode = gltf.nodes[jointId];
@@ -547,74 +550,81 @@ export function importModel(files: File[], callback: ImportCallback) {
         }
       }
 
+      let interpolationErrors = 0;
       // Animation
       let animation: { duration: number; keyFrames: { [jointName: string]: any } } = null;
-      if (Object.keys(gltf.animations).length > 0) {
+      if (gltf.animations != null && gltf.animations.length > 0) {
+        if (gltf.animations.length > 1)
+          logEntries.push(createLogWarning(`There is ${gltf.animations.length} animations in this file, only the first one will be imported`, gltfFile.name));
+
         animation = { duration: 0, keyFrames: {} };
+        const gltfAnim = gltf.animations[0];
 
-        /*for (const gltfAnimName in gltf.animations) */ {
-          const gltfAnim = gltf.animations[0];
-          // gltfAnim.count = keyframe count
+        for (const gltfChannelName in gltfAnim.channels) {
+          const gltfChannel = gltfAnim.channels[gltfChannelName];
+          const gltfSampler = gltfAnim.samplers[gltfChannel.sampler];
 
-          // gltfAnim.channels gives bone name + path (scale, rotation, position)
-          for (const gltfChannelName in gltfAnim.channels) {
-            const gltfChannel = gltfAnim.channels[gltfChannelName];
+          const jointName = gltf.nodes[gltfChannel.target.node].name;
+          // TODO: get skin.jointNames.indexOf(jointName) and work with IDs instead of jointName?
 
-            const jointName = gltf.nodes[gltfChannel.target.node].name;
-            // TODO: get skin.jointNames.indexOf(jointName) and work with IDs instead of jointName?
+          let boneAnim = animation.keyFrames[jointName];
+          if (boneAnim == null) boneAnim = animation.keyFrames[jointName] = {};
 
-            let boneAnim = animation.keyFrames[jointName];
-            if (boneAnim == null) boneAnim = animation.keyFrames[jointName] = {};
+          if (boneAnim[gltfChannel.target.path] != null) {
+            callback([ createLogError(`Found multiple animations for ${gltfChannel.target.path} of ${jointName} bone`) ]);
+            return;
+          }
 
-            if (boneAnim[gltfChannel.target.path] != null) {
-              callback([ createLogError(`Found multiple animations for ${gltfChannel.target.path} of ${jointName} bone`) ]);
-              return;
-            }
+          let boneTransformAnim = boneAnim[gltfChannel.target.path];
+          if (boneTransformAnim == null) boneTransformAnim = boneAnim[gltfChannel.target.path] = [];
 
-            let boneTransformAnim = boneAnim[gltfChannel.target.path];
-            if (boneTransformAnim == null) boneTransformAnim = boneAnim[gltfChannel.target.path] = [];
+          const inputParameterId = gltfSampler.input;
+          const timeAccessor: GLTF2Accessor = gltf.accessors[inputParameterId];
+          if (timeAccessor.componentType !== GLTF2Const.FLOAT) {
+            callback([ createLogError(`Unsupported component type for animation time accessor: ${timeAccessor.componentType}`) ]);
+            return;
+          }
 
-            const inputParameterId = gltfAnim.samplers[gltfChannel.sampler].input;
-            const timeAccessor: GLTF2Accessor = gltf.accessors[inputParameterId];
-            if (timeAccessor.componentType !== GLTFConst.FLOAT) {
-              callback([ createLogError(`Unsupported component type for animation time accessor: ${timeAccessor.componentType}`) ]);
-              return;
-            }
+          const timeBufferView: GLTF2BufferView = gltf.bufferViews[timeAccessor.bufferView];
+          const startTime =
+            timeBufferView.byteOffset != null ? timeBufferView.byteOffset : 0 +
+            timeAccessor.byteOffset != null ? timeAccessor.byteOffset : 0;
+          const timeArray = new Float32Array(buffers[timeBufferView.buffer], startTime, timeAccessor.count);
 
-            const timeBufferView: GLTF2BufferView = gltf.bufferViews[timeAccessor.bufferView];
-            const startTime =
-              timeBufferView.byteOffset != null ? timeBufferView.byteOffset : 0 +
-              timeAccessor.byteOffset != null ? timeAccessor.byteOffset : 0;
-            const timeArray = new Float32Array(buffers[timeBufferView.buffer], startTime, timeAccessor.count);
+          const outputParameterId = gltfSampler.output;
+          const outputAccessor: GLTF2Accessor = gltf.accessors[outputParameterId];
+          if (outputAccessor.componentType !== GLTF2Const.FLOAT) {
+            callback([ createLogError(`Unsupported component type for animation output accessor: ${outputAccessor.componentType}`) ]);
+            return;
+          }
 
-            const outputParameterId = gltfAnim.samplers[gltfChannel.sampler].output;
-            const outputAccessor: GLTF2Accessor = gltf.accessors[outputParameterId];
-            if (outputAccessor.componentType !== GLTFConst.FLOAT) {
-              callback([ createLogError(`Unsupported component type for animation output accessor: ${outputAccessor.componentType}`) ]);
-              return;
-            }
+          const componentsCount = (outputAccessor.type === "VEC3") ? 3 : 4;
 
-            const componentsCount = (outputAccessor.type === "VEC3") ? 3 : 4;
+          const outputBufferView: GLTF2BufferView = gltf.bufferViews[outputAccessor.bufferView];
+          const startOutput =
+            outputBufferView.byteOffset != null ? outputBufferView.byteOffset : 0 +
+            outputAccessor.byteOffset != null ? outputAccessor.byteOffset : 0;
+          const outputArray = new Float32Array(buffers[outputBufferView.buffer], startOutput, outputAccessor.count * componentsCount);
 
-            const outputBufferView: GLTF2BufferView = gltf.bufferViews[outputAccessor.bufferView];
-            const startOutput =
-              outputBufferView.byteOffset != null ? outputBufferView.byteOffset : 0 +
-              outputAccessor.byteOffset != null ? outputAccessor.byteOffset : 0;
-            const outputArray = new Float32Array(buffers[outputBufferView.buffer], startOutput, outputAccessor.count * componentsCount);
+          if (gltfSampler.interpolation !== GLTF2Interpolation.LINEAR)
+            interpolationErrors++;
+          const multCubic = (gltfSampler.interpolation === GLTF2Interpolation.CUBICSPLINE) ? 3 : 1;
+          const offCubic = (gltfSampler.interpolation === GLTF2Interpolation.CUBICSPLINE) ? componentsCount : 0;
 
-            for (let i = 0; i < timeArray.length; i++) {
-              const time = timeArray[i];
+          for (let i = 0; i < timeArray.length; i++) {
+            const time = timeArray[i];
 
-              const value: number[] = [];
-              for (let j = 0; j < componentsCount; j++) value.push(outputArray[i * componentsCount + j]);
-              if (gltfChannel.target.path === "scale") console.log(outputArray);
-              if (gltfChannel.target.path === "scale") console.log(value);
-              boneTransformAnim.push({ time, value });
-              animation.duration = Math.max(animation.duration, time);
-            }
+            const value: number[] = [];
+            for (let j = 0; j < componentsCount; j++) value.push(outputArray[i * componentsCount * multCubic + j + offCubic]);
+            boneTransformAnim.push({ time, value });
+            animation.duration = Math.max(animation.duration, time);
           }
         }
       }
+      if (interpolationErrors > 0)
+        logEntries.push(createLogWarning(`${interpolationErrors} unsupported interpolations. Replaced by a LINEAR interpolation`, gltfFile.name));
+      console.log(attributes);
+      console.log(bones);
       console.log(animation);
 
       logEntries.push(createLogInfo(`Imported glTF model v${gltf.asset.version}, ${attributes["position"].byteLength / 4 / 3} vertices.`, gltfFile.name));
@@ -905,6 +915,9 @@ export function importModel(files: File[], callback: ImportCallback) {
           }
         }
       }
+      console.log(attributes);
+      console.log(bones);
+      console.log(animation);
 
       const log = [ createLogInfo(`Imported glTF model v${gltf.asset.version}, ${attributes["position"].byteLength / 4 / 3} vertices.`, gltfFile.name) ];
 

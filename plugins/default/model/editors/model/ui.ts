@@ -166,12 +166,12 @@ function setImportLog(log: ImportLogEntry[]) {
   }
 
   const errorsAndWarningsInfo: string[] = [];
-  if (errorsCount > 1) errorsAndWarningsInfo.push(`${errorsCount} errors`);
-  else if (errorsCount > 0) errorsAndWarningsInfo.push(`1 error`);
-  else errorsAndWarningsInfo.push("No errors");
+  if (errorsCount > 1) errorsAndWarningsInfo.push(SupClient.i18n.t("modelEditor:status.severalErrors", { errors: errorsCount }));
+  else if (errorsCount > 0) errorsAndWarningsInfo.push(SupClient.i18n.t("modelEditor:status.oneError"));
+  else errorsAndWarningsInfo.push(SupClient.i18n.t("modelEditor:status.noErrors"));
 
-  if (warningsCount > 1) errorsAndWarningsInfo.push(`${warningsCount} warnings`);
-  else if (warningsCount > 0) errorsAndWarningsInfo.push(`${warningsCount} warnings`);
+  if (warningsCount > 1) errorsAndWarningsInfo.push(SupClient.i18n.t("modelEditor:status.severalWarnings", { warnings: warningsCount }));
+  else if (warningsCount > 0) errorsAndWarningsInfo.push(SupClient.i18n.t("modelEditor:status.oneWarning"));
 
   if (data == null || errorsCount > 0) {
     const info = (data == null) ? `Import failed — ` : "";

@@ -1,4 +1,18 @@
 {
+  "status": {
+    "noErrors": "No errors",
+    "oneError": "1 error",
+    "severalErrors": "${errors} errors",
+
+    "oneWarning": "1 warning",
+    "severalWarnings": "${warnings} warnings",
+
+    "line": "Line",
+    "type": "Type",
+    "message": "Message",
+    "file": "File"
+  },
+  
   "uniforms": "Uniforms",
   "newUniform": "New uniform",
   "attributes": "Attributes",

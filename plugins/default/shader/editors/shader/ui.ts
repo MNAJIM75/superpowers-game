@@ -1,4 +1,4 @@
-import { data } from "./network";
+import { data, CompileLogEntry } from "./network";
 import { setupPreview } from "./engine";
 import Uniforms, { UniformPub } from "../../data/Uniforms";
 import Attributes, { AttributePub } from "../../data/Attributes";
@@ -19,6 +19,12 @@ const ui: {
   previewTypeSelect?: HTMLSelectElement;
   previewAssetInput?: HTMLInputElement;
   previewEntry?: { id: string; type: string; };
+
+  errorPane?: HTMLDivElement;
+  errorPaneStatus?: HTMLDivElement;
+  errorPaneInfo?: HTMLDivElement;
+  errorsTBody?: HTMLTableSectionElement;
+  prevLog?: CompileLogEntry[];
 } = {};
 export default ui;
 
@@ -253,3 +259,78 @@ ui.previewAssetInput.addEventListener("input", (event: any) => {
   ui.previewEntry = entry;
   setupPreview();
 });
+
+// Error pane
+ui.errorPane = <HTMLDivElement>document.querySelector(".error-pane");
+ui.errorPaneStatus = <HTMLDivElement>ui.errorPane.querySelector(".header");
+ui.errorPaneInfo = <HTMLDivElement>ui.errorPaneStatus.querySelector(".info");
+ui.errorsTBody = <HTMLTableSectionElement>ui.errorPane.querySelector(".content tbody");
+ui.prevLog = [];
+
+SupClient.setupCollapsablePane(ui.errorPane);
+
+export function addImportLog(log: CompileLogEntry[]) {
+  let errorsCount = 0;
+  let warningsCount = 0;
+  let lastErrorRow: HTMLTableRowElement = null;
+
+  if (log == null) log = [];
+  ui.prevLog = ui.prevLog.concat(log);
+  ui.errorsTBody.innerHTML = "";
+  for (const entry of ui.prevLog) {
+    // console.log(entry.file, entry.line, entry.type, entry.message);
+
+    const logRow = document.createElement("tr");
+
+    const typeCell = document.createElement("td");
+    typeCell.textContent = entry.type;
+    logRow.appendChild(typeCell);
+
+    const fileCell = document.createElement("td");
+    fileCell.textContent = entry.file;
+    logRow.appendChild(fileCell);
+
+    const positionCell = document.createElement("td");
+    positionCell.textContent = (entry.line != null) ? (entry.line).toString() : "";
+    logRow.appendChild(positionCell);
+
+    const messageCell = document.createElement("td");
+    messageCell.textContent = entry.message;
+    logRow.appendChild(messageCell);
+
+    if (entry.type === "warning") warningsCount++;
+
+    if (entry.type !== "error") {
+      ui.errorsTBody.appendChild(logRow);
+      continue;
+    }
+
+    ui.errorsTBody.insertBefore(logRow, (lastErrorRow != null) ? lastErrorRow.nextElementSibling : ui.errorsTBody.firstChild);
+    lastErrorRow = logRow;
+    errorsCount++;
+  }
+
+  const errorsAndWarningsInfo: string[] = [];
+  if (errorsCount > 1) errorsAndWarningsInfo.push(SupClient.i18n.t("shaderEditor:status.severalErrors", { errors: errorsCount }));
+  else if (errorsCount > 0) errorsAndWarningsInfo.push(SupClient.i18n.t("shaderEditor:status.oneError"));
+  else errorsAndWarningsInfo.push(SupClient.i18n.t("shaderEditor:status.noErrors"));
+
+  if (warningsCount > 1) errorsAndWarningsInfo.push(SupClient.i18n.t("shaderEditor:status.severalWarnings", { warnings: warningsCount }));
+  else if (warningsCount > 0) errorsAndWarningsInfo.push(SupClient.i18n.t("shaderEditor:status.oneWarning"));
+
+  if (errorsCount > 0)
+    ui.errorPaneStatus.classList.add("has-errors");
+  else
+    ui.errorPaneStatus.classList.remove("has-errors");
+
+  ui.errorPaneInfo.textContent = errorsAndWarningsInfo.join(", ");
+}
+
+export function resetLog(file: string) {
+  for (let i = ui.prevLog.length - 1; i >= 0; i--) {
+    if (ui.prevLog[i].file === file) {
+      ui.prevLog.splice(i, 1);
+    }
+  }
+  addImportLog(null);
+}

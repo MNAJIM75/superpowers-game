@@ -98,3 +98,52 @@ body
 
     .fragment
       width 50%
+
+  .error-pane {
+    &.collapsable { min-height: 200px; }
+
+    .header .info {
+      flex: 1;
+      padding: 0.5em;
+    }
+
+    .content {
+      flex: 1;
+      overflow-y: scroll;
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      tbody tr {
+        // cursor pointer
+
+        &:hover { background: #eee; }
+        // &:active { background-color: #444; color: #ccc; }
+      }
+
+      th {
+        font-weight: normal;
+        color: #666;
+      }
+
+      td, th {
+        text-align: left;
+        border: 1px solid #ccc;
+        padding: 0.4em;
+      }
+
+      td:first-child, th:first-child {
+        text-align: right;
+      }
+
+      td:nth-child(4), th:nth-child(4) {
+        width: 100%;
+      }
+
+      td:last-child {
+        white-space: nowrap;
+      }
+    }
+  }

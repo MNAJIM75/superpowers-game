@@ -1,4 +1,4 @@
-import ui, { setupUniform, setUniformValueInputs, setupAttribute, setupEditors } from "./ui";
+import ui, { setupUniform, setUniformValueInputs, setupAttribute, setupEditors, addImportLog, resetLog } from "./ui";
 import { setupPreview } from "./engine";
 import ShaderAsset from "../../data/ShaderAsset";
 import { UniformPub } from "../../data/Uniforms";
@@ -7,11 +7,18 @@ import { AttributePub } from "../../data/Attributes";
 export let data: { projectClient?: SupClient.ProjectClient, shaderAsset?: ShaderAsset, previewComponentUpdater?: any };
 
 export let socket: SocketIOClient.Socket;
-SupClient.i18n.load([], () => {
+SupClient.i18n.load([{ root: `${window.location.pathname}/../..`, name: "shaderEditor" }], () => {
   socket = SupClient.connect(SupClient.query.project);
   socket.on("welcome", onWelcome);
   socket.on("disconnect", SupClient.onDisconnected);
 });
+
+export interface CompileLogEntry {
+  line: number;
+  type: string;
+  message: string;
+  file: string;
+}
 
 function onWelcome(clientId: string) {
   data = { projectClient: new SupClient.ProjectClient(socket, { subEntries: true }) };
@@ -187,18 +194,23 @@ function checkVertexShader() {
   const log = gl.getShaderInfoLog(shader);
 
   const errors = log.split("\n");
-  if (errors[errors.length - 1] === "") errors.pop();
+  resetLog("vertex");
+  let compileLog: CompileLogEntry[] = [];
   for (let error of errors) {
     error = error.replace("ERROR: 0:", "");
     const lineLimiterIndex = error.indexOf(":");
     const line = parseInt(error.slice(0, lineLimiterIndex), 10) - vertexStartLength;
     const message = error.slice(lineLimiterIndex + 2);
     console.log(`Error at line "${line}": ${message}`);
+    if (message !== "" && line !== NaN)
+      compileLog.push({line: line != null ? line : null, type: "error", message: message, file: "vertex"});
   }
 
-  ui.vertexHeader.classList.toggle("has-errors", errors.length > 0);
+  ui.vertexHeader.classList.toggle("has-errors", compileLog.length > 0);
   ui.vertexHeader.classList.toggle("has-draft", true);
-  ui.vertexSaveElt.hidden = errors.length > 0;
+  ui.vertexSaveElt.hidden = compileLog.length > 0;
+
+  addImportLog(compileLog);
 }
 
 const fragmentStart = `precision mediump float;
@@ -218,15 +230,19 @@ function checkFragmentShader() {
   const log = gl.getShaderInfoLog(shader);
 
   const errors = log.split("\n");
-  if (errors[errors.length - 1] === "") errors.pop();
+  resetLog("fragment");
+  let compileLog: CompileLogEntry[] = [];
   for (let error of errors) {
     error = error.replace("ERROR: 0:", "");
     const lineLimiterIndex = error.indexOf(":");
     const line = parseInt(error.slice(0, lineLimiterIndex), 10) - fragmentStartLength;
     const message = error.slice(lineLimiterIndex + 2);
     console.log(`Error at line "${line}": ${message}`);
+    if (message !== "" && line !== NaN)
+      compileLog.push({line: line != null ? line : null, type: "error", message: message, file: "fragment"});
   }
-  ui.fragmentHeader.classList.toggle("has-errors", errors.length > 0);
+  ui.fragmentHeader.classList.toggle("has-errors", compileLog.length > 0);
   ui.fragmentHeader.classList.toggle("has-draft", true);
-  ui.fragmentSaveElt.hidden = errors.length > 0;
+  ui.fragmentSaveElt.hidden = compileLog.length > 0;
+  addImportLog(compileLog);
 }
