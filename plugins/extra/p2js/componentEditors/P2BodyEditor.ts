@@ -15,7 +15,7 @@ export default class P2BodyEditor {
     this.editConfig = editConfig;
 
     const massRow = SupClient.table.appendRow(this.tbody, SupClient.i18n.t("componentEditors:P2Body.mass"));
-    this.fields["mass"] = SupClient.table.appendNumberField(massRow.valueCell, config.mass, { min: 0 });
+    this.fields["mass"] = SupClient.table.appendNumberField(massRow.valueCell, config.mass, { min: 0, step: "any" });
     this.fields["mass"].addEventListener("change", (event: any) => {
       this.editConfig("setProperty", "mass", parseFloat(event.target.value));
     });
@@ -27,7 +27,7 @@ export default class P2BodyEditor {
     });
 
     const offsetRow = SupClient.table.appendRow(this.tbody, SupClient.i18n.t("componentEditors:P2Body.offset"));
-    const offsetFields = SupClient.table.appendNumberFields(offsetRow.valueCell, [config.offsetX, config.offsetY]);
+    const offsetFields = SupClient.table.appendNumberFields(offsetRow.valueCell, [config.offsetX, config.offsetY], { step: "any" });
     this.fields["offsetX"] = offsetFields[0];
     this.fields["offsetX"].addEventListener("change", (event: any) => {
       this.editConfig("setProperty", "offsetX", parseFloat(event.target.value));
@@ -51,7 +51,7 @@ export default class P2BodyEditor {
     // Box
     this.sizeRow = SupClient.table.appendRow(this.tbody, SupClient.i18n.t("componentEditors:P2Body.size"));
 
-    const sizeFields = SupClient.table.appendNumberFields(this.sizeRow.valueCell, [config.width, config.height], { min: 0 });
+    const sizeFields = SupClient.table.appendNumberFields(this.sizeRow.valueCell, [config.width, config.height], { min: 0, step: "any" });
     this.fields["width"] = sizeFields[0];
     this.fields["width"].addEventListener("change", (event: any) => {
       this.editConfig("setProperty", "width", parseFloat(event.target.value));
@@ -63,14 +63,14 @@ export default class P2BodyEditor {
     });
 
     this.angleRow = SupClient.table.appendRow(this.tbody, SupClient.i18n.t("componentEditors:P2Body.angle"));
-    this.fields["angle"] = SupClient.table.appendNumberField(this.angleRow.valueCell, config.angle, { min: -360, max: 360 });
+    this.fields["angle"] = SupClient.table.appendNumberField(this.angleRow.valueCell, config.angle, { min: -360, max: 360, step: "any" });
     this.fields["angle"].addEventListener("change", (event: any) => {
       this.editConfig("setProperty", "angle", parseFloat(event.target.value));
     });
 
     // Circle
     this.radiusRow = SupClient.table.appendRow(this.tbody, SupClient.i18n.t("componentEditors:P2Body.radius"));
-    this.fields["radius"] = SupClient.table.appendNumberField(this.radiusRow.valueCell, config.radius, { min: 0 });
+    this.fields["radius"] = SupClient.table.appendNumberField(this.radiusRow.valueCell, config.radius, { min: 0, step: "any" });
     this.fields["radius"].addEventListener("change", (event: any) => {
       this.editConfig("setProperty", "radius", parseFloat(event.target.value));
     });

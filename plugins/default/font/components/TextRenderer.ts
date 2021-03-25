@@ -92,6 +92,19 @@ export default class TextRenderer extends SupEngine.ActorComponent {
     canvas.height = height;
 
     const color = (this.options.color != null) ? this.options.color : this.font.color;
+    this.texture = new THREE.CanvasTexture(canvas);
+    if (this.font.filtering === "pixelated") {
+      this.texture.magFilter = SupEngine.THREE.NearestFilter;
+      this.texture.minFilter = SupEngine.THREE.NearestFilter;
+    }
+    else{
+      this.texture.minFilter = SupEngine.THREE.LinearFilter;
+      const r = parseInt(color.substring(0, 2), 16);
+      const g = parseInt(color.substring(2, 4), 16);
+      const b = parseInt(color.substring(4, 6), 16);
+      ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.01)`; // remove the black fringe 
+      ctx.fillRect(0, 0, width, height);
+    }
     ctx.fillStyle = `#${color}`;
     ctx.font = `${fontSize}px ${this.font.name}`;
     ctx.textBaseline = "middle";
@@ -106,16 +119,6 @@ export default class TextRenderer extends SupEngine.ActorComponent {
     for (let index = 0; index < texts.length; index++) {
       ctx.fillText(texts[index], x, heightBorder + (0.5 + (index - (texts.length - 1) / 2) / texts.length) * heightWithoutBorder);
     }
-
-    this.texture = new THREE.Texture(canvas);
-    if (this.font.filtering === "pixelated") {
-      this.texture.magFilter = SupEngine.THREE.NearestFilter;
-      this.texture.minFilter = SupEngine.THREE.NearestFilter;
-    } else {
-      // See https://github.com/mrdoob/three.js/blob/4582bf1276c30c238e415cb79f4871e8560d102d/src/renderers/WebGLRenderer.js#L5664
-      this.texture.minFilter = SupEngine.THREE.LinearFilter;
-    }
-    this.texture.needsUpdate = true;
 
     const geometry = new THREE.PlaneBufferGeometry(width, height);
     const material = new THREE.MeshBasicMaterial({

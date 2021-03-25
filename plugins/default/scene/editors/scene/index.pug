@@ -50,7 +50,7 @@ html
           .title= t("sceneEditor:controls.grid.title")
           div
             label(for="grid-step")= t("sceneEditor:controls.grid.size")
-            input#grid-step(type="number",value="1",min="0")
+            input#grid-step(type="number",value="1",min="0.001",step="any")
             input#grid-visible(type="checkbox")
             label(for="grid-visible")= t("sceneEditor:controls.grid.visible")
         .light
