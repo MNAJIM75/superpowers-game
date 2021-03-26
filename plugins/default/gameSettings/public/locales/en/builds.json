@@ -6,7 +6,7 @@
     "done": "Exported ${total} elements to ${path}.",
 
     "errors": {
-      "exportFailed": "Failed to export ${path}."
+      "exportFailed": "Failed to export ${path} : ${error}"
     }
   }
 }

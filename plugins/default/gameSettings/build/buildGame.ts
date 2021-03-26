@@ -111,7 +111,7 @@ function onEntriesReceived(theEntries: SupCore.Data.Entries) {
     SupClient.fetch(systemBuildFile, "text", (err, data) => {
       if (err != null) {
         progress.errors++;
-        SupClient.html("li", { parent: detailsListElt, textContent: SupClient.i18n.t("builds:game.errors.exportFailed", { path: outputPath }) });
+        SupClient.html("li", { parent: detailsListElt, textContent: SupClient.i18n.t("builds:game.errors.exportFailed", { path: outputPath, error: err.message }) });
         progress.index++;
         updateProgress();
         return;
@@ -121,7 +121,7 @@ function onEntriesReceived(theEntries: SupCore.Data.Entries) {
       SupApp.mkdirp(outputDirname, (err) => {
         if (err != null && outputDirname !== settings.outputFolder) {
           progress.errors++;
-          SupClient.html("li", { parent: detailsListElt, textContent: SupClient.i18n.t("builds:game.errors.exportFailed", { path: outputPath }) });
+          SupClient.html("li", { parent: detailsListElt, textContent: SupClient.i18n.t("builds:game.errors.exportFailed", { path: outputPath, error: err.message }) });
           progress.index++;
           updateProgress();
           return;
@@ -130,7 +130,7 @@ function onEntriesReceived(theEntries: SupCore.Data.Entries) {
         SupApp.writeFile(outputPath, data, (err) => {
           if (err != null) {
             progress.errors++;
-            SupClient.html("li", { parent: detailsListElt, textContent: SupClient.i18n.t("builds:game.errors.exportFailed", { path: outputPath }) });
+            SupClient.html("li", { parent: detailsListElt, textContent: SupClient.i18n.t("builds:game.errors.exportFailed", { path: outputPath, error: err.message }) });
           }
 
           progress.index++;
@@ -153,7 +153,7 @@ function onManifestReceived(err: string, manifestPub: SupCore.Data.ProjectManife
   SupApp.writeFile(projectPath, json, { encoding: "utf8" }, (err) => {
     if (err != null) {
       progress.errors++;
-      SupClient.html("li", { parent: detailsListElt, textContent: SupClient.i18n.t("builds:game.errors.exportFailed", { path: projectPath }) });
+      SupClient.html("li", { parent: detailsListElt, textContent: SupClient.i18n.t("builds:game.errors.exportFailed", { path: projectPath, error: err.message }) });
     }
 
     progress.index++;
@@ -186,7 +186,7 @@ function onAssetReceived(assetId: string, asset: ClientExportableAsset) {
     asset.clientExport(outputFolder, (err) => {
       if (err != null) {
         progress.errors++;
-        SupClient.html("li", { parent: detailsListElt, textContent: SupClient.i18n.t("builds:game.errors.exportFailed", { path: outputFolder }) });
+        SupClient.html("li", { parent: detailsListElt, textContent: SupClient.i18n.t("builds:game.errors.exportFailed", { path: outputFolder, error: err.message }) });
       }
 
       progress.index++;
@@ -205,7 +205,7 @@ function onResourceReceived(resourceId: string, resource: ClientExportableResour
     resource.clientExport(outputFolder, (err) => {
       if (err != null) {
         progress.errors++;
-        SupClient.html("li", { parent: detailsListElt, textContent: SupClient.i18n.t("builds:game.errors.exportFailed", { path: outputFolder }) });
+        SupClient.html("li", { parent: detailsListElt, textContent: SupClient.i18n.t("builds:game.errors.exportFailed", { path: outputFolder, error: err.message }) });
       }
 
       progress.index++;

@@ -17,7 +17,7 @@ export default class CannonBodyEditor {
     this.fields = {};
 
     const massRow = SupClient.table.appendRow(this.tbody, SupClient.i18n.t("componentEditors:CannonBody.mass"));
-    this.fields["mass"] = SupClient.table.appendNumberField(massRow.valueCell, config.mass, { min: 0 });
+    this.fields["mass"] = SupClient.table.appendNumberField(massRow.valueCell, config.mass, { min: 0, step: "any" });
     this.fields["mass"].addEventListener("change", (event) => {
       this.editConfig("setProperty", "mass", parseFloat((event.target as HTMLInputElement).value));
     });
@@ -52,7 +52,11 @@ export default class CannonBodyEditor {
     });
 
     const positionOffsetRow = SupClient.table.appendRow(this.tbody, SupClient.i18n.t("componentEditors:CannonBody.positionOffset"));
-    const positionOffsetFields = SupClient.table.appendNumberFields(positionOffsetRow.valueCell, [ config.positionOffset.x, config.positionOffset.y, config.positionOffset.z ]);
+    const positionOffsetFields = SupClient.table.appendNumberFields(
+      positionOffsetRow.valueCell,
+      [ config.positionOffset.x, config.positionOffset.y, config.positionOffset.z ],
+      { step: "any" }
+    );
     this.fields["positionOffset.x"] = positionOffsetFields[0];
     this.fields["positionOffset.y"] = positionOffsetFields[1];
     this.fields["positionOffset.z"] = positionOffsetFields[2];
@@ -71,7 +75,7 @@ export default class CannonBodyEditor {
     this.orientationOffsetRow = SupClient.table.appendRow(this.tbody, SupClient.i18n.t("componentEditors:CannonBody.orientationOffset"));
     const orientationOffsetFields = SupClient.table.appendNumberFields(this.orientationOffsetRow.valueCell,
       [ config.orientationOffset.x, config.orientationOffset.y, config.orientationOffset.z ],
-      { min: -360, max: 360 });
+      { min: -360, max: 360, step: "any" });
     this.fields["orientationOffset.x"] = orientationOffsetFields[0];
     this.fields["orientationOffset.y"] = orientationOffsetFields[1];
     this.fields["orientationOffset.z"] = orientationOffsetFields[2];
@@ -88,7 +92,11 @@ export default class CannonBodyEditor {
 
     // Box
     this.halfSizeRow = SupClient.table.appendRow(this.tbody, SupClient.i18n.t("componentEditors:CannonBody.halfSize"));
-    const halfSizeFields = SupClient.table.appendNumberFields(this.halfSizeRow.valueCell, [ config.halfSize.x, config.halfSize.y, config.halfSize.z ], { min: 0 });
+    const halfSizeFields = SupClient.table.appendNumberFields(
+      this.halfSizeRow.valueCell,
+      [ config.halfSize.x, config.halfSize.y, config.halfSize.z ],
+      { min: 0, step: "any" }
+    );
     this.fields["halfSize.x"] = halfSizeFields[0];
     this.fields["halfSize.y"] = halfSizeFields[1];
     this.fields["halfSize.z"] = halfSizeFields[2];
@@ -104,14 +112,14 @@ export default class CannonBodyEditor {
 
     // Sphere / Cylinder
     this.radiusRow = SupClient.table.appendRow(this.tbody, SupClient.i18n.t("componentEditors:CannonBody.radius"));
-    this.fields["radius"] = SupClient.table.appendNumberField(this.radiusRow.valueCell, config.radius, { min: 0 });
+    this.fields["radius"] = SupClient.table.appendNumberField(this.radiusRow.valueCell, config.radius, { min: 0, step: "any" });
     this.fields["radius"].addEventListener("change", (event) => {
       this.editConfig("setProperty", "radius", parseFloat((event.target as HTMLInputElement).value));
     });
 
     // Cylinder
     this.heightRow = SupClient.table.appendRow(this.tbody, SupClient.i18n.t("componentEditors:CannonBody.height"));
-    this.fields["height"] = SupClient.table.appendNumberField(this.heightRow.valueCell, config.height, { min: 0 });
+    this.fields["height"] = SupClient.table.appendNumberField(this.heightRow.valueCell, config.height, { min: 0, step: "any" });
     this.fields["height"].addEventListener("change", (event) => {
       this.editConfig("setProperty", "height", parseFloat((event.target as HTMLInputElement).value));
     });

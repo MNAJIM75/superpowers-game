@@ -107,7 +107,7 @@ export default class ModelRendererEditor {
       this.editConfig("setProperty", "opacity", opacity);
     });
 
-    this.opacityFields = SupClient.table.appendSliderField(opacityParent, "", { min: 0, max: 1, step: 0.1, sliderStep: 0.01 });
+    this.opacityFields = SupClient.table.appendSliderField(opacityParent, "", { min: 0, max: 1, step: 0.01, sliderStep: 0.01 });
     this.opacityFields.numberField.parentElement.addEventListener("input", (event: any) => {
       this.editConfig("setProperty", "opacity", parseFloat(event.target.value));
     });

@@ -381,7 +381,7 @@ Sup.registerBehavior(${behaviorName});
             else
               defaultValue.push("" + safeEval(propertyDecl.initializer.getText()));
           }
-          console.log({ name: member.name, type: typeName, defaultValue: defaultValue});
+          // console.log({ name: member.name, type: typeName, defaultValue: defaultValue});
           properties.push({ name: member.name, type: typeName, defaultValue: defaultValue});
         }
       }
