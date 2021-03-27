@@ -213,16 +213,17 @@ export default class Camera extends ActorComponent {
     );
 
     this.actor.gameInstance.threeRenderer.setClearColor(this.clearColor);
-    this.actor.gameInstance.threeRenderer.clearTarget(this.renderTarget, true, true, true);
+    const target = this.usePostProcessing ? this.renderTarget : null;
+    if (target != null) this.actor.gameInstance.threeRenderer.clearTarget(target, true, true, true);
     if (this.layers.length > 0) {
       for (const layer of this.layers) {
         this.actor.gameInstance.setActiveLayer(layer);
-        this.actor.gameInstance.threeRenderer.render(this.actor.gameInstance.threeScene, this.threeCamera, this.renderTarget);
+        this.actor.gameInstance.threeRenderer.render(this.actor.gameInstance.threeScene, this.threeCamera, target);
       }
     } else {
       for (let layer = 0; layer < this.actor.gameInstance.layers.length; layer++) {
         this.actor.gameInstance.setActiveLayer(layer);
-        this.actor.gameInstance.threeRenderer.render(this.actor.gameInstance.threeScene, this.threeCamera, this.renderTarget);
+        this.actor.gameInstance.threeRenderer.render(this.actor.gameInstance.threeScene, this.threeCamera, target);
       }
     }
     this.actor.gameInstance.setActiveLayer(null);
@@ -248,11 +249,9 @@ export default class Camera extends ActorComponent {
       }
 
       this.copyMat.uniforms["map"].value = buf1.texture;
-    } else {
-      this.copyMat.uniforms["map"].value = this.renderTarget.texture;
-    }
 
-    this.quadPass.material = this.copyMat;
-    this.actor.gameInstance.threeRenderer.render(this.scenePass, this.camPass);
+      this.quadPass.material = this.copyMat;
+      this.actor.gameInstance.threeRenderer.render(this.scenePass, this.camPass);
+    }
   }
 }

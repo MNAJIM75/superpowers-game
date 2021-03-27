@@ -16,6 +16,7 @@ export default class CameraEditor {
   viewportFields: { x?: HTMLInputElement; y?: HTMLInputElement; width?: HTMLInputElement; height?: HTMLInputElement } = {};
 
   usePostProcessingField: HTMLInputElement;
+  clearColorRowParts: SupClient.table.RowParts;
   postProcessingRowParts: SupClient.table.RowParts;
   postProcessingList: HTMLDivElement;
   postProcessingLayers: string[];
@@ -57,9 +58,6 @@ export default class CameraEditor {
     const farClippingPlaneRow = SupClient.table.appendRow(tbody, SupClient.i18n.t("componentEditors:Camera.farPlane"));
     this.farClippingPlaneField = SupClient.table.appendNumberField(farClippingPlaneRow.valueCell, config.farClippingPlane, { min: 0.1, step: "any" });
 
-    const clearColorRow = SupClient.table.appendRow(tbody, SupClient.i18n.t("componentEditors:Camera.clearColor"));
-    this.clearColorField = SupClient.table.appendColorField(clearColorRow.valueCell, config.clearColor);
-
     SupClient.table.appendHeader(tbody, SupClient.i18n.t("componentEditors:Camera.viewport.title"));
     const viewportXRow = SupClient.table.appendRow(tbody, SupClient.i18n.t("componentEditors:Camera.viewport.position"));
     [ this.viewportFields.x, this.viewportFields.y ] = SupClient.table.appendNumberFields(viewportXRow.valueCell, [ config.viewport.x, config.viewport.y ]
@@ -71,6 +69,12 @@ export default class CameraEditor {
 
     const usePostProcessingRow = SupClient.table.appendRow(tbody, SupClient.i18n.t("componentEditors:Camera.postProcessing.use"));
     this.usePostProcessingField = SupClient.table.appendBooleanField(usePostProcessingRow.valueCell, config.usePostProcessing);
+
+    this.clearColorRowParts = SupClient.table.appendRow(tbody, SupClient.i18n.t("componentEditors:Camera.clearColor"));
+    this.clearColorField = SupClient.table.appendColorField(this.clearColorRowParts.valueCell, config.clearColor);
+
+    if (config.usePostProcessing) this.clearColorRowParts.row.style.display = "";
+    else this.clearColorRowParts.row.style.display = "none";
 
     this.postProcessingRowParts = SupClient.table.appendRow(tbody, SupClient.i18n.t("componentEditors:Camera.postProcessing.stack"));
     this.postProcessingList = document.createElement("div");
@@ -130,6 +134,7 @@ export default class CameraEditor {
       case "clearColor": { this.clearColorField.setValue(value); } break;
       case "usePostProcessing": {
         this.usePostProcessingField.value = value;
+        this.clearColorRowParts.row.style.display = value ? "" : "none";
         this.postProcessingRowParts.row.style.display = value ? "" : "none";
       } break;
       case "shaders": {
