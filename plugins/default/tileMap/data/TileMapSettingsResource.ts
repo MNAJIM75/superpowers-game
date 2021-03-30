@@ -45,8 +45,8 @@ export default class TileMapSettingsResource extends SupCore.Data.Base.Resource 
       layerDepthOffset: 1,
 
       grid: {
-        width: 40,
-        height: 40
+        width: 16,
+        height: 16
       }
     };
 

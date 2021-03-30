@@ -61,18 +61,18 @@ export default class Camera extends ActorComponent {
       uniforms: {
         "map": { value: null }
       },
-      vertexShader: `
-        varying vec2 vUv;
-        void main() {
-          vUv = uv;
-          gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-        }`,
-      fragmentShader: `
-        uniform sampler2D map;
-        varying vec2 vUv;
-        void main() {
-          gl_FragColor = texture2D( map, vUv );
-        }`
+      vertexShader:
+"varying vec2 vUv;\n\
+void main() {\n\
+  vUv = uv;\n\
+  gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n\
+}",
+      fragmentShader:
+"uniform sampler2D map;\n\
+varying vec2 vUv;\n\
+void main() {\n\
+  gl_FragColor = texture2D( map, vUv );\n\
+}"
     });
     this.copyMat.transparent = true;
   }

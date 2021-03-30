@@ -28,7 +28,7 @@ export default class TileMapSettingsEditor {
     this.fields["height"] = SupClient.table.appendNumberField(this.defaultHeightRow.valueCell, "");
 
     this.depthOffsetRow = SupClient.table.appendRow(tbody, SupClient.i18n.t("settingsEditors:TileMap.depthOffset"));
-    this.fields["layerDepthOffset"] = SupClient.table.appendNumberField(this.depthOffsetRow.valueCell, "");
+    this.fields["layerDepthOffset"] = SupClient.table.appendNumberField(this.depthOffsetRow.valueCell, "", { step: "any" });
 
     this.gridSizeRow = SupClient.table.appendRow(tbody, SupClient.i18n.t("settingsEditors:TileMap.tileSetGridSize"));
     const gridFields = SupClient.table.appendNumberFields(this.gridSizeRow.valueCell, ["", ""]);
@@ -39,7 +39,10 @@ export default class TileMapSettingsEditor {
     fieldNames.forEach((fieldName) => {
       const field = this.fields[fieldName];
       field.addEventListener("change", (event: any) => {
-        this.projectClient.editResource("tileMapSettings", "setProperty", fieldName, parseInt(event.target.value, 10));
+        this.projectClient.editResource(
+          "tileMapSettings", "setProperty", fieldName,
+          (fieldName === "layerDepthOffset") ? parseFloat(event.target.value) : parseInt(event.target.value, 10)
+        );
       });
     });
     this.projectClient.subResource("tileMapSettings", this);

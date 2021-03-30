@@ -1,6 +1,6 @@
 /// <reference path="../../../common/textEditorWidget/operational-transform.d.ts" />
-/// <reference path="../node_modules/typescript/lib/typescriptServices.d.ts" />
-/// <reference path="../../typescript/typescriptAPI/TypeScriptAPIPlugin.d.ts" />
+/// <reference path="../../../../node_modules/typescript/lib/typescriptServices.d.ts" />
+/// <reference path="../typescriptAPI/TypeScriptAPIPlugin.d.ts" />
 
 import * as OT from "operational-transform";
 import * as fs from "fs";
@@ -34,7 +34,7 @@ let globalDefs = "";
 if ((<any>global).window == null) {
   const serverRequire = require;
   ts = serverRequire("typescript");
-  compileTypeScript = serverRequire("../runtime/compileTypeScript").default;
+  compileTypeScript = serverRequire("../../../../typescriptCompiler/compileTypeScript").default;
 
   SupCore.system.requireForAllPlugins("typescriptAPI/index.js");
   const plugins = SupCore.system.getPlugins<SupCore.TypeScriptAPIPlugin>("typescriptAPI");
@@ -42,7 +42,7 @@ if ((<any>global).window == null) {
   for (const pluginName in plugins) {
     const plugin = plugins[pluginName];
     if (plugin.defs != null) globalDefs += plugin.defs;
-    if (plugin.exposeActorComponent != null) actorComponentAccessors.push(`${plugin.exposeActorComponent.propertyName}: ${plugin.exposeActorComponent.className};`);
+    if (plugin.exposeActorComponent != null) actorComponentAccessors.push(plugin.exposeActorComponent);
   }
 
   globalDefs = globalDefs.replace("// INSERT_COMPONENT_ACCESSORS", actorComponentAccessors.join("\n    "));
@@ -218,10 +218,6 @@ Sup.registerBehavior(${behaviorName});
         });
       }
     });
-  }
-
-  clientExport(outputPath: string, callback: (err: Error) => void) {
-    this.write(SupApp.writeFile, outputPath, callback);
   }
 
   private write(writeFile: Function, outputPath: string, callback: (err: Error) => void) {

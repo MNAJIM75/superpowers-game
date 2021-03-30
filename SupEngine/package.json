@@ -12,6 +12,8 @@
     "three": "0.92.0"
   },
   "devDependencies": {
-    "@types/three": "0.92.25"
+    "@types/three": "0.92.25",
+    "gulp-uglify": "3.0.2",
+    "vinyl-buffer": "1.0.1"
   }
 }

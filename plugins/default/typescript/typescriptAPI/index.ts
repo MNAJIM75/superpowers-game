@@ -3,7 +3,7 @@
 import * as fs from "fs";
 
 SupCore.system.registerPlugin<SupCore.TypeScriptAPIPlugin>("typescriptAPI", "lib", {
-  defs: fs.readFileSync(`${__dirname}/../node_modules/typescript/lib/lib.core.d.ts`, { encoding: "utf8" }),
+  defs: fs.readFileSync(`${__dirname}/../../../../node_modules/typescript/lib/lib.core.d.ts`, { encoding: "utf8" }),
   code: "",
 });
 
@@ -40,7 +40,7 @@ SupCore.system.registerPlugin<SupCore.TypeScriptAPIPlugin>("typescriptAPI", "Sup
 SupCore.system.registerPlugin<SupCore.TypeScriptAPIPlugin>("typescriptAPI", "Camera", {
   code: fs.readFileSync(`${__dirname}/Sup.Camera.ts.txt`, { encoding: "utf8" }),
   defs: fs.readFileSync(`${__dirname}/Sup.Camera.d.ts.txt`, { encoding: "utf8" }),
-  exposeActorComponent: { propertyName: "camera", className: "Sup.Camera" }
+  exposeActorComponent: "camera: Sup.Camera;"
 });
 
 SupCore.system.registerPlugin<SupCore.TypeScriptAPIPlugin>("typescriptAPI", "Sup.Color", {

@@ -190,7 +190,7 @@ function addTileProperty(name: string, value = "") {
   valueInput.type = "string";
   valueInput.className = "value";
   valueInput.value = value;
-  valueInput.addEventListener("input", () => { data.projectClient.editAsset(SupClient.query.asset, "editTileProperty", data.selectedTile, ui.selectedProperty, valueInput.value); });
+  valueInput.addEventListener("input", () => { data.projectClient.editAsset(SupClient.query.asset, "editTileProperty", data.selectedTile, nameSpan.textContent, valueInput.value); });
 
   liElt.appendChild(valueInput);
 
