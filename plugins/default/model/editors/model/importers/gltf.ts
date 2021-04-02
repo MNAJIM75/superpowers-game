@@ -351,18 +351,18 @@ export function importModel(files: File[], callback: ImportCallback) {
 
     const gltf1Versions = [ "0.8", "1.0" ];
     if (gltf1Versions.indexOf(gltf.asset.version) !== -1) {
-      onGLTFRead(err, gltf);
+      onGLTFRead(gltf);
       return;
     }
 
     if (gltf.asset.version === "2.0") {
-      onGLTF2Read(err, gltf);
+      onGLTF2Read(gltf);
       return;
     }
     callback([ createLogError(`Unsupported glTF format version: ${gltf.asset.version}. Supported versions are: 0.8, 1.0, 2.0.`) ], gltfFile.name);
   };
 
-  const onGLTF2Read = (err: Error, gltf: GLTF2File) => {
+  const onGLTF2Read = (gltf: GLTF2File) => {
     if (gltf.meshes.length > 1) { callback([ createLogError("Only a single mesh is supported") ], gltfFile.name); return; }
 
     let logEntries: ImportLogEntry[] = [];
@@ -410,7 +410,7 @@ export function importModel(files: File[], callback: ImportCallback) {
     if (mode == null) mode = GLTFPrimitiveMode.TRIANGLES;
     if (mode !== GLTFPrimitiveMode.TRIANGLES) { callback([ createLogError("Only triangles are supported", gltfFile.name) ]); return; }
 
-    async.forEachOf(gltf.buffers, (bufferInfo: GLTF2Buffer, index: number, cb) => {
+    async.eachOf(gltf.buffers, (bufferInfo: GLTF2Buffer, index: number, cb) => {
       // Remove path info from the URI
       let filename = decodeURI(bufferInfo.uri);
       if (filename.indexOf("/") !== -1) filename = filename.substring(filename.lastIndexOf("/") + 1);
@@ -644,7 +644,7 @@ export function importModel(files: File[], callback: ImportCallback) {
     });
   };
 
-  const onGLTFRead = (err: Error, gltf: GLTFFile) => {
+  const onGLTFRead = (gltf: GLTFFile) => {
     const meshNames = Object.keys(gltf.meshes);
     if (meshNames.length > 1) { callback([ createLogError("Only a single mesh is supported") ], gltfFile.name); return; }
 

@@ -1,7 +1,7 @@
 {
   "name": "superpowers-game",
   "description": "Three.js-based game development system for Superpowers, the HTML5 app for real-time collaborative projects",
-  "version": "6.0.1",
+  "version": "6.0.2",
   "license": "ISC",
   "repository": {
     "type": "git",
@@ -11,12 +11,14 @@
     "systemId": "game"
   },
   "dependencies": {
+    "async": "^2.6.3",
     "combine-source-map": "^0.7.1",
     "convert-source-map": "^1.1.1",
     "typescript": "~1.8.2",
     "uglify-js": "2.7.5"
   },
   "devDependencies": {
+    "@types/async": "^2.4.2",
     "@types/convert-source-map": "0.0.30",
     "@types/uglify-js": "^2.6.28"
   }
