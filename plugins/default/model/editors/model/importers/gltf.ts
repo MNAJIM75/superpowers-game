@@ -623,9 +623,6 @@ export function importModel(files: File[], callback: ImportCallback) {
       }
       if (interpolationErrors > 0)
         logEntries.push(createLogWarning(`${interpolationErrors} unsupported interpolations. Replaced by a LINEAR interpolation`, gltfFile.name));
-      console.log(attributes);
-      console.log(bones);
-      console.log(animation);
 
       logEntries.push(createLogInfo(`Imported glTF model v${gltf.asset.version}, ${attributes["position"].byteLength / 4 / 3} vertices.`, gltfFile.name));
 

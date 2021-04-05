@@ -80,11 +80,10 @@ function onTileMapAssetReceived() {
 }
 
 function updateTileSetInput() {
-  const tileSetName =
-    (data.tileMapUpdater.tileMapAsset.pub.tileSetId != null) ?
-      data.projectClient.entries.getPathFromId(data.tileMapUpdater.tileMapAsset.pub.tileSetId) : "";
+  const assetId = data.tileMapUpdater.tileMapAsset.pub.tileSetId;
+  const tileSetName = (assetId != null) ? data.projectClient.entries.getPathFromId(assetId) : "";
   ui.tileSetInput.value = tileSetName;
-  ui.openTileSetButton.disabled = data.tileMapUpdater.tileMapAsset.pub.tileSetId == null;
+  ui.selectTileSetButton.textContent = SupClient.i18n.t(`common:actions.${assetId == null ? "select" : "clear"}`);
 }
 
 onEditCommands["changeTileSet"] = () => {

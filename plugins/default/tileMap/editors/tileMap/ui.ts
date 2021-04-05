@@ -12,7 +12,7 @@ import { TileMapLayerPub } from "../../data/TileMapLayers";
 
 const ui: {
   tileSetInput: HTMLInputElement;
-  openTileSetButton: HTMLButtonElement;
+  selectTileSetButton: HTMLButtonElement;
 
   sizeInput: HTMLInputElement;
 
@@ -38,12 +38,44 @@ new ResizeHandle(document.querySelector(".sidebar") as HTMLElement, "right");
 new ResizeHandle(document.querySelector(".layers") as HTMLElement, "bottom");
 
 ui.tileSetInput = document.querySelector(".property-tileSetId") as HTMLInputElement;
-ui.tileSetInput.addEventListener("input", onTileSetChange);
-ui.tileSetInput.addEventListener("keyup", (event: Event) => { event.stopPropagation(); });
+ui.tileSetInput.addEventListener("click", (event) => {
+  if (data.tileMapUpdater.tileMapAsset.pub.tileSetId != null) {
+    SupClient.openEntry(data.tileMapUpdater.tileMapAsset.pub.tileSetId);
+  } else {
+    new SupClient.Dialogs.FindAssetDialog(
+      data.projectClient.entries,
+      { "tileSet" : { pluginPath: "default/tileMap" } },
+      (assetId) => {
+        if (assetId != null) data.projectClient.editAsset(SupClient.query.asset, "changeTileSet", assetId);
+      });
+  }
+});
 
-ui.openTileSetButton = document.querySelector("button.open-tileSet") as HTMLButtonElement;
-ui.openTileSetButton.addEventListener("click", (event) => {
-  SupClient.openEntry(data.tileMapUpdater.tileMapAsset.pub.tileSetId);
+ui.tileSetInput.addEventListener("dragover", (event) => {
+  event.preventDefault();
+});
+ui.tileSetInput.addEventListener("drop", (event) => {
+  const entryId = event.dataTransfer.getData("application/vnd.superpowers.entry").split(",")[0];
+  if (typeof entryId !== "string") return;
+
+  const entry = data.projectClient.entries.byId[entryId];
+  if (entry == null || entry.type !== "tileSet") return;
+
+  data.projectClient.editAsset(SupClient.query.asset, "changeTileSet", entryId);
+});
+
+ui.selectTileSetButton = document.querySelector("button.select-tileSet") as HTMLButtonElement;
+ui.selectTileSetButton.addEventListener("click", (event) => {
+  if (data.tileMapUpdater.tileMapAsset.pub.tileSetId != null) {
+    data.projectClient.editAsset(SupClient.query.asset, "changeTileSet", null);
+    return;
+  }
+  new SupClient.Dialogs.FindAssetDialog(
+    data.projectClient.entries,
+    { "tileSet" : { pluginPath: "default/tileMap" } },
+    (assetId) => {
+      if (assetId != null) data.projectClient.editAsset(SupClient.query.asset, "changeTileSet", assetId);
+    });
 });
 
 ui.sizeInput = document.querySelector(".property-size") as HTMLInputElement;

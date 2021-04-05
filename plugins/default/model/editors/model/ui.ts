@@ -279,8 +279,9 @@ function onNewAnimationClick() {
 function onAnimationFileSelectChange(event: any) {
   if (event.target.files.length === 0) return;
 
-  const animationId: string = ui.selectedAnimationId;
+  ui.errorsTBody.innerHTML = "";
 
+  const animationId: string = ui.selectedAnimationId;
   importModel(event.target.files, (log, result) => {
     event.target.parentElement.reset();
 
