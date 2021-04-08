@@ -1,8 +1,8 @@
-import ui, { setupLayer, selectBrushTool, refreshLayersId } from "./ui";
+import ui, { setupLayer, setupSmartGroup, selectBrushTool, refreshLayersId, refreshSmartGroupsId, onLayerSelect, onSmartGroupSelect } from "./ui";
 import mapArea from "./mapArea";
 import tileSetArea from "./tileSetArea";
 
-import { TileMapLayerPub, SmartIdPub } from "../../data/TileMapLayers";
+import { TileMapLayerPub, SmartGroupPub } from "../../data/TileMapLayers";
 import TileMapRenderer from "../../components/TileMapRenderer";
 import TileMapRendererUpdater from "../../components/TileMapRendererUpdater";
 
@@ -76,6 +76,7 @@ function onTileMapAssetReceived() {
 
   tileSetArea.selectedLayerId = pub.layers[0].id.toString();
   ui.layersTreeView.addToSelection(ui.layersTreeView.treeRoot.querySelector(`li[data-id="${pub.layers[0].id}"]`) as HTMLLIElement);
+  onLayerSelect();
   mapArea.patternActor.setLocalPosition(new SupEngine.THREE.Vector3(0, 0, pub.layerDepthOffset / 2));
 }
 
@@ -122,6 +123,7 @@ onEditCommands["deleteLayer"] = (id: string) => {
     tileSetArea.selectedLayerId = data.tileMapUpdater.tileMapAsset.pub.layers[0].id;
     ui.layersTreeView.clearSelection();
     ui.layersTreeView.addToSelection(ui.layersTreeView.treeRoot.querySelector(`li[data-id="${tileSetArea.selectedLayerId}"]`) as HTMLLIElement);
+    onLayerSelect();
   }
 
   const pub = data.tileMapUpdater.tileMapAsset.pub;
@@ -145,13 +147,41 @@ onEditCommands["moveLayer"] = (id: string, newIndex: number) => {
   refreshLayersId();
 };
 
-onEditCommands["newSmartId"] = (layerId: string, newSmartId: SmartIdPub, index: number) => {
-  console.log("onEditCommands newSmartId");
-  /* todo */
-  console.log(layerId);
-  console.log(newSmartId);
-  console.log(index);
-  console.log(data.tileMapUpdater.tileMapAsset.layers.byId[layerId]);
+onEditCommands["newSmartGroup"] = (layerId: string, smartGroup: SmartGroupPub, index: number) => {
+  if (tileSetArea.selectedLayerId === layerId) {
+    setupSmartGroup(smartGroup, index);
+    refreshSmartGroupsId();
+  }
+};
+
+onEditCommands["renameSmartGroup"] = (layerId: string, smartGroupId: string, newName: string) => {
+  if (tileSetArea.selectedLayerId === layerId) {
+    const smartElt = ui.smartGroupTreeView.treeRoot.querySelector(`[data-id="${smartGroupId}"]`);
+    smartElt.querySelector(".name").textContent = newName;
+  }
+};
+
+onEditCommands["deleteSmartGroup"] = (layerId: string, smartGroupId: string) => {
+  if (tileSetArea.selectedLayerId === layerId) {
+    const smartElt = ui.smartGroupTreeView.treeRoot.querySelector(`[data-id="${smartGroupId}"]`) as HTMLLIElement;
+    ui.smartGroupTreeView.remove(smartElt);
+
+    if (smartGroupId === tileSetArea.selectedSmartGroup) {
+      ui.smartGroupTreeView.clearSelection();
+      onSmartGroupSelect();
+    }
+
+    refreshSmartGroupsId();
+  }
+};
+
+onEditCommands["moveSmartGroup"] = (layerId: string, smartGroupId: string, newIndex: number) => {
+  if (tileSetArea.selectedLayerId === layerId) {
+    const pub = data.tileMapUpdater.tileMapAsset.layers.byId[layerId];
+    const smartElt = ui.smartGroupTreeView.treeRoot.querySelector(`li[data-id="${smartGroupId}"]`) as HTMLLIElement;
+    ui.smartGroupTreeView.insertAt(smartElt, "item", pub.smartGroups.length - newIndex);
+    refreshSmartGroupsId();
+  }
 };
 
 // Tile Set

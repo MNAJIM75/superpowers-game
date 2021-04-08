@@ -31,9 +31,9 @@
 
   "rules": "Rules",
   "rule": "Rule",
-  "smartId": "Smart Ids",
-  "newSmartIdPrompt": "Enter a name for the smart id.",
-  "newSmartIdInitialValue": "Smart Id",
-  "renameSmartIdPrompt": "Enter a new name for the smart id.",
-  "deleteSmartIdConfirm": "Are you sure you want to delete the selected smart id?"
+  "smartGroups": "Smart Groups",
+  "newSmartGroupPrompt": "Enter a name for the smart group.",
+  "newSmartGroupInitialValue": "Smart Group",
+  "renameSmartGroupPrompt": "Enter a new name for the smart group.",
+  "deleteSmartGroupConfirm": "Are you sure you want to delete the selected smart group?"
 }

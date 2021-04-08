@@ -95,7 +95,7 @@ export function setupPattern(layerData: TileData[], width = 1, startX?: number, 
     layerDepthOffset: pub.layerDepthOffset,
     layers: [ {
       id: "0", name: "pattern", data: patternLayerData,
-      isSmartLayer: false, smartIds: [] as any[], smartData: [] as any[], rules: [] as any[]
+      isSmartLayer: false, smartGroups: [] as any[], smartData: [] as any[], rules: [] as any[]
     } ]
   };
 
@@ -149,7 +149,7 @@ export function setupFillPattern(newTileData: TileData) {
     layerDepthOffset: pub.layerDepthOffset,
     layers: [ {
       id: "0", name: "pattern", data: patternLayerData,
-      isSmartLayer: false, smartIds: [] as any[], smartData: [] as any[], rules: [] as any[]
+      isSmartLayer: false, smartGroups: [] as any[], smartData: [] as any[], rules: [] as any[]
     } ]
   };
 

@@ -10,7 +10,7 @@ const tileSetArea: {
   cameraComponent?: any;
 
   selectedLayerId?: string;
-  selectedSmartId?: string;
+  selectedSmartGroup?: string;
 
   selectionStartPoint?: { x: number; y : number };
   selectionEndPoint?: { x: number; y : number };

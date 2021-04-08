@@ -1,4 +1,5 @@
-export interface SmartIdPub {
+export interface SmartGroupPub {
+  id: string;
   name: string;
   color: string;
 }
@@ -17,18 +18,17 @@ export interface TileMapLayerPub {
   name: string;
   data: ((number|boolean)[]|number)[];
   isSmartLayer: boolean;
-  smartIds: SmartIdPub[];
+  smartGroups: SmartGroupPub[];
   smartData: number[];
   rules: TileRulesPub[];
 }
 
 export default class TileMapLayers extends SupCore.Data.Base.ListById {
-
   static schema: SupCore.Data.Schema = {
     name: { type: "string", minLength: 1, maxLength: 80, mutable: true },
     data: { type: "array" },
     isSmartLayer: { type: "boolean", mutable: true },
-    smartIds: { type: "array" },
+    smartGroups: { type: "array" },
     smartData: { type: "array" },
     rules: { type: "array" }
   };

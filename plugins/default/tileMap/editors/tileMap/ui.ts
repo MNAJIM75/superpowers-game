@@ -8,7 +8,7 @@ import * as ResizeHandle from "resize-handle";
 const tmpPosition = new SupEngine.THREE.Vector3();
 const tmpScale = new SupEngine.THREE.Vector3();
 
-import { TileMapLayerPub } from "../../data/TileMapLayers";
+import { SmartGroupPub, TileMapLayerPub } from "../../data/TileMapLayers";
 
 const ui: {
   tileSetInput: HTMLInputElement;
@@ -28,7 +28,7 @@ const ui: {
   eraserToolButton: HTMLInputElement;
 
   layersTreeView: TreeView;
-  smartIdTreeView: TreeView;
+  smartGroupTreeView: TreeView;
 
   mousePositionLabel?: { x: HTMLLabelElement; y: HTMLLabelElement; };
 } = {} as any;
@@ -116,11 +116,11 @@ document.querySelector("button.new-layer").addEventListener("click", onNewLayerC
 document.querySelector("button.rename-layer").addEventListener("click", onRenameLayerClick);
 document.querySelector("button.delete-layer").addEventListener("click", onDeleteLayerClick);
 
-ui.smartIdTreeView = new TreeView(document.querySelector(".smart-id-tree-view") as HTMLElement, { dragStartCallback: () => true, dropCallback: onSmartIdTreeViewDrop, multipleSelection: false });
-ui.smartIdTreeView.on("selectionChange", onSmartIdSelect);
-document.querySelector("button.new-smart-id").addEventListener("click", onNewSmartIdClick);
-document.querySelector("button.rename-smart-id").addEventListener("click", onRenameSmartIdClick);
-document.querySelector("button.delete-smart-id").addEventListener("click", onDeleteSmartIdClick);
+ui.smartGroupTreeView = new TreeView(document.querySelector(".smart-id-tree-view") as HTMLElement, { dragStartCallback: () => true, dropCallback: onSmartGroupTreeViewDrop, multipleSelection: false });
+ui.smartGroupTreeView.on("selectionChange", onSmartGroupSelect);
+document.querySelector("button.new-smart-id").addEventListener("click", onNewSmartGroupClick);
+document.querySelector("button.rename-smart-id").addEventListener("click", onRenameSmartGroupClick);
+document.querySelector("button.delete-smart-id").addEventListener("click", onDeleteSmartGroupClick);
 
 ui.mousePositionLabel = {
   x: document.querySelector("label.position-x") as HTMLLabelElement,
@@ -233,7 +233,7 @@ function onNewLayerClick() {
     data.projectClient.editAsset(SupClient.query.asset, "newLayer", name, index, inputElt.checked, (layerId: string) => {
       ui.layersTreeView.clearSelection();
       ui.layersTreeView.addToSelection(ui.layersTreeView.treeRoot.querySelector(`li[data-id="${layerId}"]`) as HTMLLIElement);
-      tileSetArea.selectedLayerId = layerId;
+      onLayerSelect();
     });
   });
   const formElt = (prompt as any).formElt as HTMLFormElement;
@@ -288,7 +288,7 @@ function onLayersTreeViewDrop(event: DragEvent, dropLocation: TreeView.DropLocat
   return false;
 }
 
-function onLayerSelect() {
+export function onLayerSelect() {
   if (ui.layersTreeView.selectedNodes.length === 0) {
     ui.layersTreeView.addToSelection(ui.layersTreeView.treeRoot.querySelector(`li[data-id="${tileSetArea.selectedLayerId}"]`) as HTMLLIElement);
   } else {
@@ -304,44 +304,81 @@ function onLayerSelect() {
 
   tileSetArea.tileSetElt.hidden = layer.isSmartLayer;
   tileSetArea.rulesElt.hidden = !layer.isSmartLayer;
+
+  ui.smartGroupTreeView.clear();
+  for (let index = layer.smartGroups.length - 1; index >= 0; index--) setupSmartGroup(layer.smartGroups[index], index);
 }
 
-function onNewSmartIdClick() {
+function onNewSmartGroupClick() {
   const options = {
-    initialValue: SupClient.i18n.t("tileMapEditor:newSmartIdInitialValue"),
+    initialValue: SupClient.i18n.t("tileMapEditor:newSmartGroupInitialValue"),
     validationLabel: SupClient.i18n.t("common:actions.create")
   };
 
-  const prompt = new SupClient.Dialogs.PromptDialog(SupClient.i18n.t("tileMapEditor:newSmartIdPrompt"), options, (name) => {
+  new SupClient.Dialogs.PromptDialog(SupClient.i18n.t("tileMapEditor:newSmartGroupPrompt"), options, (name) => {
     if (name == null) return;
 
-    let color = "FFFFFF";
-    let index = SupClient.getTreeViewInsertionPoint(ui.smartIdTreeView).index;
+    let color = Math.floor(Math.random() * 16777215).toString(16); // random color
+    let index = SupClient.getTreeViewInsertionPoint(ui.smartGroupTreeView).index;
     if (index == null) index = 1;
     const layer = data.tileMapUpdater.tileMapAsset.layers.byId[tileSetArea.selectedLayerId];
-    index = layer.smartIds.length - index + 1;
-    data.projectClient.editAsset(SupClient.query.asset, "newSmartId", name, color, index, tileSetArea.selectedLayerId, (smartId: string) => {
-      ui.smartIdTreeView.clearSelection();
-      // ui.smartIdTreeView.addToSelection(ui.smartIdTreeView.treeRoot.querySelector(`li[data-id="${smartId}"]`) as HTMLLIElement);
-      tileSetArea.selectedSmartId = smartId;
+    index = layer.smartGroups.length - index + 1;
+    data.projectClient.editAsset(SupClient.query.asset, "newSmartGroup", tileSetArea.selectedLayerId, name, color, index, (smartGroupId: string) => {
+      ui.smartGroupTreeView.clearSelection();
+      ui.smartGroupTreeView.addToSelection(ui.smartGroupTreeView.treeRoot.querySelector(`li[data-id="${smartGroupId}"]`) as HTMLLIElement);
+      tileSetArea.selectedSmartGroup = smartGroupId;
     });
   });
 }
 
-function onRenameSmartIdClick() {
-  // todo
+function onRenameSmartGroupClick() {
+  if (ui.smartGroupTreeView.selectedNodes.length !== 1) return;
+
+  const layer = data.tileMapUpdater.tileMapAsset.layers.byId[tileSetArea.selectedLayerId];
+  const selectedNode = ui.smartGroupTreeView.selectedNodes[0];
+  let smartGroupIndex = layer.smartGroups.findIndex(element => element.id === selectedNode.dataset["id"]);
+  const smartGroup = layer.smartGroups[smartGroupIndex];
+
+  const options = {
+    initialValue: smartGroup.name,
+    validationLabel: SupClient.i18n.t("common:actions.rename")
+  };
+
+  new SupClient.Dialogs.PromptDialog(SupClient.i18n.t("tileMapEditor:renameSmartGroupPrompt"), options, (newName) => {
+    if (newName == null) return;
+    data.projectClient.editAsset(SupClient.query.asset, "renameSmartGroup", layer.id, smartGroup.id, newName);
+  });
 }
 
-function onDeleteSmartIdClick() {
-  // todo
+function onDeleteSmartGroupClick() {
+  if (ui.smartGroupTreeView.selectedNodes.length !== 1) return;
+
+  const layer = data.tileMapUpdater.tileMapAsset.layers.byId[tileSetArea.selectedLayerId];
+  const selectedNode = ui.smartGroupTreeView.selectedNodes[0];
+  let smartGroupIndex = layer.smartGroups.findIndex(element => element.id === selectedNode.dataset["id"]);
+  const smartGroup = layer.smartGroups[smartGroupIndex];
+
+  const confirmLabel = SupClient.i18n.t("tileMapEditor:deleteSmartGroupConfirm");
+  const validationLabel = SupClient.i18n.t("common:actions.delete");
+  new SupClient.Dialogs.ConfirmDialog(confirmLabel, { validationLabel }, (confirm) => {
+    if (!confirm) return;
+
+    data.projectClient.editAsset(SupClient.query.asset, "deleteSmartGroup", layer.id, smartGroup.id);
+  });
 }
 
-function onSmartIdTreeViewDrop(event: DragEvent, dropLocation: TreeView.DropLocation, orderedNodes: HTMLLIElement[]) {
-  // todo
+function onSmartGroupTreeViewDrop(event: DragEvent, dropLocation: TreeView.DropLocation, orderedNodes: HTMLLIElement[]) {
+  const layer = data.tileMapUpdater.tileMapAsset.layers.byId[tileSetArea.selectedLayerId];
+  const id = orderedNodes[0].dataset["id"];
+  const dropId = dropLocation.target.dataset["id"];
+  let newIndex = layer.smartGroups.findIndex(element => element.id === dropId);
+  if (dropLocation.where === "above") newIndex++;
+
+  data.projectClient.editAsset(SupClient.query.asset, "moveSmartGroup", tileSetArea.selectedLayerId, id, newIndex);
   return false;
 }
 
-function onSmartIdSelect() {
+export function onSmartGroupSelect() {
   // todo
 }
 
@@ -448,5 +485,38 @@ export function refreshLayersId() {
     const layerId = data.tileMapUpdater.tileMapAsset.pub.layers[layerIndex].id;
     const indexSpanElt = ui.layersTreeView.treeRoot.querySelector(`[data-id="${layerId}"] .index`) as HTMLSpanElement;
     indexSpanElt.textContent = `${layerIndex} -`;
+  }
+}
+
+export function setupSmartGroup(smartGroup: SmartGroupPub, index: number) {
+  const liElt = document.createElement("li") as HTMLLIElement;
+  liElt.dataset["id"] = smartGroup.id;
+
+  const indexSpan = document.createElement("span");
+  indexSpan.classList.add("index");
+  indexSpan.textContent = `${index} -`;
+  liElt.appendChild(indexSpan);
+
+  const nameSpan = document.createElement("span");
+  nameSpan.classList.add("name");
+  nameSpan.textContent = smartGroup.name;
+  liElt.appendChild(nameSpan);
+
+  const colorInput = document.createElement("input");
+  colorInput.type = "color";
+  colorInput.classList.add("color-picker");
+  colorInput.value = `#${smartGroup.color}`;
+  liElt.appendChild(colorInput);
+
+  const currentLayer = data.tileMapUpdater.tileMapAsset.layers.byId[tileSetArea.selectedLayerId];
+  ui.smartGroupTreeView.insertAt(liElt, "item", currentLayer.smartGroups.length - 1 - index);
+}
+
+export function refreshSmartGroupsId() {
+  const smartGroupList = data.tileMapUpdater.tileMapAsset.layers.byId[tileSetArea.selectedLayerId].smartGroups;
+  for (let smartIndex = 0; smartIndex < smartGroupList.length; smartIndex++) {
+    const smartGroupId = smartGroupList[smartIndex].id;
+    const indexSpanElt = ui.smartGroupTreeView.treeRoot.querySelector(`[data-id="${smartGroupId}"] .index`) as HTMLSpanElement;
+    indexSpanElt.textContent = `${smartIndex} -`;
   }
 }
