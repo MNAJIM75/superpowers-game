@@ -25,6 +25,15 @@
   "layers": "Layers",
   "newLayerPrompt": "Enter a name for the layer.",
   "newLayerInitialValue": "Layer",
+  "newLayerIsSmart": "Is a smart layer",
   "renameLayerPrompt": "Enter a new name for the layer.",
-  "deleteLayerConfirm": "Are you sure you want to delete the selected layer?"
+  "deleteLayerConfirm": "Are you sure you want to delete the selected layer?",
+
+  "rules": "Rules",
+  "rule": "Rule",
+  "smartId": "Smart Ids",
+  "newSmartIdPrompt": "Enter a name for the smart id.",
+  "newSmartIdInitialValue": "Smart Id",
+  "renameSmartIdPrompt": "Enter a new name for the smart id.",
+  "deleteSmartIdConfirm": "Are you sure you want to delete the selected smart id?"
 }

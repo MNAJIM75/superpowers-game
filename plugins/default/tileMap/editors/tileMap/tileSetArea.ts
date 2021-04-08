@@ -10,12 +10,18 @@ const tileSetArea: {
   cameraComponent?: any;
 
   selectedLayerId?: string;
+  selectedSmartId?: string;
 
   selectionStartPoint?: { x: number; y : number };
   selectionEndPoint?: { x: number; y : number };
+
+  tileSetElt?: HTMLCanvasElement;
+  rulesElt?: HTMLElement;
 } = {};
 
-tileSetArea.gameInstance = new SupEngine.GameInstance(<HTMLCanvasElement>document.querySelector("canvas.tileSet"));
+tileSetArea.tileSetElt = <HTMLCanvasElement>document.querySelector("canvas.tileSet");
+tileSetArea.rulesElt = <HTMLElement>document.querySelector("div.rules");
+tileSetArea.gameInstance = new SupEngine.GameInstance(tileSetArea.tileSetElt);
 
 const cameraActor = new SupEngine.Actor(tileSetArea.gameInstance, "Camera");
 cameraActor.setLocalPosition(new SupEngine.THREE.Vector3(0, 0, 10));

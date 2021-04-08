@@ -1,4 +1,4 @@
-import TileMapLayers, { TileMapLayerPub } from "./TileMapLayers";
+import TileMapLayers, { SmartIdPub, TileMapLayerPub } from "./TileMapLayers";
 import TileMapSettingsResource from "./TileMapSettingsResource";
 
 import * as path from "path";
@@ -15,6 +15,8 @@ type RenameLayerCallback = SupCore.Data.Base.ErrorCallback & ((err: string, ack:
 type DeleteLayerCallback = SupCore.Data.Base.ErrorCallback & ((err: string, ack: any, layerId: string) => void);
 type MoveLayerCallback = SupCore.Data.Base.ErrorCallback & ((err: string, ack: any, layerId: string, index: number) => void);
 
+type NewSmartIdCallback = SupCore.Data.Base.ErrorCallback & ((err: string, ack: any, layerId: string, smartId: SmartIdPub, index: number) => void);
+
 export interface TileMapAssetPub {
   formatVersion?: number;
   tileSetId: string;
@@ -26,7 +28,7 @@ export interface TileMapAssetPub {
 }
 
 export default class TileMapAsset extends SupCore.Data.Base.Asset {
-  static currentFormatVersion = 1;
+  static currentFormatVersion = 2;
 
   static schema: SupCore.Data.Schema = {
     formatVersion: { type: "integer" },
@@ -103,6 +105,16 @@ export default class TileMapAsset extends SupCore.Data.Base.Asset {
       }
 
       pub.formatVersion = 1;
+    }
+
+    if (pub.formatVersion === 1) {
+      for (const layer of pub.layers) {
+        layer.isSmartLayer = false;
+        layer.smartIds = [];
+        layer.smartData = [];
+        layer.rules = [];
+      }
+      pub.formatVersion = 2;
     }
 
     callback(true);
@@ -190,7 +202,6 @@ export default class TileMapAsset extends SupCore.Data.Base.Asset {
   }
 
   server_moveMap(client: SupCore.RemoteClient, horizontalOffset: number, verticalOffset: number, callback: MoveMapCallback) {
-
     if (typeof horizontalOffset !== "number") { callback("horizontalOffset must be an integer"); return; }
     if (typeof verticalOffset   !== "number") { callback("verticalOffset must be an integer"); return; }
     if (horizontalOffset === 0 && verticalOffset === 0) return;
@@ -272,7 +283,11 @@ export default class TileMapAsset extends SupCore.Data.Base.Asset {
     const newLayer: TileMapLayerPub = {
       id: null,
       name: layerName,
-      data: []
+      data: [],
+      isSmartLayer: false,
+      smartIds: [],
+      smartData: [],
+      rules: []
     };
 
     for (let y = 0; y < this.pub.height; y++) {
@@ -285,8 +300,9 @@ export default class TileMapAsset extends SupCore.Data.Base.Asset {
     return newLayer;
   }
 
-  server_newLayer(client: SupCore.RemoteClient, layerName: string, index: number, callback: NewLayerCallback) {
+  server_newLayer(client: SupCore.RemoteClient, layerName: string, index: number, isSmart: boolean, callback: NewLayerCallback) {
     const newLayer = this.createEmptyLayer(layerName);
+    newLayer.isSmartLayer = isSmart;
     this.layers.add(newLayer, index, (err, actualIndex) => {
       if (err != null) { callback(err); return; }
 
@@ -344,5 +360,26 @@ export default class TileMapAsset extends SupCore.Data.Base.Asset {
 
   client_moveLayer(layerId: string, layerIndex: number) {
     this.layers.client_move(layerId, layerIndex);
+  }
+
+  server_newSmartId(client: SupCore.RemoteClient, smartIdName: string, smartIdColor: string, smartIdIndex: number, layerId: string, callback: NewSmartIdCallback) {
+    const newSmartId = {
+      name: smartIdName,
+      color: smartIdColor
+    };
+    this.client_newSmartId(layerId, newSmartId, smartIdIndex);
+    callback(null, null, layerId, newSmartId, smartIdIndex);
+    this.emit("change");
+  }
+
+  client_newSmartId(layerId: string, newSmartId: SmartIdPub, index: number) {
+    console.log("client newSmartId");
+
+    this.layers.byId[layerId].smartIds.splice(index, 0, newSmartId);
+    console.log(layerId);
+    console.log(newSmartId);
+    console.log(index);
+    console.log(this.layers.byId[layerId].smartIds);
+    // todo
   }
 }

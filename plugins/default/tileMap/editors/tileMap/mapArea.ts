@@ -93,7 +93,10 @@ export function setupPattern(layerData: TileData[], width = 1, startX?: number, 
     width: pub.width, height: pub.height,
     pixelsPerUnit: pub.pixelsPerUnit,
     layerDepthOffset: pub.layerDepthOffset,
-    layers: [ { id: "0", name: "pattern", data: patternLayerData } ]
+    layers: [ {
+      id: "0", name: "pattern", data: patternLayerData,
+      isSmartLayer: false, smartIds: [] as any[], smartData: [] as any[], rules: [] as any[]
+    } ]
   };
 
   mapArea.patternRenderer.setTileMap(new TileMap(patternData));
@@ -144,7 +147,10 @@ export function setupFillPattern(newTileData: TileData) {
     width: pub.width, height: pub.height,
     pixelsPerUnit: pub.pixelsPerUnit,
     layerDepthOffset: pub.layerDepthOffset,
-    layers: [ { id: "0", name: "pattern", data: patternLayerData } ]
+    layers: [ {
+      id: "0", name: "pattern", data: patternLayerData,
+      isSmartLayer: false, smartIds: [] as any[], smartData: [] as any[], rules: [] as any[]
+    } ]
   };
 
   mapArea.patternRenderer.setTileMap(new TileMap(patternData));
@@ -270,14 +276,14 @@ function getMapGridPosition(gameInstance: SupEngine.GameInstance, cameraComponen
   const position = new SupEngine.THREE.Vector3(mousePosition.x, mousePosition.y, 0);
   cameraComponent.actor.getLocalPosition(tmpVector3);
 
-  let x = position.x / gameInstance.threeRenderer.domElement.width;
+  let x = position.x / Math.max(gameInstance.threeRenderer.domElement.width, 1);
   x = x * 2 - 1;
-  x *= cameraComponent.orthographicScale / 2 * cameraComponent.cachedRatio;
+  x *= cameraComponent.orthographicScale / 2 * (Number.isFinite(cameraComponent.cachedRatio) ? cameraComponent.cachedRatio : 1);
   x += tmpVector3.x;
   x *= data.tileMapUpdater.tileMapAsset.pub.pixelsPerUnit / data.tileMapUpdater.tileSetAsset.pub.grid.width;
   x = Math.floor(x);
 
-  let y = position.y / gameInstance.threeRenderer.domElement.height;
+  let y = position.y / Math.max(gameInstance.threeRenderer.domElement.height, 1);
   y = y * 2 - 1;
   y *= cameraComponent.orthographicScale / 2;
   y -= tmpVector3.y;
@@ -309,7 +315,6 @@ export function handleMapArea() {
     ui.mousePositionLabel.x.textContent = mouseX.toString();
     ui.mousePositionLabel.y.textContent = mouseY.toString();
   }
-
   if (ui.brushToolButton.checked) handleBrushMode(cursorHasMoved);
   else if (ui.fillToolButton.checked) handleFillMode(cursorHasMoved);
   else if (ui.selectionToolButton.checked) handleSelectionMode(cursorHasMoved);

@@ -1,14 +1,36 @@
+export interface SmartIdPub {
+  name: string;
+  color: string;
+}
+
+export interface TileRulesPub {
+  tile: number;
+  pattern: number[];
+  size: number;
+  chance: number;
+  active: boolean;
+  breakOnMatch: boolean;
+}
+
 export interface TileMapLayerPub {
   id: string;
   name: string;
   data: ((number|boolean)[]|number)[];
+  isSmartLayer: boolean;
+  smartIds: SmartIdPub[];
+  smartData: number[];
+  rules: TileRulesPub[];
 }
 
 export default class TileMapLayers extends SupCore.Data.Base.ListById {
 
   static schema: SupCore.Data.Schema = {
     name: { type: "string", minLength: 1, maxLength: 80, mutable: true },
-    data: { type: "array" }
+    data: { type: "array" },
+    isSmartLayer: { type: "boolean", mutable: true },
+    smartIds: { type: "array" },
+    smartData: { type: "array" },
+    rules: { type: "array" }
   };
 
   pub: TileMapLayerPub[];

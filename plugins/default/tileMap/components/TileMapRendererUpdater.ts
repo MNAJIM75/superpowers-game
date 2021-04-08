@@ -1,7 +1,7 @@
 import TileMap from "./TileMap";
 import TileMapRenderer from "./TileMapRenderer";
 import TileMapAsset from "../data/TileMapAsset";
-import { TileMapLayerPub } from "../data/TileMapLayers";
+import { TileMapLayerPub, SmartIdPub } from "../data/TileMapLayers";
 import { TileMapRendererConfigPub } from "../componentConfigs/TileMapRendererConfig";
 
 import TileSet from "./TileSet";
@@ -118,7 +118,16 @@ export default class TileMapRendererUpdater {
 
     newLayer: (layer: TileMapLayerPub, index: number) => { this.tileMapRenderer.addLayer(layer.id, index); },
     deleteLayer: (id: string, index: number) => { this.tileMapRenderer.deleteLayer(index); },
-    moveLayer: (id: string, newIndex: number) => { this.tileMapRenderer.moveLayer(id, newIndex); }
+    moveLayer: (id: string, newIndex: number) => { this.tileMapRenderer.moveLayer(id, newIndex); },
+
+    newSmartId: (layerId: string, newSmartId: SmartIdPub, index: number) => {
+      console.log("updater newSmartId");
+      /* todo */
+      console.log(layerId);
+      console.log(newSmartId);
+      console.log(index);
+      console.log(this.tileMapAsset.layers.byId[layerId]);
+    },
   };
 
   private onTileMapAssetTrashed = (assetId: string) => {

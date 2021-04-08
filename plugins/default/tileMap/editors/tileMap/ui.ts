@@ -28,6 +28,7 @@ const ui: {
   eraserToolButton: HTMLInputElement;
 
   layersTreeView: TreeView;
+  smartIdTreeView: TreeView;
 
   mousePositionLabel?: { x: HTMLLabelElement; y: HTMLLabelElement; };
 } = {} as any;
@@ -111,10 +112,15 @@ ui.eraserToolButton.addEventListener("change", () => { selectEraserTool(); });
 
 ui.layersTreeView = new TreeView(document.querySelector(".layers-tree-view") as HTMLElement, { dragStartCallback: () => true, dropCallback: onLayersTreeViewDrop, multipleSelection: false });
 ui.layersTreeView.on("selectionChange", onLayerSelect);
-
 document.querySelector("button.new-layer").addEventListener("click", onNewLayerClick);
 document.querySelector("button.rename-layer").addEventListener("click", onRenameLayerClick);
 document.querySelector("button.delete-layer").addEventListener("click", onDeleteLayerClick);
+
+ui.smartIdTreeView = new TreeView(document.querySelector(".smart-id-tree-view") as HTMLElement, { dragStartCallback: () => true, dropCallback: onSmartIdTreeViewDrop, multipleSelection: false });
+ui.smartIdTreeView.on("selectionChange", onSmartIdSelect);
+document.querySelector("button.new-smart-id").addEventListener("click", onNewSmartIdClick);
+document.querySelector("button.rename-smart-id").addEventListener("click", onRenameSmartIdClick);
+document.querySelector("button.delete-smart-id").addEventListener("click", onDeleteSmartIdClick);
 
 ui.mousePositionLabel = {
   x: document.querySelector("label.position-x") as HTMLLabelElement,
@@ -147,14 +153,6 @@ document.addEventListener("keyup", (event) => {
 SupClient.setupHelpCallback(() => {
     window.parent.postMessage({ type: "openTool", name: "documentation", state: { section: "tileMap" } }, window.location.origin);
 });
-
-function onTileSetChange(event: Event) {
-  const value = (event.target as HTMLInputElement).value;
-  if (value === "") { data.projectClient.editAsset(SupClient.query.asset, "changeTileSet", null); return; }
-
-  const entry = SupClient.findEntryByPath(data.projectClient.entries.pub, value);
-  if (entry != null && entry.type === "tileSet") data.projectClient.editAsset(SupClient.query.asset, "changeTileSet", entry.id);
-}
 
 function onResizeMapClick() {
   const options = {
@@ -208,23 +206,48 @@ function onMoveMapClick() {
   });
 }
 
+function onChangeGridDisplay() {
+  mapArea.gridActor.threeObject.visible = ui.gridCheckbox.checked;
+}
+
+function onChangeHighlight() {
+  for (const id in data.tileMapUpdater.tileMapRenderer.layerMeshesById) {
+    const layerMesh = data.tileMapUpdater.tileMapRenderer.layerMeshesById[id];
+
+    const opacity = ui.highlightCheckbox.checked && id !== tileSetArea.selectedLayerId ? parseFloat(ui.highlightSlider.value) / 100 : 1;
+    (layerMesh.material as THREE.ShaderMaterial).uniforms["opacity"].value = opacity;
+  }
+}
+
 function onNewLayerClick() {
   const options = {
     initialValue: SupClient.i18n.t("tileMapEditor:newLayerInitialValue"),
     validationLabel: SupClient.i18n.t("common:actions.create")
   };
 
-  new SupClient.Dialogs.PromptDialog(SupClient.i18n.t("tileMapEditor:newLayerPrompt"), options, (name) => {
+  const prompt = new SupClient.Dialogs.PromptDialog(SupClient.i18n.t("tileMapEditor:newLayerPrompt"), options, (name) => {
     if (name == null) return;
 
     let index = SupClient.getTreeViewInsertionPoint(ui.layersTreeView).index;
     index = data.tileMapUpdater.tileMapAsset.pub.layers.length - index + 1;
-    data.projectClient.editAsset(SupClient.query.asset, "newLayer", name, index, (layerId: string) => {
+    data.projectClient.editAsset(SupClient.query.asset, "newLayer", name, index, inputElt.checked, (layerId: string) => {
       ui.layersTreeView.clearSelection();
       ui.layersTreeView.addToSelection(ui.layersTreeView.treeRoot.querySelector(`li[data-id="${layerId}"]`) as HTMLLIElement);
       tileSetArea.selectedLayerId = layerId;
     });
   });
+  const formElt = (prompt as any).formElt as HTMLFormElement;
+  const downElt = formElt.querySelector("div.buttons") as HTMLElement;
+  const inputElt = SupClient.html("input", {
+    id: "auto-open-checkbox", type: "checkbox", style: { margin: "auto 0.5em auto 0" }, checked: false
+  } as SupClient.HTMLInputOptions);
+
+  const labelElt = SupClient.html("label", {
+    textContent: SupClient.i18n.t("tileMapEditor:newLayerIsSmart"),
+    htmlFor: "auto-open-checkbox", style: { flex: "1", margin: "auto 0" }
+  });
+  downElt.prepend(labelElt);
+  downElt.prepend(inputElt);
 }
 
 function onRenameLayerClick() {
@@ -278,19 +301,48 @@ function onLayerSelect() {
   const layer = data.tileMapUpdater.tileMapAsset.layers.byId[tileSetArea.selectedLayerId];
   const z = (pub.layers.indexOf(layer) + 0.5) * pub.layerDepthOffset;
   mapArea.patternActor.setLocalPosition(new SupEngine.THREE.Vector3(0, 0, z));
+
+  tileSetArea.tileSetElt.hidden = layer.isSmartLayer;
+  tileSetArea.rulesElt.hidden = !layer.isSmartLayer;
 }
 
-function onChangeGridDisplay() {
-  mapArea.gridActor.threeObject.visible = ui.gridCheckbox.checked;
+function onNewSmartIdClick() {
+  const options = {
+    initialValue: SupClient.i18n.t("tileMapEditor:newSmartIdInitialValue"),
+    validationLabel: SupClient.i18n.t("common:actions.create")
+  };
+
+  const prompt = new SupClient.Dialogs.PromptDialog(SupClient.i18n.t("tileMapEditor:newSmartIdPrompt"), options, (name) => {
+    if (name == null) return;
+
+    let color = "FFFFFF";
+    let index = SupClient.getTreeViewInsertionPoint(ui.smartIdTreeView).index;
+    if (index == null) index = 1;
+    const layer = data.tileMapUpdater.tileMapAsset.layers.byId[tileSetArea.selectedLayerId];
+    index = layer.smartIds.length - index + 1;
+    data.projectClient.editAsset(SupClient.query.asset, "newSmartId", name, color, index, tileSetArea.selectedLayerId, (smartId: string) => {
+      ui.smartIdTreeView.clearSelection();
+      // ui.smartIdTreeView.addToSelection(ui.smartIdTreeView.treeRoot.querySelector(`li[data-id="${smartId}"]`) as HTMLLIElement);
+      tileSetArea.selectedSmartId = smartId;
+    });
+  });
 }
 
-function onChangeHighlight() {
-  for (const id in data.tileMapUpdater.tileMapRenderer.layerMeshesById) {
-    const layerMesh = data.tileMapUpdater.tileMapRenderer.layerMeshesById[id];
+function onRenameSmartIdClick() {
+  // todo
+}
 
-    const opacity = ui.highlightCheckbox.checked && id !== tileSetArea.selectedLayerId ? parseFloat(ui.highlightSlider.value) / 100 : 1;
-    (layerMesh.material as THREE.ShaderMaterial).uniforms["opacity"].value = opacity;
-  }
+function onDeleteSmartIdClick() {
+  // todo
+}
+
+function onSmartIdTreeViewDrop(event: DragEvent, dropLocation: TreeView.DropLocation, orderedNodes: HTMLLIElement[]) {
+  // todo
+  return false;
+}
+
+function onSmartIdSelect() {
+  // todo
 }
 
 export function selectBrushTool(x?: number, y?: number, width = 1, height = 1) {
@@ -380,6 +432,13 @@ export function setupLayer(layer: TileMapLayerPub, index: number) {
   nameSpan.classList.add("name");
   nameSpan.textContent = layer.name;
   liElt.appendChild(nameSpan);
+
+  if (layer.isSmartLayer) {
+    const smartSpan = document.createElement("span");
+    smartSpan.classList.add("smart");
+    smartSpan.textContent = " (smart)";
+    liElt.appendChild(smartSpan);
+  }
 
   ui.layersTreeView.insertAt(liElt, "item", data.tileMapUpdater.tileMapAsset.pub.layers.length - 1 - index);
 }

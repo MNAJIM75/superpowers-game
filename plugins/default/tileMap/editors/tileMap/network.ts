@@ -2,7 +2,7 @@ import ui, { setupLayer, selectBrushTool, refreshLayersId } from "./ui";
 import mapArea from "./mapArea";
 import tileSetArea from "./tileSetArea";
 
-import { TileMapLayerPub } from "../../data/TileMapLayers";
+import { TileMapLayerPub, SmartIdPub } from "../../data/TileMapLayers";
 import TileMapRenderer from "../../components/TileMapRenderer";
 import TileMapRendererUpdater from "../../components/TileMapRendererUpdater";
 
@@ -143,6 +143,15 @@ onEditCommands["moveLayer"] = (id: string, newIndex: number) => {
   mapArea.patternActor.setLocalPosition(new SupEngine.THREE.Vector3(0, 0, z));
 
   refreshLayersId();
+};
+
+onEditCommands["newSmartId"] = (layerId: string, newSmartId: SmartIdPub, index: number) => {
+  console.log("onEditCommands newSmartId");
+  /* todo */
+  console.log(layerId);
+  console.log(newSmartId);
+  console.log(index);
+  console.log(data.tileMapUpdater.tileMapAsset.layers.byId[layerId]);
 };
 
 // Tile Set
