@@ -19,6 +19,7 @@ type NewSmartGroupCallback = SupCore.Data.Base.ErrorCallback & ((err: string, sm
 type RenameSmartGroupCallback = SupCore.Data.Base.ErrorCallback & ((err: string, ack: any, layerId: string, smartGroupId: string, newName: string) => void);
 type DeleteSmartGroupCallback = SupCore.Data.Base.ErrorCallback & ((err: string, ack: any, layerId: string, smartGroupId: string) => void);
 type MoveSmartGroupCallback = SupCore.Data.Base.ErrorCallback & ((err: string, ack: any, layerId: string, smartGroupId: string, newIndex: number) => void);
+type EditSmartDataCallback = SupCore.Data.Base.ErrorCallback & ((err: string, ack: any, layerId: string, edits: {x: number, y: number, smartGroup: string}[]) => void);
 
 export interface TileMapAssetPub {
   formatVersion?: number;
@@ -306,6 +307,14 @@ export default class TileMapAsset extends SupCore.Data.Base.Asset {
   server_newLayer(client: SupCore.RemoteClient, layerName: string, index: number, isSmart: boolean, callback: NewLayerCallback) {
     const newLayer = this.createEmptyLayer(layerName);
     newLayer.isSmartLayer = isSmart;
+    if (isSmart) {
+      for (let y = 0; y < this.pub.height; y++) {
+        for (let x = 0; x < this. pub.width; x++) {
+          const index = y * this.pub.width + x;
+          newLayer.smartData[index] = "";
+        }
+      }
+    }
     this.layers.add(newLayer, index, (err, actualIndex) => {
       if (err != null) { callback(err); return; }
 
@@ -366,8 +375,13 @@ export default class TileMapAsset extends SupCore.Data.Base.Asset {
   }
 
   server_newSmartGroup(client: SupCore.RemoteClient, layerId: string, smartGroupName: string, smartGroupColor: string, index: number, callback: NewSmartGroupCallback) {
-    let id: number = 0;
+    if (typeof layerId !== "string" || this.layers.byId[layerId] == null) { callback("no such layer"); return; }
     const layer = this.layers.byId[layerId];
+    if (!layer.isSmartLayer) { callback("the layer is not a smart layer"); return; }
+    if (typeof smartGroupName !== "string") { callback("smartGroupName must be a string"); return; }
+    if (typeof smartGroupColor !== "string" || smartGroupColor.length !== 6) { callback("smartGroupColor must be a string and have a length of 6"); return; }
+
+    let id: number = 0;
     for (const item of layer.smartGroups)
       id = Math.max(id, Number(item.id));
     id++;
@@ -388,8 +402,9 @@ export default class TileMapAsset extends SupCore.Data.Base.Asset {
 
   server_renameSmartGroup(client: SupCore.RemoteClient, layerId: string, smartGroupId: string, newName: string, callback: RenameSmartGroupCallback) {
     if (typeof layerId !== "string" || this.layers.byId[layerId] == null) { callback("no such layer"); return; }
-    if (typeof smartGroupId !== "string") { callback("smartGroupId must be a string"); return; }
     const layer = this.layers.byId[layerId];
+    if (!layer.isSmartLayer) { callback("the layer is not a smart layer"); return; }
+    if (typeof smartGroupId !== "string") { callback("smartGroupId must be a string"); return; }
     const index = layer.smartGroups.findIndex(element => element.id === smartGroupId);
     if (index === -1) { callback("no such smart group"); return; }
 
@@ -406,8 +421,9 @@ export default class TileMapAsset extends SupCore.Data.Base.Asset {
 
   server_deleteSmartGroup(client: SupCore.RemoteClient, layerId: string, smartGroupId: string, callback: DeleteSmartGroupCallback) {
     if (typeof layerId !== "string" || this.layers.byId[layerId] == null) { callback("no such layer"); return; }
-    if (typeof smartGroupId !== "string") { callback("smartGroupId must be a string"); return; }
     const layer = this.layers.byId[layerId];
+    if (!layer.isSmartLayer) { callback("the layer is not a smart layer"); return; }
+    if (typeof smartGroupId !== "string") { callback("smartGroupId must be a string"); return; }
     const index = layer.smartGroups.findIndex(element => element.id === smartGroupId);
     if (index === -1) { callback("no such smart group"); return; }
 
@@ -420,12 +436,18 @@ export default class TileMapAsset extends SupCore.Data.Base.Asset {
     const layer = this.layers.byId[layerId];
     const index = layer.smartGroups.findIndex(element => element.id === smartGroupId);
     layer.smartGroups.splice(index, 1);
+
+    for (let i = 0; i < layer.smartData.length; i++) {
+      if (layer.smartData[i] === smartGroupId)
+        layer.smartData[i] = "";
+    }
   }
 
   server_moveSmartGroup(client: SupCore.RemoteClient, layerId: string, smartGroupId: string, newIndex: number, callback: MoveSmartGroupCallback) {
     if (typeof layerId !== "string" || this.layers.byId[layerId] == null) { callback("no such layer"); return; }
-    if (typeof smartGroupId !== "string") { callback("smartGroupId must be a string"); return; }
     const layer = this.layers.byId[layerId];
+    if (!layer.isSmartLayer) { callback("the layer is not a smart layer"); return; }
+    if (typeof smartGroupId !== "string") { callback("smartGroupId must be a string"); return; }
     let oldIndex = layer.smartGroups.findIndex(element => element.id === smartGroupId);
     if (oldIndex === -1) { callback("no such smart group"); return; }
     if (typeof newIndex !== "number") { callback("newIndex must be an integer"); return; }
@@ -444,5 +466,35 @@ export default class TileMapAsset extends SupCore.Data.Base.Asset {
 
     if (oldIndex < newIndex) newIndex--;
     layer.smartGroups.splice(newIndex, 0, item);
+  }
+
+  server_editSmartData(client: SupCore.RemoteClient, layerId: string, edits: {x: number, y: number, smartGroup: string}[], callback: EditSmartDataCallback) {
+    if (typeof layerId !== "string" || this.layers.byId[layerId] == null) { callback("no such layer"); return; }
+    if (!Array.isArray(edits)) { callback("edits must be an array"); return; }
+    const layer = this.layers.byId[layerId];
+    if (!layer.isSmartLayer) { callback("the layer is not a smart layer"); return; }
+
+    for (const edit of edits) {
+      const x = edit.x;
+      const y = edit.y;
+      const smartGroup = edit.smartGroup;
+
+      if (x == null || typeof x !== "number" || x < 0 || x >= this.pub.width) { callback(`x must be an integer between 0 && ${this.pub.width - 1}`); return; }
+      if (y == null || typeof y !== "number" || y < 0 || y >= this.pub.height) { callback(`y must be an integer between 0 && ${this.pub.height - 1}`); return; }
+      if (typeof smartGroup !== "string") { callback("smartGroup must be an string"); return; }
+      let smartGroupIndex = layer.smartGroups.findIndex(element => element.id === smartGroup);
+      if (smartGroupIndex === -1) { callback("no such smart group"); return; }
+    }
+
+    this.client_editSmartData(layerId, edits);
+    callback(null, null, layerId, edits);
+    this.emit("change");
+  }
+
+  client_editSmartData(layerId: string, edits: {x: number, y: number, smartGroup: string}[]) {
+    for (const edit of edits) {
+      const index = edit.y * this.pub.width + edit.x;
+      this.layers.byId[layerId].smartData[index] = edit.smartGroup;
+    }
   }
 }

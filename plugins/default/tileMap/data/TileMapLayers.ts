@@ -19,7 +19,7 @@ export interface TileMapLayerPub {
   data: ((number|boolean)[]|number)[];
   isSmartLayer: boolean;
   smartGroups: SmartGroupPub[];
-  smartData: number[];
+  smartData: string[];
   rules: TileRulesPub[];
 }
 
