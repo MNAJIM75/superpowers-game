@@ -403,7 +403,7 @@ export function selectBrushTool(x?: number, y?: number, width = 1, height = 1) {
 
   mapArea.lastTile = null;
   mapArea.patternActor.threeObject.visible = true;
-  data.tileSetUpdater.tileSetRenderer.selectedTileActor.threeObject.visible = true;
+  data.tileSetUpdater.tileSetRenderer.showSelection();
   mapArea.patternBackgroundActor.threeObject.visible = true;
   mapArea.patternBackgroundActor.setLocalScale(new SupEngine.THREE.Vector3(width, height / ratio, 1));
 }
@@ -412,13 +412,15 @@ export function selectFillTool(x?: number, y?: number) {
   ui.fillToolButton.checked = true;
 
   if (data.tileMapUpdater.tileSetAsset == null || data.tileMapUpdater.tileSetAsset.pub == null) return;
+  data.tileSetUpdater.tileSetRenderer.selectedTileActor.getLocalPosition(tmpPosition);
   if (x != null && y != null) data.tileSetUpdater.tileSetRenderer.select(x, y);
+  else data.tileSetUpdater.tileSetRenderer.select(tmpPosition.x, -tmpPosition.y);
 
   data.tileSetUpdater.tileSetRenderer.selectedTileActor.getLocalPosition(tmpPosition);
   setupFillPattern([ tmpPosition.x, -tmpPosition.y, false, false, 0 ]);
 
   mapArea.patternActor.threeObject.visible = true;
-  data.tileSetUpdater.tileSetRenderer.selectedTileActor.threeObject.visible = true;
+  data.tileSetUpdater.tileSetRenderer.showSelection();
   mapArea.patternBackgroundActor.threeObject.visible = false;
 }
 
@@ -429,7 +431,7 @@ export function selectSelectionTool() {
 
   mapArea.patternActor.threeObject.visible = false;
   mapArea.patternBackgroundActor.threeObject.visible = false;
-  data.tileSetUpdater.tileSetRenderer.selectedTileActor.threeObject.visible = false;
+  data.tileSetUpdater.tileSetRenderer.hideSelection();
 
   mapArea.selectionStartPoint = null;
 }
@@ -440,7 +442,7 @@ export function selectEraserTool() {
   if (data.tileMapUpdater.tileSetAsset == null || data.tileMapUpdater.tileSetAsset.pub == null) return;
 
   mapArea.patternActor.threeObject.visible = false;
-  data.tileSetUpdater.tileSetRenderer.selectedTileActor.threeObject.visible = false;
+  data.tileSetUpdater.tileSetRenderer.hideSelection();
   mapArea.patternBackgroundActor.threeObject.visible = true;
   const ratio = data.tileSetUpdater.tileSetAsset.pub.grid.width / data.tileSetUpdater.tileSetAsset.pub.grid.height;
   mapArea.patternBackgroundActor.setLocalScale(new SupEngine.THREE.Vector3(1, 1 / ratio, 1));

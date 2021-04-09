@@ -117,7 +117,7 @@ export default class TileMapRendererUpdater {
     },
 
     newLayer: (layer: TileMapLayerPub, index: number) => { this.tileMapRenderer.addLayer(layer.id, index); },
-    deleteLayer: (id: string, index: number) => { this.tileMapRenderer.deleteLayer(index); },
+    deleteLayer: (layerId: string) => { this.tileMapRenderer.deleteLayerById(layerId); },
     moveLayer: (id: string, newIndex: number) => { this.tileMapRenderer.moveLayer(id, newIndex); },
 
     newSmartGroup: (layerId: string, smartGroup: SmartGroupPub, index: number) => {
