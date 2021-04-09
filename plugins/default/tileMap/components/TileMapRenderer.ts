@@ -160,9 +160,15 @@ export default class TileMapRenderer extends SupEngine.ActorComponent {
     this.refreshLayersDepth();
   }
 
-  deleteLayer(layerIndex: number) {
-    this.actor.threeObject.remove(this.layerMeshes[layerIndex]);
-    this.layerMeshes.splice(layerIndex, 1);
+  deleteLayerById(layerId: string) {
+    const index = this.layerMeshes.indexOf(this.layerMeshesById[layerId]);
+    this.layerMeshesById[layerId].geometry.dispose();
+    (this.layerMeshesById[layerId].material as THREE.Material).dispose();
+    this.actor.threeObject.remove(this.layerMeshesById[layerId]);
+
+    this.layerMeshes.splice(index, 1);
+    delete this.layerMeshesById[layerId];
+    delete this.layerVisibleById[layerId];
 
     this.refreshLayersDepth();
   }

@@ -346,48 +346,53 @@ function handleBrushMode(cursorHasMoved: boolean) {
 
   const shiftKey = input.keyboardButtons[(<any>window).KeyEvent.DOM_VK_SHIFT];
 
-  if (input.mouseButtons[0].isDown) {
-    if (mapArea.lastTile != null && shiftKey.isDown) {
-      const xMin = Math.min(mapArea.cursorPoint.x, mapArea.lastTile.x);
-      const xOffset = Math.abs(mapArea.cursorPoint.x - mapArea.lastTile.x) + 1;
-      const yMin = Math.min(mapArea.cursorPoint.y, mapArea.lastTile.y);
-      const yOffset = Math.abs(mapArea.cursorPoint.y - mapArea.lastTile.y) + 1;
-
-      const point = { x: 0, y: 0 };
-      if (xOffset > yOffset) {
-        point.x = xMin;
-        point.y = mapArea.lastTile.y;
-      } else {
-        point.x = mapArea.lastTile.x;
-        point.y = yMin;
-      }
-      editMap(getEditsFromPattern(point));
-      setupPattern([mapArea.patternData[0]], 1);
-    } else editMap(getEditsFromPattern(mapArea.cursorPoint));
-
-    const x = mapArea.cursorPoint.x;
-    const y = mapArea.cursorPoint.y;
-    if (mapArea.patternData.length === 1 && x >= 0 && x < pub.width && y >= 0 && y < pub.height)
-      mapArea.lastTile = { x, y, tile: (mapArea.patternData[0] as (number|boolean)[]).slice() };
-
-  } else if (mapArea.lastTile != null && shiftKey.wasJustReleased) {
-    setupPattern([mapArea.lastTile.tile]);
-
-  } else if (mapArea.lastTile != null && shiftKey.isDown) {
+  let lastTileX = mapArea.cursorPoint.x;
+  let lastTileY = mapArea.cursorPoint.y;
+  if (mapArea.lastTile != null && shiftKey.isDown) { // Draw line when shift is pressed
+    // todo: implement proper line algorithm
     const xMin = Math.min(mapArea.cursorPoint.x, mapArea.lastTile.x);
     const xOffset = Math.abs(mapArea.cursorPoint.x - mapArea.lastTile.x) + 1;
     const yMin = Math.min(mapArea.cursorPoint.y, mapArea.lastTile.y);
     const yOffset = Math.abs(mapArea.cursorPoint.y - mapArea.lastTile.y) + 1;
 
-    const patternData: TileData[] = [];
-    if (xOffset > yOffset) {
-      for (let x = 0; x < xOffset; x++) patternData.push(mapArea.lastTile.tile);
-      setupPattern(patternData, xOffset, xMin, mapArea.lastTile.y);
+    // Send line only on pressed to avoid weird brush + line issue
+    if (input.mouseButtons[0].wasJustPressed) {
+      const point = { x: 0, y: 0 };
+      if (xOffset > yOffset) {
+        point.x = xMin;
+        point.y = mapArea.lastTile.y;
+        lastTileY = mapArea.lastTile.y;
+      } else {
+        point.x = mapArea.lastTile.x;
+        point.y = yMin;
+        lastTileX = mapArea.lastTile.x;
+      }
+
+      lastTileX = Math.max(0, Math.min(pub.width - 1, lastTileX));
+      lastTileY = Math.max(0, Math.min(pub.height - 1, lastTileY));
+      editMap(getEditsFromPattern(point));
+      setupPattern([mapArea.patternData[0]]);
+      mapArea.lastTile = { x: lastTileX, y: lastTileY, tile: (mapArea.patternData[0] as (number|boolean)[]).slice() };
     } else {
-      for (let y = 0; y < yOffset; y++) patternData.push(mapArea.lastTile.tile);
-      setupPattern(patternData, 1, mapArea.lastTile.x, yMin);
+      const patternData: TileData[] = [];
+      if (xOffset > yOffset) {
+        for (let x = 0; x < xOffset; x++) patternData.push(mapArea.lastTile.tile);
+        setupPattern(patternData, xOffset, xMin, mapArea.lastTile.y);
+      } else {
+        for (let y = 0; y < yOffset; y++) patternData.push(mapArea.lastTile.tile);
+        setupPattern(patternData, 1, mapArea.lastTile.x, yMin);
+      }
     }
-  } else if (cursorHasMoved) setupPattern(mapArea.patternData, mapArea.patternDataWidth);
+  } else {
+    if (mapArea.lastTile != null && shiftKey.wasJustReleased)
+      setupPattern([mapArea.lastTile.tile]);
+    if (input.mouseButtons[0].isDown) {
+      editMap(getEditsFromPattern(mapArea.cursorPoint));
+      if (mapArea.patternData.length === 1 && lastTileX >= 0 && lastTileX < pub.width && lastTileY >= 0 && lastTileY < pub.height)
+        mapArea.lastTile = { x: lastTileX, y: lastTileY, tile: (mapArea.patternData[0] as (number|boolean)[]).slice() };
+    } else if (cursorHasMoved)
+      setupPattern(mapArea.patternData, mapArea.patternDataWidth);
+  }
 }
 
 function handleFillMode(cursorHasMoved: boolean) {

@@ -13,6 +13,7 @@ export default class TileSetRenderer extends SupEngine.ActorComponent {
   mesh: THREE.Mesh;
   gridRenderer: any;
   selectedTileActor: SupEngine.Actor;
+  // todo: add proper selectedTile field to avoid selectedTileActor.getLocalPosition everywhere
 
   constructor(actor: SupEngine.Actor, asset?: TileSet) {
     super(actor, "TileSetRenderer");
@@ -42,13 +43,21 @@ export default class TileSetRenderer extends SupEngine.ActorComponent {
     this.mesh = new THREE.Mesh(geometry, this.material);
     this.actor.threeObject.add(this.mesh);
     this.refreshScaleRatio();
-    this.selectedTileActor.threeObject.visible = true;
+    this.showSelection();
   }
 
   select(x: number, y: number, width = 1, height = 1) {
     const ratio = this.asset.data.grid.width / this.asset.data.grid.height;
     this.selectedTileActor.setLocalPosition(new THREE.Vector3(x, -y / ratio, 2));
     this.selectedTileActor.setLocalScale(new THREE.Vector3(width, -height / ratio, 1));
+  }
+
+  hideSelection() {
+    this.selectedTileActor.threeObject.visible = false;
+  }
+
+  showSelection() {
+    this.selectedTileActor.threeObject.visible = true;
   }
 
   refreshScaleRatio() {
