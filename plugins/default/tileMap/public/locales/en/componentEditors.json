@@ -1,8 +1,8 @@
 {
   "TileMapRenderer": {
-    "label": "Tile Map Renderer",
-    "tileMap": "Tile Map",
-    "tileSet": "Tile Set",
+    "label": "Tilemap Renderer",
+    "tileMap": "Tilemap",
+    "tileSet": "Tileset",
     "shadow": {
       "title": "Shadow",
       "cast": "Cast",

@@ -27,7 +27,7 @@ namespace Sup {
     getNearClippingPlane() { return this.__inner.nearClippingPlane; }
     setFarClippingPlane(farClippingPlane) { this.__inner.setFarClippingPlane(farClippingPlane); return this; }
     getFarClippingPlane() { return this.__inner.farClippingPlane; }
-    setClearColor(clearColor, clearOpacity) { this.__inner.setClearColor(clearColor.getHex(), clearOpacity); return this; }
+    setClearColor(clearColor) { this.__inner.setClearColor(clearColor.getHex()); return this; }
     getClearColor() { return new Color(1, 1, 1).setHex(this.__inner.clearColor); }
 
     setViewport(x, y, width, height) { this.__inner.setViewport(x, y, width, height); return this; }

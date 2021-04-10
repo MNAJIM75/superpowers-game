@@ -15,7 +15,6 @@
     "nearPlane": "Near Plane",
     "farPlane": "Far Plane",
     "clearColor": "Clear Color",
-    "clearOpacity": "Clear Opacity",
     "viewport": {
       "title": "Viewport",
       "position": "Top / Left",

@@ -4,15 +4,15 @@
     "type": "Typ",
     "typeOptions": {
       "box": "Låda",
-      "tileMap": "Tile Map"
+      "tileMap": "Tilemap"
     },
 
     "movable": "Flyttbar",
     "size": "Storlek",
     "offset": "Offset",
 
-    "tileMap": "Tile Map",
-    "tileSetProperty": "Tile Set Egenskap",
+    "tileMap": "Tilemap",
+    "tileSetProperty": "Tileset Egenskap",
     "layers": "Lager"
   }
 }

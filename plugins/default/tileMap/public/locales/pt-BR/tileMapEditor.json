@@ -1,6 +1,6 @@
 {
-  "tileMap": "Tile Map",
-  "tileSet": "Tile Set",
+  "tileMap": "Tilemap",
+  "tileSet": "Tileset",
   "pixelsPerUnit": "Pixels / Unidade",
   "depthOffset": "Deslocamento de profundidade",
 

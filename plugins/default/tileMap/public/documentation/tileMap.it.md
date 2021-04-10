@@ -1,4 +1,6 @@
-# Tile Map editor
+# Tilemap editor
+
+![](editor.png)
 
 ## Controlli
 
@@ -10,7 +12,7 @@ Usa la **rotellina del mouse** oppure **+/-** per effettuare lo zoom in/out
 
 ## Tasti di Scelta Rapida
 
-L'editor di tile map possiede alcune combinazioni di tasti per creare velocemente la tua mappa
+L'editor di tilemap possiede alcune combinazioni di tasti per creare velocemente la tua mappa
 
 Usa **I** per attivare l'highlight mode e **G** per attivare la griglia
 

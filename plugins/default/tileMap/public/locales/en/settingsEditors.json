@@ -1,10 +1,10 @@
 {
   "TileMap": {
-    "label": "Tile Map",
+    "label": "Tilemap",
     "pixelsPerUnit": "Pixels per unit",
     "defaultWidth": "Default width",
     "defaultHeight": "Default height",
     "depthOffset": "Depth offset",
-    "tileSetGridSize": "Tile Set grid size"
+    "tileSetGridSize": "Tileset grid size"
   }
 }

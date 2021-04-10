@@ -1,6 +1,6 @@
 {
-  "tileMap": "Tile Map",
-  "tileSet": "Tile Set",
+  "tileMap": "Tilemap",
+  "tileSet": "Tileset",
   "pixelsPerUnit": "像素 / 單位",
   "depthOffset": "深度位移",
 

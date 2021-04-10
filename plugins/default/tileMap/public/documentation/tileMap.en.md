@@ -1,4 +1,6 @@
-# Tile Map editor
+# Tilemap editor
+
+![](editor.png)
 
 ## Controls
 
@@ -10,7 +12,7 @@ Use the **Mouse wheel** or **+/-** to zoom in and out.
 
 ## Hotkeys
 
-The tile map editor has some hotkeys to help you build your map quickly.
+The tilemap editor has some hotkeys to help you build your map quickly.
 
 Use **I** to trigger the highlight mode and **G** to trigger the grid.
 

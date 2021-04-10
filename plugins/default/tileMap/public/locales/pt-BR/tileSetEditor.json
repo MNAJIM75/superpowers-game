@@ -1,9 +1,9 @@
 {
-  "tileSet": "Tile Set",
+  "tileSet": "Tileset",
   "texture": {
     "title": "Textura",
     "downloadPrompt": "Digite um nome para a textura",
-    "downloadInitialValue": "Tile Set"
+    "downloadInitialValue": "Tileset"
   },
   "grid": "Grade (px)",
 

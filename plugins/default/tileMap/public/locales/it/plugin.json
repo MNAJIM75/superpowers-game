@@ -1,10 +1,10 @@
 {
   "editors": {
     "tileMap": {
-      "title": "Tile Map"
+      "title": "Tilemap"
     },
     "tileSet": {
-      "title": "Tile Set"
+      "title": "Tileset"
     }
   }
 }

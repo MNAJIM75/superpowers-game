@@ -1,8 +1,8 @@
 {
   "TileMapRenderer": {
-    "label": "Tile Map ReRenderingnderer",
-    "tileMap": "Tile Map",
-    "tileSet": "Tile Set",
+    "label": "Tilemap ReRenderingnderer",
+    "tileMap": "Tilemap",
+    "tileSet": "Tileset",
     "shadow": {
       "title": "Skuggor",
       "cast": "Kastar",
