@@ -1,8 +1,8 @@
 {
   "TileMapRenderer": {
-    "label": "Renderizador de Tile Map",
-    "tileMap": "Tile Map",
-    "tileSet": "Tile Set",
+    "label": "Renderizador de Tilemap",
+    "tileMap": "Tilemap",
+    "tileSet": "Tileset",
     "shadow": {
       "title": "Sombra",
       "cast": "Produz",

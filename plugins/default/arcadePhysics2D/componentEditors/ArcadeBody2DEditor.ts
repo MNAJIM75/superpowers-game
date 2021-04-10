@@ -69,7 +69,7 @@ export default class ArcadeBody2DEditor {
       this.editConfig("setProperty", "bounce.y", parseFloat(event.target.value));
     });
 
-    // Tile Map boxFields
+    // Tilemap boxFields
     this.tileMapFields = {};
 
     const tileMapRow = SupClient.table.appendRow(this.tbody, SupClient.i18n.t("componentEditors:ArcadeBody2D.tileMap"));

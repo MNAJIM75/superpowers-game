@@ -1,10 +1,10 @@
 {
   "TileMap": {
-    "label": "Tile Map",
+    "label": "Tilemap",
     "pixelsPerUnit": "Pixlar per enhet",
     "defaultWidth": "Default bredd",
     "defaultHeight": "Default höjd",
     "depthOffset": "Djupoffset",
-    "tileSetGridSize": "Tile Set rutnätsstorlek"
+    "tileSetGridSize": "Tileset rutnätsstorlek"
   }
 }

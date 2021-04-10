@@ -1,4 +1,4 @@
-# Editeur de scène
+# Éditeur de scène
 
 ## Contrôles
 

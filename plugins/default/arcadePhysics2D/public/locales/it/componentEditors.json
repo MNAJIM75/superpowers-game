@@ -4,7 +4,7 @@
     "type": "Tipo",
     "typeOptions": {
       "box": "Box",
-      "tileMap": "Tile Map"
+      "tileMap": "Tilemap"
     },
 
     "movable": "Movibile",
@@ -12,8 +12,8 @@
     "offset": "Offset",
     "bounce": "Rimbalzo",
 
-    "tileMap": "Tile Map",
-    "tileSetProperty": "Proprietà del Tile Set",
+    "tileMap": "Tilemap",
+    "tileSetProperty": "Proprietà del Tileset",
     "layers": "Livelli"
   }
 }

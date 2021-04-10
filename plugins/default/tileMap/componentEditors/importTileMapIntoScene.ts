@@ -1,7 +1,7 @@
 export function importActor(entry: SupCore.Data.EntryNode, projectClient: SupClient.ProjectClient, options: SupClient.ImportIntoScenePluginOptions,
 callback: (err: string, nodeId: string) => any) {
   let name = entry.name;
-  if (name === "Tile Map") {
+  if (name === "Tilemap") {
     const parentNode = projectClient.entries.parentNodesById[entry.id];
     if (parentNode != null) name = parentNode.name;
   }

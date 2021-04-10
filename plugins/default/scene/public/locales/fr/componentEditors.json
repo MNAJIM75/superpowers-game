@@ -1,5 +1,6 @@
 {
   "camera": {
+    "label": "Caméra",
     "mode": "Mode",
     "modeOptions": {
       "perspective": "Perspective",
@@ -13,6 +14,7 @@
     "layersTitle": "Quelles couches rendre et dans quel ordre",
     "nearPlane": "Plan proche",
     "farPlane": "Plan lointain",
+    "clearColor": "Couleur d'effacement",
     "viewport": {
       "title": "Fenêtre de rendu",
       "position": "Haut / Gauche",

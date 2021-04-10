@@ -4,15 +4,15 @@
     "type": "Tipo",
     "typeOptions": {
       "box": "Caixa",
-      "tileMap": "Tile Map"
+      "tileMap": "Tilemap"
     },
 
     "movable": "Móvel",
     "size": "Dimensão",
     "offset": "Deslocamento",
 
-    "tileMap": "Tile Map",
-    "tileSetProperty": "Propriedade do Tile Set",
+    "tileMap": "Tilemap",
+    "tileSetProperty": "Propriedade do Tileset",
     "layers": "Camadas"
   }
 }

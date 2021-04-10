@@ -16,7 +16,7 @@ declare namespace Sup {
     getNearClippingPlane(): number;
     setFarClippingPlane(farClippingPlane: number): Camera;
     getFarClippingPlane(): number;
-    setClearColor(clearColor: Color, clearOpacity: number): Camera;
+    setClearColor(clearColor: Color): Camera;
     getClearColor(): Color;
     setViewport(x: number, y: number, width: number, height: number): Camera;
     getViewport(): { x: number; y: number; width: number; height: number; };

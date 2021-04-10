@@ -1,10 +1,10 @@
 {
   "TileMap": {
-    "label": "Tile Map",
+    "label": "Tilemap",
     "pixelsPerUnit": "Pixels por unidade",
     "defaultWidth": "Largura padrão",
     "defaultHeight": "Altura padrão",
     "depthOffset": "Deslocamento de profundidade",
-    "tileSetGridSize": "Dimensão da Grade do Tile Set"
+    "tileSetGridSize": "Dimensão da Grade do Tileset"
   }
 }
