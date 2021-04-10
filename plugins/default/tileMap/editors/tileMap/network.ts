@@ -25,7 +25,7 @@ const onTileSetEditCommands: { [command: string]: Function; } = {};
 function onConnected() {
   data.projectClient = new SupClient.ProjectClient(socket, { subEntries: true });
 
-  const tileMapActor = new SupEngine.Actor(mapArea.gameInstance, "Tile Map");
+  const tileMapActor = new SupEngine.Actor(mapArea.gameInstance, "Tilemap");
   const tileMapRenderer = new TileMapRenderer(tileMapActor);
   const config = { tileMapAssetId: SupClient.query.asset, tileSetAssetId: null as string, materialType: "basic" };
 
@@ -54,11 +54,11 @@ const setProperty = onEditCommands["setProperty"] = (path: string, value: any) =
   }
 };
 
-// Tile Map
+// Tilemap
 function onTileMapAssetReceived() {
   const pub = data.tileMapUpdater.tileMapAsset.pub;
 
-  const tileSetActor = new SupEngine.Actor(tileSetArea.gameInstance, "Tile Set");
+  const tileSetActor = new SupEngine.Actor(tileSetArea.gameInstance, "Tileset");
   const tileSetRenderer = new TileSetRenderer(tileSetActor);
   const config = { tileSetAssetId: pub.tileSetId };
 
@@ -184,7 +184,7 @@ onEditCommands["moveSmartGroup"] = (layerId: string, smartGroupId: string, newIn
   }
 };
 
-// Tile Set
+// Tileset
 function onTileSetAssetReceived() {
   const tileMapPub = data.tileMapUpdater.tileMapAsset.pub;
   const tileSetPub = data.tileMapUpdater.tileSetAsset.pub;

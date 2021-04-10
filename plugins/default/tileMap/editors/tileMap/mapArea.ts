@@ -230,6 +230,12 @@ interface Edits {
   tileValue: ((number|boolean)[]|number);
 }
 
+interface SmartEdits {
+  x: number;
+  y: number;
+  smartGroup: string;
+}
+
 function getEditsFromPattern(point: { x: number; y: number }) {
   const edits: Edits[] = [];
   for (let tileIndex = 0; tileIndex < mapArea.patternData.length; tileIndex++) {
@@ -245,6 +251,7 @@ function getEditsFromPattern(point: { x: number; y: number }) {
 function editMap(edits: Edits[]) {
   const actualEdits: Edits[] = [];
   const layer = data.tileMapUpdater.tileMapAsset.layers.byId[tileSetArea.selectedLayerId];
+  if (layer.isSmartLayer) return;
 
   for (const edit of edits) {
     if (edit.x >= 0 && edit.x < data.tileMapUpdater.tileMapAsset.pub.width && edit.y >= 0 && edit.y < data.tileMapUpdater.tileMapAsset.pub.height) {
@@ -269,6 +276,24 @@ function editMap(edits: Edits[]) {
 
   if (actualEdits.length === 0) return;
   data.projectClient.editAsset(SupClient.query.asset, "editMap", layer.id, actualEdits);
+}
+
+function editSmartData(edits: SmartEdits[]) {
+  const actualEdits: SmartEdits[] = [];
+  const layer = data.tileMapUpdater.tileMapAsset.layers.byId[tileSetArea.selectedLayerId];
+  if (!layer.isSmartLayer) return;
+
+  for (const edit of edits) {
+    if (edit.x >= 0 && edit.x < data.tileMapUpdater.tileMapAsset.pub.width && edit.y >= 0 && edit.y < data.tileMapUpdater.tileMapAsset.pub.height) {
+
+      const index = edit.y * data.tileMapUpdater.tileMapAsset.pub.width + edit.x;
+
+      if (layer.smartData[index] !== edit.smartGroup) actualEdits.push(edit);
+    }
+  }
+
+  if (actualEdits.length === 0) return;
+  data.projectClient.editAsset(SupClient.query.asset, "editSmartData", layer.id, actualEdits);
 }
 
 function getMapGridPosition(gameInstance: SupEngine.GameInstance, cameraComponent: any) {
@@ -320,7 +345,7 @@ export function handleMapArea() {
   else if (ui.selectionToolButton.checked) handleSelectionMode(cursorHasMoved);
   else if (ui.eraserToolButton.checked) handleEraserMode(cursorHasMoved);
 
-  // Quick switch to Brush or Eraser
+  // Quick switch to Brush or Eraser, tile picker
   if (input.mouseButtons[2].wasJustReleased && (ui.brushToolButton.checked || ui.eraserToolButton.checked))  {
     if (mouseX >= 0 && mouseX < pub.width && mouseY >= 0 && mouseY < pub.height) {
       const layer = data.tileMapUpdater.tileMapAsset.layers.byId[tileSetArea.selectedLayerId];
@@ -392,7 +417,17 @@ function handleBrushMode(cursorHasMoved: boolean) {
     if (mapArea.lastTile != null && shiftKey.wasJustReleased)
       setupPattern([mapArea.lastTile.tile]);
     if (input.mouseButtons[0].isDown) {
-      editMap(getEditsFromPattern(mapArea.cursorPoint));
+      const layer = data.tileMapUpdater.tileMapAsset.layers.byId[tileSetArea.selectedLayerId];
+      if (layer.isSmartLayer) {
+        let edits: SmartEdits[] = [];
+        edits.push({
+          x: mapArea.cursorPoint.x,
+          y: mapArea.cursorPoint.y,
+          smartGroup: tileSetArea.selectedSmartGroup
+        });
+        editSmartData(edits);
+      }
+      else editMap(getEditsFromPattern(mapArea.cursorPoint));
       if (mapArea.patternData.length === 1 && lastTileX >= 0 && lastTileX < pub.width && lastTileY >= 0 && lastTileY < pub.height)
         mapArea.lastTile = { x: lastTileX, y: lastTileY, tile: (mapArea.patternData[0] as (number|boolean)[]).slice() };
     } else if (cursorHasMoved)

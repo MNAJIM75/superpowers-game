@@ -379,7 +379,9 @@ function onSmartGroupTreeViewDrop(event: DragEvent, dropLocation: TreeView.DropL
 }
 
 export function onSmartGroupSelect() {
-  // todo
+  if (ui.smartGroupTreeView.selectedNodes.length !== 0) {
+    tileSetArea.selectedSmartGroup = ui.smartGroupTreeView.selectedNodes[0].dataset["id"];
+  }
 }
 
 export function selectBrushTool(x?: number, y?: number, width = 1, height = 1) {

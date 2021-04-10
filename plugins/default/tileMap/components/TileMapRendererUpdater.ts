@@ -125,7 +125,11 @@ export default class TileMapRendererUpdater {
     },
     deleteSmartGroup: (layerId: string, id: string) => {
       console.log("updater deleteSmartGroup");
-    }
+    },
+    editSmartData: (layerId: string, edits: { x: number, y: number }[]) => {
+      const index = this.tileMapAsset.pub.layers.indexOf(this.tileMapAsset.layers.byId[layerId]);
+      for (const edit of edits) this.tileMapRenderer.refreshTileAt(index, edit.x, edit.y);
+    },
   };
 
   private onTileMapAssetTrashed = (assetId: string) => {

@@ -184,8 +184,12 @@ export default class TileMapAsset extends SupCore.Data.Base.Asset {
         for (const layer of this.pub.layers) {
           if (width > this.pub.width) {
             for (let i = 0; i < width - this.pub.width; i++) layer.data.splice(row * this.pub.width, 0, 0);
+            if (layer.isSmartLayer)
+              for (let i = 0; i < width - this.pub.width; i++) layer.smartData.splice(row * this.pub.width, 0, "");
           } else {
             layer.data.splice((row - 1) * this.pub.width + width, this.pub.width - width);
+            if (layer.isSmartLayer)
+              layer.smartData.splice((row - 1) * this.pub.width + width, this.pub.width - width);
           }
         }
       }
@@ -197,8 +201,12 @@ export default class TileMapAsset extends SupCore.Data.Base.Asset {
       for (const layer of this.pub.layers) {
         if (height > this.pub.height) {
           for (let i = 0; i < (height - this.pub.height) * this.pub.width; i++) layer.data.splice(this.pub.height * this.pub.width, 0, 0);
+          if (layer.isSmartLayer)
+            for (let i = 0; i < (height - this.pub.height) * this.pub.width; i++) layer.smartData.splice(this.pub.height * this.pub.width, 0, "");
         } else {
           layer.data.splice(height * this.pub.width, (this.pub.height - height) * this.pub.width);
+          if (layer.isSmartLayer)
+            layer.smartData.splice(height * this.pub.width, (this.pub.height - height) * this.pub.width);
         }
       }
       this.pub.height = height;
@@ -251,6 +259,7 @@ export default class TileMapAsset extends SupCore.Data.Base.Asset {
   server_editMap(client: SupCore.RemoteClient, layerId: string, edits: {x: number, y: number, tileValue: (number|boolean)[]}[], callback: EditMapCallback) {
     if (typeof layerId !== "string" || this.layers.byId[layerId] == null) { callback("no such layer"); return; }
     if (!Array.isArray(edits)) { callback("edits must be an array"); return; }
+    if (this.layers.byId[layerId].isSmartLayer) { callback("a smart layer cannot be edited directly"); return; }
 
     for (const edit of edits) {
       const x = edit.x;
@@ -487,7 +496,7 @@ export default class TileMapAsset extends SupCore.Data.Base.Asset {
     }
 
     this.client_editSmartData(layerId, edits);
-    callback(null, null, layerId, edits);
+    callback(null, null, layerId, edits); // todo: update only tile changed by a rule after resolving
     this.emit("change");
   }
 
@@ -495,6 +504,27 @@ export default class TileMapAsset extends SupCore.Data.Base.Asset {
     for (const edit of edits) {
       const index = edit.y * this.pub.width + edit.x;
       this.layers.byId[layerId].smartData[index] = edit.smartGroup;
+    }
+    this.resolveSmartLayer(layerId);
+  }
+
+  resolveSmartLayer(layerId: string) {
+    const layer = this.layers.byId[layerId];
+    if (!layer.isSmartLayer) return;
+
+    for (let y = 0; y < this.pub.height; y++) {
+      for (let x = 0; x < this. pub.width; x++) {
+        const index = y * this.pub.width + x;
+        let data = layer.smartData[index];
+        layer.data[index] = 0;
+        if (data === "") continue;
+        if (Number(data) == null) continue;
+        layer.data[index] = [
+          Number(data), 0,
+          false, false,
+          0
+        ]; // tmp
+      }
     }
   }
 }

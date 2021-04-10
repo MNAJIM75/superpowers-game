@@ -85,7 +85,7 @@ function onConnected() {
   data = {} as any;
   data.projectClient = new SupClient.ProjectClient(socket, { subEntries: false });
 
-  const tileSetActor = new SupEngine.Actor(ui.gameInstance, "Tile Set");
+  const tileSetActor = new SupEngine.Actor(ui.gameInstance, "Tileset");
   const tileSetRenderer = new TileSetRenderer(tileSetActor);
   const config = { tileSetAssetId: SupClient.query.asset };
 
