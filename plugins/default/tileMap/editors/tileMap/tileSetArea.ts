@@ -62,7 +62,6 @@ export function handleTileSetArea() {
 
   const [ mouseX, mouseY ] = getTileSetGridPosition(tileSetArea.gameInstance, tileSetArea.cameraComponent);
   if (tileSetArea.gameInstance.input.mouseButtons[0].wasJustPressed) {
-
     if (mouseX >= 0 && mouseX < tilesPerRow && mouseY >= 0 && mouseY < tilesPerColumn) {
       if (ui.fillToolButton.checked) {
         selectFillTool(mouseX, mouseY);
@@ -71,51 +70,25 @@ export function handleTileSetArea() {
         selectBrushTool(mouseX, mouseY);
       }
     }
-
-  } else if (tileSetArea.gameInstance.input.mouseButtons[0].wasJustReleased && tileSetArea.selectionStartPoint != null) {
-    // Clamp mouse values
-    const x = Math.max(0, Math.min(tilesPerRow - 1, mouseX));
-    const y = Math.max(0, Math.min(tilesPerColumn - 1, mouseY));
-
-    const startX = Math.min(tileSetArea.selectionStartPoint.x, x);
-    const startY = Math.min(tileSetArea.selectionStartPoint.y, y);
-    const width = Math.abs(x - tileSetArea.selectionStartPoint.x) + 1;
-    const height = Math.abs(y - tileSetArea.selectionStartPoint.y);
-    const layerData: (number|boolean)[][] = [];
-    for (let y = height; y >= 0; y--) {
-      for (let x = 0; x < width; x++) {
-        layerData.push([ startX + x, startY + y, false, false, 0 ]);
-      }
-    }
-
-    setupPattern(layerData, width);
-    selectBrushTool(startX, startY, width, height + 1);
-    tileSetArea.selectionStartPoint = null;
-  }
-
-  if (tileSetArea.selectionStartPoint != null) {
+  } else if (tileSetArea.selectionStartPoint != null) {
     // Clamp mouse values
     let x = Math.max(0, Math.min(tilesPerRow - 1, mouseX));
     let y = Math.max(0, Math.min(tilesPerColumn - 1, mouseY));
+    const startX = Math.min(tileSetArea.selectionStartPoint.x, x);
+    const startY = Math.min(tileSetArea.selectionStartPoint.y, y);
+    const width = Math.abs(x - tileSetArea.selectionStartPoint.x) + 1;
+    const height = Math.abs(y - tileSetArea.selectionStartPoint.y) + 1;
+    if (tileSetArea.gameInstance.input.mouseButtons[0].wasJustReleased) {
+      const layerData: (number|boolean)[][] = [];
+      for (let y = height - 1; y >= 0; y--)
+        for (let x = 0; x < width; x++)
+          layerData.push([ startX + x, startY + y, false, false, 0 ]);
 
-    let width = x - tileSetArea.selectionStartPoint.x;
-    if (width >= 0) {
-      width += 1;
-      x = tileSetArea.selectionStartPoint.x;
+      setupPattern(layerData, width);
+      selectBrushTool(startX, startY, width, height);
+      tileSetArea.selectionStartPoint = null;
     } else {
-      width -= 1;
-      x = tileSetArea.selectionStartPoint.x + 1;
+      data.tileSetUpdater.tileSetRenderer.select(startX, startY, width, height);
     }
-
-    let height = y - tileSetArea.selectionStartPoint.y;
-    if (height >= 0) {
-      height += 1;
-      y = tileSetArea.selectionStartPoint.y;
-    } else {
-      height -= 1;
-      y = tileSetArea.selectionStartPoint.y + 1;
-    }
-
-    data.tileSetUpdater.tileSetRenderer.select(x, y, width, height);
   }
 }
