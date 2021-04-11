@@ -1,0 +1,12 @@
+{
+  "game": {
+    "title": "Export HTML5",
+    "progress": "Exportation vers ${path}... (${index}/${total})",
+    "doneWithErrors": "${errors} erreurs rencontrés pendant l'export des ${total} éléments vers ${path}.",
+    "done": "${total} éléments exporté vers ${path}.",
+
+    "errors": {
+      "exportFailed": "Échec de l'export de ${path} : ${error}"
+    }
+  }
+}

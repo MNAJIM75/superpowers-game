@@ -1,0 +1,31 @@
+{
+  "tileMap": "Tilemap",
+  "tileSet": "Tileset",
+  "pixelsPerUnit": "Pixels / Unité",
+  "depthOffset": "Écart de profondeur",
+
+  "size": "Taille",
+  "resize": "Redimens.",
+  "newWidthPrompt": "Entrez une nouvelle largeur pour la tilemap.",
+  "newHeightPrompt": "Entrez une nouvelle hauteur pour la tilemap.",
+  "move": "Déplacer",
+  "applyOffset": "Appliquer le décalage",
+  "horizontalOffsetPrompt": "Entrez le décalage horizontal.",
+  "verticalOffsetPrompt": "Entrez le décalage vertical.",
+  
+  "tools": "Outils",
+  "grid": "Grille",
+  "highlight": "Surbrillance",
+  
+  "brush":      "Pinceau",
+  "fill":       "Rempliss.",
+  "selection":  "Sélection",
+  "eraser":     "Gomme",
+  
+  "layers": "Calques",
+  "newLayerPrompt": "Entrez un nom pour le nouveau calque.",
+  "newLayerInitialValue": "Calque",
+  "newLayerIsSmart": "Est un calque intelligent",
+  "renameLayerPrompt": "Entrez un nouveau nom pour le calque.",
+  "deleteLayerConfirm": "Êtes-vous sûr de vouloir supprimer le calque sélectionné?"
+}

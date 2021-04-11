@@ -1,0 +1,10 @@
+{
+  "editors": {
+    "tileMap": {
+      "title": "Tilemap"
+    },
+    "tileSet": {
+      "title": "Tileset"
+    }
+  }
+}
