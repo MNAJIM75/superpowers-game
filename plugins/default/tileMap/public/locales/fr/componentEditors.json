@@ -1,0 +1,14 @@
+{
+  "TileMapRenderer": {
+    "label": "Tilemap Renderer",
+    "tileMap": "Tilemap",
+    "tileSet": "Tileset",
+    "shadow": {
+      "title": "Ombres",
+      "cast": "Projeter",
+      "receive": "Recevoir"
+    },
+    "material": "Matériau",
+    "shader": "Shader"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "game": {
+    "label": "HTML5",
+    "description": "Exporter en HTML5",
+    
+    "outputFolder": "Dossier de destination",
+    "errors": {
+      "selectDestionationFolder": "Selectionnez un dossier de destination.",
+      "emptyDirectoryCheckFail": "Impossible de vérifier si le dossier de destination est vide.",
+      "destinationFolderEmpty": "Le dossier de destination doit être vide."
+    }
+  }
+}
