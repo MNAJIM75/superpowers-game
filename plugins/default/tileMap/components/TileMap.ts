@@ -31,4 +31,11 @@ export default class TileMap extends EventEmitter {
     const index = y * this.data.width + x;
     return this.data.layers[layer].data[index];
   }
+
+  getSmartGroupAt(layer: number, x: number, y: number) {
+    if (x < 0 || y < 0 || x >= this.data.width || y >= this.data.height) return "";
+
+    const index = y * this.data.width + x;
+    return this.data.layers[layer].smartData[index];
+  }
 }

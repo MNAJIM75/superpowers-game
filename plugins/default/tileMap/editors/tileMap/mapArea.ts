@@ -343,7 +343,7 @@ export function handleMapArea() {
   if (ui.brushToolButton.checked) handleBrushMode(cursorHasMoved);
   else if (ui.fillToolButton.checked) handleFillMode(cursorHasMoved);
   else if (ui.selectionToolButton.checked) handleSelectionMode(cursorHasMoved);
-  else if (ui.eraserToolButton.checked) handleEraserMode(cursorHasMoved);
+  else if (ui.eraserToolButton.checked) handleEraserMode();
 
   // Quick switch to Brush or Eraser, tile picker
   if (input.mouseButtons[2].wasJustReleased && (ui.brushToolButton.checked || ui.eraserToolButton.checked))  {
@@ -359,8 +359,8 @@ export function handleMapArea() {
     }
   }
 
-  // Update pattern background
-  if (mapArea.patternActor.threeObject.visible || ui.eraserToolButton.checked) {
+  // Update pattern background with the mouse (except with selection mode)
+  if (mapArea.patternBackgroundActor.threeObject.visible && !ui.selectionToolButton.checked) {
     const layer = data.tileMapUpdater.tileMapAsset.layers.byId[tileSetArea.selectedLayerId];
     const z = (pub.layers.indexOf(layer) + 0.5) * pub.layerDepthOffset;
     const ratioX = pub.pixelsPerUnit / data.tileMapUpdater.tileSetAsset.pub.grid.width;
@@ -373,6 +373,9 @@ export function handleMapArea() {
 function handleBrushMode(cursorHasMoved: boolean) {
   const pub = data.tileMapUpdater.tileMapAsset.pub;
   const input = mapArea.gameInstance.input;
+
+  const layer = data.tileMapUpdater.tileMapAsset.layers.byId[tileSetArea.selectedLayerId];
+  if (layer.isSmartLayer) { handleBrushModeSmart(); return; }
 
   const shiftKey = input.keyboardButtons[(<any>window).KeyEvent.DOM_VK_SHIFT];
 
@@ -418,16 +421,7 @@ function handleBrushMode(cursorHasMoved: boolean) {
       setupPattern([mapArea.lastTile.tile]);
     if (input.mouseButtons[0].isDown) {
       const layer = data.tileMapUpdater.tileMapAsset.layers.byId[tileSetArea.selectedLayerId];
-      if (layer.isSmartLayer) {
-        let edits: SmartEdits[] = [];
-        edits.push({
-          x: mapArea.cursorPoint.x,
-          y: mapArea.cursorPoint.y,
-          smartGroup: tileSetArea.selectedSmartGroup
-        });
-        editSmartData(edits);
-      }
-      else editMap(getEditsFromPattern(mapArea.cursorPoint));
+      editMap(getEditsFromPattern(mapArea.cursorPoint));
       if (mapArea.patternData.length === 1 && lastTileX >= 0 && lastTileX < pub.width && lastTileY >= 0 && lastTileY < pub.height)
         mapArea.lastTile = { x: lastTileX, y: lastTileY, tile: (mapArea.patternData[0] as (number|boolean)[]).slice() };
     } else if (cursorHasMoved)
@@ -435,7 +429,64 @@ function handleBrushMode(cursorHasMoved: boolean) {
   }
 }
 
+function handleBrushModeSmart() {
+  const pub = data.tileMapUpdater.tileMapAsset.pub;
+  const input = mapArea.gameInstance.input;
+  const layer = data.tileMapUpdater.tileMapAsset.layers.byId[tileSetArea.selectedLayerId];
+  if (!layer.isSmartLayer) return;
+  if (tileSetArea.selectedSmartGroup == null) return;
+
+  const shiftKey = input.keyboardButtons[(<any>window).KeyEvent.DOM_VK_SHIFT];
+
+  let lastTileX = mapArea.cursorPoint.x;
+  let lastTileY = mapArea.cursorPoint.y;
+  if (mapArea.lastTile != null && shiftKey.isDown) { // Draw line when shift is pressed
+    // todo: implement proper line algorithm
+    const xMin = Math.min(mapArea.cursorPoint.x, mapArea.lastTile.x);
+    const xOffset = Math.abs(mapArea.cursorPoint.x - mapArea.lastTile.x) + 1;
+    const yMin = Math.min(mapArea.cursorPoint.y, mapArea.lastTile.y);
+    const yOffset = Math.abs(mapArea.cursorPoint.y - mapArea.lastTile.y) + 1;
+
+    // Send line only on pressed to avoid weird brush + line issue
+    if (input.mouseButtons[0].wasJustPressed) {
+      const point = { x: 0, y: 0 };
+      if (xOffset > yOffset) {
+        point.x = xMin;
+        point.y = mapArea.lastTile.y;
+        lastTileY = mapArea.lastTile.y;
+      } else {
+        point.x = mapArea.lastTile.x;
+        point.y = yMin;
+        lastTileX = mapArea.lastTile.x;
+      }
+
+      lastTileX = Math.max(0, Math.min(pub.width - 1, lastTileX));
+      lastTileY = Math.max(0, Math.min(pub.height - 1, lastTileY));
+      let edits: SmartEdits[] = [];
+      if (xOffset > yOffset)
+        for (let x = 0; x < xOffset; x++) edits.push({x: point.x + x, y: point.y, smartGroup: tileSetArea.selectedSmartGroup});
+      else
+        for (let y = 0; y < yOffset; y++) edits.push({x: point.x, y: point.y + y, smartGroup: tileSetArea.selectedSmartGroup});
+      editSmartData(edits);
+      mapArea.lastTile = { x: lastTileX, y: lastTileY, tile: (mapArea.patternData[0] as (number|boolean)[]).slice() };
+    }
+  } else if (input.mouseButtons[0].isDown) {
+    let edits: SmartEdits[] = [];
+    edits.push({
+      x: mapArea.cursorPoint.x,
+      y: mapArea.cursorPoint.y,
+      smartGroup: tileSetArea.selectedSmartGroup
+    });
+    editSmartData(edits);
+    if (mapArea.patternData.length === 1 && lastTileX >= 0 && lastTileX < pub.width && lastTileY >= 0 && lastTileY < pub.height)
+      mapArea.lastTile = { x: lastTileX, y: lastTileY, tile: (mapArea.patternData[0] as (number|boolean)[]).slice() };
+  }
+}
+
 function handleFillMode(cursorHasMoved: boolean) {
+  const layer = data.tileMapUpdater.tileMapAsset.layers.byId[tileSetArea.selectedLayerId];
+  if (layer.isSmartLayer) { handleFillModeSmart(); return; }
+
   if (cursorHasMoved) {
     data.tileSetUpdater.tileSetRenderer.selectedTileActor.getLocalPosition(tmpVector3);
     setupFillPattern([ tmpVector3.x, -tmpVector3.y, false, false, 0 ]);
@@ -452,6 +503,52 @@ function handleFillMode(cursorHasMoved: boolean) {
     }
   }
   editMap(edits);
+}
+
+function handleFillModeSmart() {
+  const pub = data.tileMapUpdater.tileMapAsset.pub;
+  const input = mapArea.gameInstance.input;
+  const layer = data.tileMapUpdater.tileMapAsset.layers.byId[tileSetArea.selectedLayerId];
+  if (!layer.isSmartLayer) return;
+  if (tileSetArea.selectedSmartGroup == null) return;
+
+  if (!input.mouseButtons[0].wasJustPressed) return;
+
+  const patternLayerData: string[] = [];
+  for (let y = 0; y < pub.height; y++) {
+    for (let x = 0; x < pub.width; x++) {
+      patternLayerData.push("");
+    }
+  }
+  const edits: SmartEdits[] = [];
+
+  const refTileData = layer.smartData[mapArea.cursorPoint.y * pub.width + mapArea.cursorPoint.x];
+  function checkTile(x: number, y: number) {
+    if (x < 0 || x >= pub.width || y < 0 || y >= pub.height) return;
+
+    const index = y * pub.width + x;
+
+    // Skip if target tile on pattern isn't empty
+    const patternTile = patternLayerData[index];
+    if (patternTile !== "") return;
+
+    // Skip if target tile on layer is different from the base tile
+    const data = layer.smartData[index];
+    if (data !== refTileData) return;
+
+    patternLayerData[index] = tileSetArea.selectedSmartGroup;
+    edits.push({x, y, smartGroup: tileSetArea.selectedSmartGroup});
+
+    checkTile(x - 1, y);
+    checkTile(x + 1, y);
+    checkTile(x    , y - 1);
+    checkTile(x    , y + 1);
+  }
+
+  if (mapArea.cursorPoint.x >= 0 && mapArea.cursorPoint.x < pub.width && mapArea.cursorPoint.y >= 0 && mapArea.cursorPoint.y < pub.height)
+    checkTile(mapArea.cursorPoint.x, mapArea.cursorPoint.y);
+
+  editSmartData(edits);
 }
 
 function handleSelectionMode(cursorHasMoved: boolean) {
@@ -571,7 +668,17 @@ export function selectEntireLayer() {
   };
 }
 
-function handleEraserMode(cursorHasMoved: boolean) {
+function handleEraserMode() {
+  const layer = data.tileMapUpdater.tileMapAsset.layers.byId[tileSetArea.selectedLayerId];
+  if (layer.isSmartLayer) { handleEraserModeSmart(); return; }
+
   if (mapArea.gameInstance.input.mouseButtons[0].isDown)
     editMap([{ x: mapArea.cursorPoint.x, y: mapArea.cursorPoint.y, tileValue: 0 }]);
+}
+
+function handleEraserModeSmart() {
+  const layer = data.tileMapUpdater.tileMapAsset.layers.byId[tileSetArea.selectedLayerId];
+  if (!layer.isSmartLayer) return;
+  if (mapArea.gameInstance.input.mouseButtons[0].isDown)
+    editSmartData([{ x: mapArea.cursorPoint.x, y: mapArea.cursorPoint.y, smartGroup: "" }]);
 }

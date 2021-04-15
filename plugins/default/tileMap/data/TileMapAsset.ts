@@ -492,7 +492,7 @@ export default class TileMapAsset extends SupCore.Data.Base.Asset {
       if (y == null || typeof y !== "number" || y < 0 || y >= this.pub.height) { callback(`y must be an integer between 0 && ${this.pub.height - 1}`); return; }
       if (typeof smartGroup !== "string") { callback("smartGroup must be an string"); return; }
       let smartGroupIndex = layer.smartGroups.findIndex(element => element.id === smartGroup);
-      if (smartGroupIndex === -1) { callback("no such smart group"); return; }
+      if (smartGroup !== "" && smartGroupIndex === -1) { callback("no such smart group"); return; }
     }
 
     this.client_editSmartData(layerId, edits);

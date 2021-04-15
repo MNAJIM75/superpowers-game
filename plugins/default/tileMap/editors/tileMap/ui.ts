@@ -307,6 +307,7 @@ export function onLayerSelect() {
 
   ui.smartGroupTreeView.clear();
   for (let index = layer.smartGroups.length - 1; index >= 0; index--) setupSmartGroup(layer.smartGroups[index], index);
+  updateToolsVisibility();
 }
 
 function onNewSmartGroupClick() {
@@ -381,6 +382,9 @@ function onSmartGroupTreeViewDrop(event: DragEvent, dropLocation: TreeView.DropL
 export function onSmartGroupSelect() {
   if (ui.smartGroupTreeView.selectedNodes.length !== 0) {
     tileSetArea.selectedSmartGroup = ui.smartGroupTreeView.selectedNodes[0].dataset["id"];
+    if (ui.eraserToolButton.checked || ui.selectionToolButton.checked) selectBrushTool();
+  } else {
+    tileSetArea.selectedSmartGroup = null;
   }
 }
 
@@ -404,10 +408,8 @@ export function selectBrushTool(x?: number, y?: number, width = 1, height = 1) {
   setupPattern(layerData, tmpScale.x);
 
   mapArea.lastTile = null;
-  mapArea.patternActor.threeObject.visible = true;
-  data.tileSetUpdater.tileSetRenderer.showSelection();
-  mapArea.patternBackgroundActor.threeObject.visible = true;
-  mapArea.patternBackgroundActor.setLocalScale(new SupEngine.THREE.Vector3(width, height / ratio, 1));
+
+  updateToolsVisibility(width, height);
 }
 
 export function selectFillTool(x?: number, y?: number) {
@@ -421,9 +423,7 @@ export function selectFillTool(x?: number, y?: number) {
   data.tileSetUpdater.tileSetRenderer.selectedTileActor.getLocalPosition(tmpPosition);
   setupFillPattern([ tmpPosition.x, -tmpPosition.y, false, false, 0 ]);
 
-  mapArea.patternActor.threeObject.visible = true;
-  data.tileSetUpdater.tileSetRenderer.showSelection();
-  mapArea.patternBackgroundActor.threeObject.visible = false;
+  updateToolsVisibility();
 }
 
 export function selectSelectionTool() {
@@ -431,11 +431,10 @@ export function selectSelectionTool() {
 
   if (data.tileMapUpdater.tileSetAsset == null || data.tileMapUpdater.tileSetAsset.pub == null) return;
 
-  mapArea.patternActor.threeObject.visible = false;
-  mapArea.patternBackgroundActor.threeObject.visible = false;
-  data.tileSetUpdater.tileSetRenderer.hideSelection();
-
   mapArea.selectionStartPoint = null;
+
+  ui.smartGroupTreeView.clearSelection();
+  updateToolsVisibility();
 }
 
 export function selectEraserTool() {
@@ -443,11 +442,9 @@ export function selectEraserTool() {
 
   if (data.tileMapUpdater.tileSetAsset == null || data.tileMapUpdater.tileSetAsset.pub == null) return;
 
-  mapArea.patternActor.threeObject.visible = false;
-  data.tileSetUpdater.tileSetRenderer.hideSelection();
-  mapArea.patternBackgroundActor.threeObject.visible = true;
-  const ratio = data.tileSetUpdater.tileSetAsset.pub.grid.width / data.tileSetUpdater.tileSetAsset.pub.grid.height;
-  mapArea.patternBackgroundActor.setLocalScale(new SupEngine.THREE.Vector3(1, 1 / ratio, 1));
+  ui.smartGroupTreeView.clearSelection();
+  tileSetArea.selectedSmartGroup = null;
+  updateToolsVisibility();
 }
 
 export function setupLayer(layer: TileMapLayerPub, index: number) {
@@ -522,5 +519,39 @@ export function refreshSmartGroupsId() {
     const smartGroupId = smartGroupList[smartIndex].id;
     const indexSpanElt = ui.smartGroupTreeView.treeRoot.querySelector(`[data-id="${smartGroupId}"] .index`) as HTMLSpanElement;
     indexSpanElt.textContent = `${smartIndex} -`;
+  }
+}
+
+export function updateToolsVisibility(brushWidth: number = -1, brushHeight: number = -1) {
+  if (data.tileMapUpdater.tileSetAsset == null || data.tileMapUpdater.tileSetAsset.pub == null) return;
+
+  const ratio = data.tileSetUpdater.tileSetAsset.pub.grid.width / data.tileSetUpdater.tileSetAsset.pub.grid.height;
+  const layer = data.tileMapUpdater.tileMapAsset.layers.byId[tileSetArea.selectedLayerId];
+  if (layer.isSmartLayer) {
+    mapArea.patternActor.threeObject.visible = false;
+    mapArea.patternBackgroundActor.threeObject.visible = true;
+    mapArea.patternBackgroundActor.setLocalScale(new SupEngine.THREE.Vector3(1, 1 / ratio, 1));
+    data.tileSetUpdater.tileSetRenderer.hideSelection();
+    return;
+  }
+  if (ui.brushToolButton.checked) {
+    mapArea.patternActor.threeObject.visible = true;
+    mapArea.patternBackgroundActor.threeObject.visible = true;
+    data.tileSetUpdater.tileSetRenderer.showSelection();
+    if (brushWidth !== -1 && brushHeight !== -1)
+      mapArea.patternBackgroundActor.setLocalScale(new SupEngine.THREE.Vector3(brushWidth, brushHeight / ratio, 1));
+  } else if (ui.fillToolButton.checked) {
+    mapArea.patternActor.threeObject.visible = true;
+    mapArea.patternBackgroundActor.threeObject.visible = false;
+    data.tileSetUpdater.tileSetRenderer.showSelection();
+  } else if (ui.selectionToolButton.checked) {
+    mapArea.patternActor.threeObject.visible = false;
+    mapArea.patternBackgroundActor.threeObject.visible = false;
+    data.tileSetUpdater.tileSetRenderer.hideSelection();
+  } else if (ui.eraserToolButton.checked) {
+    mapArea.patternActor.threeObject.visible = false;
+    mapArea.patternBackgroundActor.threeObject.visible = true;
+    data.tileSetUpdater.tileSetRenderer.hideSelection();
+    mapArea.patternBackgroundActor.setLocalScale(new SupEngine.THREE.Vector3(1, 1 / ratio, 1));
   }
 }
