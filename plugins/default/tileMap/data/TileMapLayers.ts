@@ -5,12 +5,12 @@ export interface SmartGroupPub {
 }
 
 export interface TileRulesPub {
+  id: string;
   tile: number;
-  pattern: number[];
+  pattern: string[];
   size: number;
   chance: number;
   active: boolean;
-  breakOnMatch: boolean;
 }
 
 export interface TileMapLayerPub {

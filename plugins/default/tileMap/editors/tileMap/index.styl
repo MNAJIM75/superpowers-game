@@ -52,15 +52,56 @@ body
       &:hover
         background-color #ddd
 
-  .tileSet
+  .tileset
     flex 1
     border-top 1px solid #aaa
     min-height 100px
 
-  .rules
+  .smartTileset
     flex 1
-    border-top 1px solid #aaa
-    min-height 100px
+    display flex
+    flex-direction column
+    box-sizing border-box
+
+    .smart-groups-panel
+      flex 1
+      min-height 100px
+      display flex
+      flex-direction column
+
+      .smart-groups
+        flex 1
+        display flex
+        flex-flow column
+
+        .smart-groups-buttons
+          display flex
+
+          button
+            flex 1
+            font-size smaller
+            white-space nowrap
+
+        .smart-groups-tree-view
+          flex 1
+          position relative
+          background #fff
+          overflow-y auto
+
+          .tree
+            position absolute
+
+          .name
+            white-space pre
+            flex-grow 1
+          
+          .color-picker
+            padding 0
+            border 0
+            background-color transparent
+    
+    .rules-panel
+      min-height 100px
 
   .layers
     height 200px
@@ -68,58 +109,25 @@ body
     display flex
     flex-flow column
 
-  .layers-buttons
-    display flex
+    .layers-buttons
+      display flex
 
-    button
+      button
+        flex 1
+        font-size smaller
+        white-space nowrap
+
+    .layers-tree-view
       flex 1
-      font-size smaller
-      white-space nowrap
+      position relative
+      background #fff
+      overflow-y auto
 
-  .layers-tree-view
-    flex 1
-    position relative
-    background #fff
-    overflow-y auto
+      .tree
+        position absolute
 
-    .tree
-      position absolute
+      .name
+        white-space pre
 
-    .name
-      white-space pre
-
-    .smart
-      font-weight lighter
-
-
-  .smart-id
-    height 200px
-    min-height 100px
-    display flex
-    flex-flow column
-
-  .smart-id-buttons
-    display flex
-
-    button
-      flex 1
-      font-size smaller
-      white-space nowrap
-
-  .smart-id-tree-view
-    flex 1
-    position relative
-    background #fff
-    overflow-y auto
-
-    .tree
-      position absolute
-
-    .name
-      white-space pre
-      flex-grow 1
-    
-    .color-picker
-      padding 0
-      border 0
-      background-color transparent
+      .smart
+        font-weight lighter

@@ -16,11 +16,11 @@ const tileSetArea: {
   selectionEndPoint?: { x: number; y : number };
 
   tileSetElt?: HTMLCanvasElement;
-  rulesElt?: HTMLElement;
+  smartTilesetElt?: HTMLElement;
 } = {};
 
-tileSetArea.tileSetElt = <HTMLCanvasElement>document.querySelector("canvas.tileSet");
-tileSetArea.rulesElt = <HTMLElement>document.querySelector("div.rules");
+tileSetArea.tileSetElt = <HTMLCanvasElement>document.querySelector("canvas.tileset");
+tileSetArea.smartTilesetElt = <HTMLElement>document.querySelector("div.smartTileset");
 tileSetArea.gameInstance = new SupEngine.GameInstance(tileSetArea.tileSetElt);
 
 const cameraActor = new SupEngine.Actor(tileSetArea.gameInstance, "Camera");

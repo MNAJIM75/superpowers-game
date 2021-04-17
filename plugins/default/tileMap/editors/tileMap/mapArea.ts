@@ -360,7 +360,7 @@ export function handleMapArea() {
   }
 
   // Update pattern background with the mouse (except with selection mode)
-  if (mapArea.patternBackgroundActor.threeObject.visible && !ui.selectionToolButton.checked) {
+  if (mapArea.patternBackgroundActor.threeObject.visible && (!ui.selectionToolButton.checked || mapArea.patternActor.threeObject.visible)) {
     const layer = data.tileMapUpdater.tileMapAsset.layers.byId[tileSetArea.selectedLayerId];
     const z = (pub.layers.indexOf(layer) + 0.5) * pub.layerDepthOffset;
     const ratioX = pub.pixelsPerUnit / data.tileMapUpdater.tileSetAsset.pub.grid.width;
@@ -553,6 +553,7 @@ function handleFillModeSmart() {
 
 function handleSelectionMode(cursorHasMoved: boolean) {
   const pub = data.tileMapUpdater.tileMapAsset.pub;
+  const layer = data.tileMapUpdater.tileMapAsset.layers.byId[tileSetArea.selectedLayerId];
   const input = mapArea.gameInstance.input;
   const keyEvent = (<any>window).KeyEvent;
 
@@ -602,7 +603,7 @@ function handleSelectionMode(cursorHasMoved: boolean) {
 
   const ratioX = pub.pixelsPerUnit / data.tileMapUpdater.tileSetAsset.pub.grid.width;
   const ratioY = pub.pixelsPerUnit / data.tileMapUpdater.tileSetAsset.pub.grid.height;
-  const z = data.tileMapUpdater.tileMapAsset.layers.pub.length * pub.layerDepthOffset;
+  const z = (pub.layers.indexOf(layer) + 0.5) * pub.layerDepthOffset;
   const patternPosition = new SupEngine.THREE.Vector3(startX / ratioX, startY / ratioY, z);
   mapArea.patternBackgroundActor.setLocalPosition(patternPosition);
   const ratio = data.tileSetUpdater.tileSetAsset.pub.grid.width / data.tileSetUpdater.tileSetAsset.pub.grid.height;
@@ -620,8 +621,6 @@ function handleSelectionMode(cursorHasMoved: boolean) {
 
   // Move/duplicate the selection
   else if (input.keyboardButtons[keyEvent.DOM_VK_M].wasJustReleased || input.keyboardButtons[keyEvent.DOM_VK_D].wasJustReleased) {
-    const layer = data.tileMapUpdater.tileMapAsset.layers.byId[tileSetArea.selectedLayerId];
-
     mapArea.duplicatingSelection = input.keyboardButtons[keyEvent.DOM_VK_D].wasJustReleased;
     if (!mapArea.duplicatingSelection) {
       const edits: Edits[] = [];

@@ -29,6 +29,7 @@ const ui: {
 
   layersTreeView: TreeView;
   smartGroupTreeView: TreeView;
+  rulesTreeView: TreeView;
 
   mousePositionLabel?: { x: HTMLLabelElement; y: HTMLLabelElement; };
 } = {} as any;
@@ -37,6 +38,7 @@ export default ui;
 // Setup resize handles
 new ResizeHandle(document.querySelector(".sidebar") as HTMLElement, "right");
 new ResizeHandle(document.querySelector(".layers") as HTMLElement, "bottom");
+new ResizeHandle(document.querySelector(".rules-panel") as HTMLElement, "bottom");
 
 ui.tileSetInput = document.querySelector(".property-tileSetId") as HTMLInputElement;
 ui.tileSetInput.addEventListener("click", (event) => {
@@ -116,11 +118,17 @@ document.querySelector("button.new-layer").addEventListener("click", onNewLayerC
 document.querySelector("button.rename-layer").addEventListener("click", onRenameLayerClick);
 document.querySelector("button.delete-layer").addEventListener("click", onDeleteLayerClick);
 
-ui.smartGroupTreeView = new TreeView(document.querySelector(".smart-id-tree-view") as HTMLElement, { dragStartCallback: () => true, dropCallback: onSmartGroupTreeViewDrop, multipleSelection: false });
+ui.smartGroupTreeView = new TreeView(
+  document.querySelector(".smart-groups-tree-view") as HTMLElement,
+  { dragStartCallback: () => true, dropCallback: onSmartGroupTreeViewDrop, multipleSelection: false }
+);
 ui.smartGroupTreeView.on("selectionChange", onSmartGroupSelect);
-document.querySelector("button.new-smart-id").addEventListener("click", onNewSmartGroupClick);
-document.querySelector("button.rename-smart-id").addEventListener("click", onRenameSmartGroupClick);
-document.querySelector("button.delete-smart-id").addEventListener("click", onDeleteSmartGroupClick);
+document.querySelector("button.new-smart-group").addEventListener("click", onNewSmartGroupClick);
+document.querySelector("button.rename-smart-group").addEventListener("click", onRenameSmartGroupClick);
+document.querySelector("button.delete-smart-group").addEventListener("click", onDeleteSmartGroupClick);
+
+ui.rulesTreeView = new TreeView(document.querySelector(".rules-tree-view") as HTMLElement, { dragStartCallback: () => true, dropCallback: onRulesTreeViewDrop, multipleSelection: false });
+// ui.smartGroupTreeView.on("selectionChange", onSmartGroupSelect);
 
 ui.mousePositionLabel = {
   x: document.querySelector("label.position-x") as HTMLLabelElement,
@@ -303,7 +311,7 @@ export function onLayerSelect() {
   mapArea.patternActor.setLocalPosition(new SupEngine.THREE.Vector3(0, 0, z));
 
   tileSetArea.tileSetElt.hidden = layer.isSmartLayer;
-  tileSetArea.rulesElt.hidden = !layer.isSmartLayer;
+  tileSetArea.smartTilesetElt.hidden = !layer.isSmartLayer;
 
   ui.smartGroupTreeView.clear();
   for (let index = layer.smartGroups.length - 1; index >= 0; index--) setupSmartGroup(layer.smartGroups[index], index);
@@ -386,6 +394,10 @@ export function onSmartGroupSelect() {
   } else {
     tileSetArea.selectedSmartGroup = null;
   }
+}
+
+function onRulesTreeViewDrop(event: DragEvent, dropLocation: TreeView.DropLocation, orderedNodes: HTMLLIElement[]) {
+  return false;
 }
 
 export function selectBrushTool(x?: number, y?: number, width = 1, height = 1) {

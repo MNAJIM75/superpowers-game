@@ -1,4 +1,4 @@
-import TileMapLayers, { SmartGroupPub, TileMapLayerPub } from "./TileMapLayers";
+import TileMapLayers, { TileMapLayerPub, SmartGroupPub, TileRulesPub } from "./TileMapLayers";
 import TileMapSettingsResource from "./TileMapSettingsResource";
 
 import * as path from "path";
@@ -20,6 +20,8 @@ type RenameSmartGroupCallback = SupCore.Data.Base.ErrorCallback & ((err: string,
 type DeleteSmartGroupCallback = SupCore.Data.Base.ErrorCallback & ((err: string, ack: any, layerId: string, smartGroupId: string) => void);
 type MoveSmartGroupCallback = SupCore.Data.Base.ErrorCallback & ((err: string, ack: any, layerId: string, smartGroupId: string, newIndex: number) => void);
 type EditSmartDataCallback = SupCore.Data.Base.ErrorCallback & ((err: string, ack: any, layerId: string, edits: {x: number, y: number, smartGroup: string}[]) => void);
+
+type NewRuleCallback = SupCore.Data.Base.ErrorCallback & ((err: string, ruleId: string, layerId: string, rule: TileRulesPub, index: number) => void);
 
 export interface TileMapAssetPub {
   formatVersion?: number;
@@ -506,6 +508,37 @@ export default class TileMapAsset extends SupCore.Data.Base.Asset {
       this.layers.byId[layerId].smartData[index] = edit.smartGroup;
     }
     this.resolveSmartLayer(layerId);
+  }
+
+  server_newRule(client: SupCore.RemoteClient, layerId: string, index: number, callback: NewRuleCallback) {
+    if (typeof layerId !== "string" || this.layers.byId[layerId] == null) { callback("no such layer"); return; }
+    const layer = this.layers.byId[layerId];
+    if (!layer.isSmartLayer) { callback("the layer is not a smart layer"); return; }
+
+    let id: number = 0;
+    for (const item of layer.rules)
+      id = Math.max(id, Number(item.id));
+    id++;
+
+    const newRule = {
+      id: id.toString(),
+      tile: 0,
+      pattern: [
+        "", "", "",
+        "", "3", "",
+        "", "", ""
+      ],
+      size: 3,
+      chance: 1,
+      active: true
+    };
+    this.client_newRule(layerId, newRule, index);
+    callback(null, newRule.id, layerId, newRule, index);
+    this.emit("change");
+  }
+
+  client_newRule(layerId: string, rule: TileRulesPub, index: number) {
+    this.layers.byId[layerId].rules.splice(index, 0, rule);
   }
 
   resolveSmartLayer(layerId: string) {

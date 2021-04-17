@@ -70,29 +70,26 @@ html
         input(type="radio",name="Tool",id="Eraser")
         label(title="E",for="Eraser")= t("tileMapEditor:eraser")
 
-      canvas(tabindex="0").tileSet
-      div(hidden).rules
-        .header
-          span= t("tileMapEditor:smartGroups")
-        .smart-id
-          .smart-id-buttons
-            button.new-smart-id= t("common:actions.new")
-            button.rename-smart-id= t("common:actions.rename")
-            button.delete-smart-id= t("common:actions.delete")
-          .smart-id-tree-view
-        table.properties
-          tr
-            th(colspan="2")= t("tileMapEditor:rules")
-          tr 
-            th= t("tileMapEditor:rule")
-            td
-              input(type="number",step="any")
-          
-
-      .header
-        span= t("tileMapEditor:layers")
+      canvas(tabindex="0").tileset
+      div(hidden).smartTileset
+        .smart-groups-panel
+          .header
+            span= t("tileMapEditor:smartGroups")
+          .smart-groups
+            .smart-groups-buttons
+              button.new-smart-group= t("common:actions.new")
+              button.rename-smart-group= t("common:actions.rename")
+              button.delete-smart-group= t("common:actions.delete")
+            .smart-groups-tree-view
+        .rules-panel
+          .header
+            span= t("tileMapEditor:rules")
+          .rules
+            .rules-tree-view
 
       .layers
+        .header
+          span= t("tileMapEditor:layers")
         .layers-buttons
           button.new-layer= t("common:actions.new")
           button.rename-layer= t("common:actions.rename")
