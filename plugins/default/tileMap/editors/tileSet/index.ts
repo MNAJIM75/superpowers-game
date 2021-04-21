@@ -47,8 +47,8 @@ function start() {
   ui.cameraComponent.setClearColor(0xbbbbbb);
   ui.cameraControls = new SupEngine.editorComponentClasses["Camera2DControls"](
     cameraActor, ui.cameraComponent,
-    { zoomSpeed: 1.5, zoomMin: 0.1, zoomMax: 10000 },
-    () => { data.tileSetUpdater.tileSetRenderer.gridRenderer.setOrthgraphicScale(ui.cameraComponent.orthographicScale); }
+    { zoomSpeed: 1.5, zoomMin: 0.5, zoomMax: 25 },
+    () => { data.tileSetUpdater.tileSetRenderer.gridRenderer.setOrthographicScale(ui.cameraComponent.orthographicScale); }
   );
 
   // Sidebar
@@ -99,8 +99,17 @@ function onConnected() {
 }
 
 function onAssetReceived(err: string, asset: any) {
-  setupProperty("grid-width", data.tileSetUpdater.tileSetAsset.pub.grid.width);
-  setupProperty("grid-height", data.tileSetUpdater.tileSetAsset.pub.grid.height);
+  const pub = data.tileSetUpdater.tileSetAsset.pub;
+
+  const maxDim = Math.max(pub.texture.image.width / pub.grid.width, pub.texture.image.height / pub.grid.height);
+  ui.cameraComponent.setOrthographicScale(maxDim);
+  ui.cameraComponent.actor.setLocalPosition(new SupEngine.THREE.Vector3(
+    pub.texture.image.width / pub.grid.width / 2.0,
+    -pub.texture.image.height / pub.grid.height / 2.0,
+    10
+  ));
+  setupProperty("grid-width", pub.grid.width);
+  setupProperty("grid-height", pub.grid.height);
   selectTile({ x: 0, y: 0 });
 }
 

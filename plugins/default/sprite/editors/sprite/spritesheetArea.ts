@@ -25,7 +25,7 @@ cameraComponent.setClearColor(0xbbbbbb);
 
 spritesheetArea.cameraControls = new SupEngine.editorComponentClasses["Camera2DControls"](cameraActor, cameraComponent,
   { zoomSpeed: 1.5, zoomMin: 0.1, zoomMax: 10000 },
-  () => { spritesheetArea.gridRenderer.setOrthgraphicScale(cameraComponent.orthographicScale); }
+  () => { spritesheetArea.gridRenderer.setOrthographicScale(cameraComponent.orthographicScale); }
 );
 
 const spriteActor = new SupEngine.Actor(spritesheetArea.gameInstance, "Sprite");

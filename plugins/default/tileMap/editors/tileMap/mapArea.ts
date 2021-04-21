@@ -45,8 +45,8 @@ mapArea.cameraComponent.setOrthographicMode(true);
 mapArea.cameraComponent.setClearColor(0xbbbbbb);
 mapArea.cameraControls = new SupEngine.editorComponentClasses["Camera2DControls"](
   cameraActor, mapArea.cameraComponent,
-  { zoomSpeed: 1.5, zoomMin: 0.1, zoomMax: 10000 },
-  () => { mapArea.gridRenderer.setOrthgraphicScale(mapArea.cameraComponent.orthographicScale); }
+  { zoomSpeed: 1.5, zoomMin: 0.5, zoomMax: 25 },
+  () => { mapArea.gridRenderer.setOrthographicScale(mapArea.cameraComponent.orthographicScale); }
 );
 
 mapArea.gridActor = new SupEngine.Actor(mapArea.gameInstance, "Grid");
@@ -111,6 +111,7 @@ export function setupFillPattern(newTileData: TileData) {
   }
 
   const refTileData = <(number|boolean)[]>layerData[mapArea.cursorPoint.y * pub.width + mapArea.cursorPoint.x];
+  let tileToCheck = [];
   function checkTile(x: number, y: number) {
     if (x < 0 || x >= pub.width || y < 0 || y >= pub.height) return;
 
@@ -130,14 +131,19 @@ export function setupFillPattern(newTileData: TileData) {
 
     patternLayerData[index] = _.cloneDeep(newTileData);
 
-    checkTile(x - 1, y);
-    checkTile(x + 1, y);
-    checkTile(x    , y - 1);
-    checkTile(x    , y + 1);
+    tileToCheck.push({x: x - 1, y: y});
+    tileToCheck.push({x: x + 1, y: y});
+    tileToCheck.push({x: x, y: y - 1});
+    tileToCheck.push({x: x, y: y + 1});
   }
 
   if (mapArea.cursorPoint.x >= 0 && mapArea.cursorPoint.x < pub.width && mapArea.cursorPoint.y >= 0 && mapArea.cursorPoint.y < pub.height)
-    checkTile(mapArea.cursorPoint.x, mapArea.cursorPoint.y);
+    tileToCheck.push({x: mapArea.cursorPoint.x, y: mapArea.cursorPoint.y});
+
+  while (tileToCheck.length > 0) {
+    let tile = tileToCheck.pop();
+    checkTile(tile.x, tile.y);
+  }
 
   const patternData = {
     tileSetId: <string>null,
@@ -270,14 +276,14 @@ function getMapGridPosition(gameInstance: SupEngine.GameInstance, cameraComponen
   const position = new SupEngine.THREE.Vector3(mousePosition.x, mousePosition.y, 0);
   cameraComponent.actor.getLocalPosition(tmpVector3);
 
-  let x = position.x / gameInstance.threeRenderer.domElement.width;
+  let x = position.x / Math.max(gameInstance.threeRenderer.domElement.width, 1);
   x = x * 2 - 1;
-  x *= cameraComponent.orthographicScale / 2 * cameraComponent.cachedRatio;
+  x *= cameraComponent.orthographicScale / 2 * (Number.isFinite(cameraComponent.cachedRatio) ? cameraComponent.cachedRatio : 1);
   x += tmpVector3.x;
   x *= data.tileMapUpdater.tileMapAsset.pub.pixelsPerUnit / data.tileMapUpdater.tileSetAsset.pub.grid.width;
   x = Math.floor(x);
 
-  let y = position.y / gameInstance.threeRenderer.domElement.height;
+  let y = position.y / Math.max(gameInstance.threeRenderer.domElement.height, 1);
   y = y * 2 - 1;
   y *= cameraComponent.orthographicScale / 2;
   y -= tmpVector3.y;
