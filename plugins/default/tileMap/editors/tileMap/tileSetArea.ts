@@ -24,14 +24,14 @@ tileSetArea.smartTilesetElt = <HTMLElement>document.querySelector("div.smartTile
 tileSetArea.gameInstance = new SupEngine.GameInstance(tileSetArea.tileSetElt);
 
 const cameraActor = new SupEngine.Actor(tileSetArea.gameInstance, "Camera");
-cameraActor.setLocalPosition(new SupEngine.THREE.Vector3(0, 0, 10));
 tileSetArea.cameraComponent = new SupEngine.componentClasses["Camera"](cameraActor);
 tileSetArea.cameraComponent.setOrthographicMode(true);
 tileSetArea.cameraComponent.setClearColor(0xbbbbbb);
+cameraActor.setLocalPosition(new SupEngine.THREE.Vector3(tileSetArea.cameraComponent.cachedRatio * 5 - 0.2, -5 + 0.2, 10));
 new SupEngine.editorComponentClasses["Camera2DControls"](
   cameraActor, tileSetArea.cameraComponent,
   { zoomSpeed: 1.5, zoomMin: 0.1, zoomMax: 10000 },
-  () => { data.tileSetUpdater.tileSetRenderer.gridRenderer.setOrthgraphicScale(tileSetArea.cameraComponent.orthographicScale); }
+  () => { data.tileSetUpdater.tileSetRenderer.gridRenderer.setOrthographicScale(tileSetArea.cameraComponent.orthographicScale); }
 );
 export default tileSetArea;
 

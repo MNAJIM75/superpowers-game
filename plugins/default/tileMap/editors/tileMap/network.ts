@@ -78,6 +78,10 @@ function onTileMapAssetReceived() {
   ui.layersTreeView.addToSelection(ui.layersTreeView.treeRoot.querySelector(`li[data-id="${pub.layers[0].id}"]`) as HTMLLIElement);
   onLayerSelect();
   mapArea.patternActor.setLocalPosition(new SupEngine.THREE.Vector3(0, 0, pub.layerDepthOffset / 2));
+
+  const maxDim = Math.max(pub.width, pub.height);
+  mapArea.cameraComponent.setOrthographicScale(maxDim / 10.0 + 0.2);
+  mapArea.cameraComponent.actor.setLocalPosition(new SupEngine.THREE.Vector3(pub.width / 20.0, pub.height / 20.0, 100)); // Divided by 10 then by 2
 }
 
 function updateTileSetInput() {

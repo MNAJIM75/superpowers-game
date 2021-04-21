@@ -45,8 +45,8 @@ mapArea.cameraComponent.setOrthographicMode(true);
 mapArea.cameraComponent.setClearColor(0xbbbbbb);
 mapArea.cameraControls = new SupEngine.editorComponentClasses["Camera2DControls"](
   cameraActor, mapArea.cameraComponent,
-  { zoomSpeed: 1.5, zoomMin: 0.1, zoomMax: 10000 },
-  () => { mapArea.gridRenderer.setOrthgraphicScale(mapArea.cameraComponent.orthographicScale); }
+  { zoomSpeed: 1.5, zoomMin: 0.5, zoomMax: 25 },
+  () => { mapArea.gridRenderer.setOrthographicScale(mapArea.cameraComponent.orthographicScale); }
 );
 
 mapArea.gridActor = new SupEngine.Actor(mapArea.gameInstance, "Grid");
@@ -114,6 +114,7 @@ export function setupFillPattern(newTileData: TileData) {
   }
 
   const refTileData = <(number|boolean)[]>layerData[mapArea.cursorPoint.y * pub.width + mapArea.cursorPoint.x];
+  let tileToCheck = [];
   function checkTile(x: number, y: number) {
     if (x < 0 || x >= pub.width || y < 0 || y >= pub.height) return;
 
@@ -133,14 +134,19 @@ export function setupFillPattern(newTileData: TileData) {
 
     patternLayerData[index] = _.cloneDeep(newTileData);
 
-    checkTile(x - 1, y);
-    checkTile(x + 1, y);
-    checkTile(x    , y - 1);
-    checkTile(x    , y + 1);
+    tileToCheck.push({x: x - 1, y: y});
+    tileToCheck.push({x: x + 1, y: y});
+    tileToCheck.push({x: x, y: y - 1});
+    tileToCheck.push({x: x, y: y + 1});
   }
 
   if (mapArea.cursorPoint.x >= 0 && mapArea.cursorPoint.x < pub.width && mapArea.cursorPoint.y >= 0 && mapArea.cursorPoint.y < pub.height)
-    checkTile(mapArea.cursorPoint.x, mapArea.cursorPoint.y);
+    tileToCheck.push({x: mapArea.cursorPoint.x, y: mapArea.cursorPoint.y});
+
+  while (tileToCheck.length > 0) {
+    let tile = tileToCheck.pop();
+    checkTile(tile.x, tile.y);
+  }
 
   const patternData = {
     tileSetId: <string>null,
@@ -523,6 +529,7 @@ function handleFillModeSmart() {
   const edits: SmartEdits[] = [];
 
   const refTileData = layer.smartData[mapArea.cursorPoint.y * pub.width + mapArea.cursorPoint.x];
+  let tileToCheck = [];
   function checkTile(x: number, y: number) {
     if (x < 0 || x >= pub.width || y < 0 || y >= pub.height) return;
 
@@ -539,14 +546,19 @@ function handleFillModeSmart() {
     patternLayerData[index] = tileSetArea.selectedSmartGroup;
     edits.push({x, y, smartGroup: tileSetArea.selectedSmartGroup});
 
-    checkTile(x - 1, y);
-    checkTile(x + 1, y);
-    checkTile(x    , y - 1);
-    checkTile(x    , y + 1);
+    tileToCheck.push({x: x - 1, y: y});
+    tileToCheck.push({x: x + 1, y: y});
+    tileToCheck.push({x: x, y: y - 1});
+    tileToCheck.push({x: x, y: y + 1});
   }
 
   if (mapArea.cursorPoint.x >= 0 && mapArea.cursorPoint.x < pub.width && mapArea.cursorPoint.y >= 0 && mapArea.cursorPoint.y < pub.height)
-    checkTile(mapArea.cursorPoint.x, mapArea.cursorPoint.y);
+    tileToCheck.push({x: mapArea.cursorPoint.x, y: mapArea.cursorPoint.y});
+
+  while (tileToCheck.length > 0) {
+    let tile = tileToCheck.pop();
+    checkTile(tile.x, tile.y);
+  }
 
   editSmartData(edits);
 }

@@ -46,7 +46,7 @@ export default class GridRenderer extends ActorComponent {
     this._createMesh();
   }
 
-  setOrthgraphicScale(orthographicScale: number) {
+  setOrthographicScale(orthographicScale: number) {
     this.orthographicScale = orthographicScale;
     this._clearMesh();
     this._createMesh();
