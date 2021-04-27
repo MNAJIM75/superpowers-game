@@ -21,7 +21,7 @@ function onConnected() {
 
   const spriteActor = new SupEngine.Actor(animationArea.gameInstance, "Sprite");
   const spriteRenderer = new SpriteRenderer(spriteActor);
-  const config = { spriteAssetId: SupClient.query.asset, materialType: "basic", color: "ffffff" };
+  const config = { spriteAssetId: SupClient.query.asset, materialType: "basic", color: "ffffff", blendMode: "alpha" };
 
   const subscriber: SupClient.AssetSubscriber = {
     onAssetReceived,

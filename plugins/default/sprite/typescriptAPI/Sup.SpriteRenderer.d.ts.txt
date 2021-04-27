@@ -20,6 +20,8 @@ declare namespace Sup {
     getColor(): Sup.Color;
     setColor(color: Sup.Color): SpriteRenderer;
     setColor(r: number, g: number, b: number): SpriteRenderer;
+    getBlendMode(): SpriteRenderer.BlendMode;
+    setBlendMode(blendMode: SpriteRenderer.BlendMode): SpriteRenderer;
 
     getAnimation(): string;
     setAnimation(animationName: string, looping?: boolean): SpriteRenderer;
@@ -39,5 +41,6 @@ declare namespace Sup {
 
   namespace SpriteRenderer {
     enum MaterialType { Basic, Phong, Shader }
+    enum BlendMode { Alpha, Multiply, Add, Screen, Erase, Substract, Min, Max }
   }
 }

@@ -11,6 +11,7 @@ export default class SpriteRendererUpdater {
 
   materialType: string;
   shaderAssetId: string;
+  blendMode: string;
   shaderPub: any;
   overrideOpacity = false;
   opacity: number;
@@ -24,6 +25,7 @@ export default class SpriteRendererUpdater {
     this.animationId = config.animationId;
     this.materialType = config.materialType;
     this.shaderAssetId = config.shaderAssetId;
+    this.blendMode = config.blendMode;
 
     if (this.externalSubscriber == null) this.externalSubscriber = {};
 
@@ -40,6 +42,7 @@ export default class SpriteRendererUpdater {
     const g = (hex >> 8 & 255) / 255;
     const b = (hex & 255) / 255;
     this.spriteRenderer.setColor(r, g, b);
+    this.spriteRenderer.setBlendMode(this.blendMode);
 
     this.spriteSubscriber = {
       onAssetReceived: this.onSpriteAssetReceived,
@@ -268,6 +271,11 @@ export default class SpriteRendererUpdater {
         this.spriteRenderer.setSprite(null);
 
         if (this.shaderAssetId != null) this.client.subAsset(this.shaderAssetId, "shader", this.shaderSubscriber);
+        break;
+
+      case "blendMode":
+        this.blendMode = value;
+        this.spriteRenderer.setBlendMode(value);
         break;
     }
   }

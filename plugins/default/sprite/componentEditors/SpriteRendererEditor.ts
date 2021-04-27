@@ -29,6 +29,8 @@ export default class SpriteRendererEditor {
 
   materialSelectBox: HTMLSelectElement;
   shaderRow: HTMLTableRowElement;
+  blendModeRow: HTMLTableRowElement;
+  blendModeSelectBox: HTMLSelectElement;
 
   asset: SpriteAsset;
   overrideOpacity: boolean;
@@ -139,6 +141,22 @@ export default class SpriteRendererEditor {
     this.opacityFields.numberField.parentElement.addEventListener("input", (event: any) => {
       this.editConfig("setProperty", "opacity", parseFloat(event.target.value));
     });
+
+    const blendModeRow = SupClient.table.appendRow(tbody, SupClient.i18n.t("componentEditors:SpriteRenderer.blendMode"));
+    this.blendModeRow = blendModeRow.row;
+    this.blendModeSelectBox = SupClient.table.appendSelectBox(blendModeRow.valueCell, {
+      "alpha": "Alpha",
+      "multiply": "Multiply",
+      "add": "Additive",
+      "screen": "Screen",
+      "erase": "Erase",
+      "sub": "Substract",
+      "min": "Min",
+      "max": "Max"
+    }, config.blendMode);
+    this.blendModeSelectBox.addEventListener("change", (event: any) => {
+      this.editConfig("setProperty", "blendMode", event.target.value);
+    });
     this.updateOpacityField();
 
     const materialRow = SupClient.table.appendRow(tbody, SupClient.i18n.t("componentEditors:SpriteRenderer.material"));
@@ -225,6 +243,10 @@ export default class SpriteRendererEditor {
         this.shaderAssetId = value;
         this.shaderFieldSubscriber.onChangeAssetId(this.shaderAssetId);
         break;
+
+      case "blendMode":
+        this.blendModeSelectBox.value = value;
+        break;
     }
   }
 
@@ -289,16 +311,19 @@ export default class SpriteRendererEditor {
     if (!this.overrideOpacity && this.asset == null) {
       this.transparentField.value = "empty";
       this.opacityFields.numberField.parentElement.hidden = true;
+      this.blendModeRow.hidden = true;
     } else {
       const opacity = this.overrideOpacity ? this.opacity : this.asset.pub.opacity;
       if (opacity != null) {
         this.transparentField.value = "transparent";
         this.opacityFields.numberField.parentElement.hidden = false;
+        this.blendModeRow.hidden = false;
         this.opacityFields.sliderField.value = opacity.toString();
         this.opacityFields.numberField.value = opacity.toString();
       } else {
         this.transparentField.value = "opaque";
         this.opacityFields.numberField.parentElement.hidden = true;
+        this.blendModeRow.hidden = true;
       }
     }
   }

@@ -31,6 +31,7 @@ export function loadAsset(player: SupRuntime.Player, entry: any, callback: (err:
             texture.wrapS = SupEngine.THREE.MirroredRepeatWrapping;
             texture.wrapT = SupEngine.THREE.MirroredRepeatWrapping;
           }
+          texture.premultiplyAlpha = true;
           cb();
         };
 

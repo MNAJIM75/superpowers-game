@@ -18,6 +18,7 @@ export default class SpriteRenderer extends SupEngine.ActorComponent {
   material: THREE.MeshBasicMaterial|THREE.MeshPhongMaterial|THREE.ShaderMaterial;
   materialType = "basic";
   shaderAsset: any;
+  blendMode = "alpha";
   threeMesh: THREE.Mesh;
   horizontalFlip = false;
   verticalFlip = false;
@@ -58,7 +59,6 @@ export default class SpriteRenderer extends SupEngine.ActorComponent {
         this.shaderAsset, this.asset.textures, this.geometry
       );
       (<any>this.material).map = this.asset.textures[this.asset.mapSlots["map"]];
-
     } else {
       let material: THREE.MeshBasicMaterial|THREE.MeshPhongMaterial;
       if (this.materialType === "basic") material = new THREE.MeshBasicMaterial();
@@ -71,12 +71,14 @@ export default class SpriteRenderer extends SupEngine.ActorComponent {
       material.specularMap = this.asset.textures[this.asset.mapSlots["specular"]];
       material.alphaMap = this.asset.textures[this.asset.mapSlots["alpha"]];
       if (this.materialType === "phong") (<THREE.MeshPhongMaterial>material).normalMap = this.asset.textures[this.asset.mapSlots["normal"]];
-      material.alphaTest = this.asset.alphaTest;
       this.material = material;
-      this.setOpacity(this.opacity);
     }
+    this.material.premultipliedAlpha = true;
+    this.material.alphaTest = this.asset.alphaTest;
     this.material.side = THREE.DoubleSide;
+    this.setOpacity(this.opacity);
     this.setColor(this.color.r, this.color.g, this.color.b);
+    this.setBlendMode(this.blendMode);
 
     // TEMP
     // this.asset.textures["map"].wrapS = THREE.RepeatWrapping;
@@ -102,7 +104,54 @@ export default class SpriteRenderer extends SupEngine.ActorComponent {
       if (uniforms.color != null) uniforms.color.value.setRGB(r, g, b);
     } else (<THREE.MeshBasicMaterial>this.material).color.setRGB(r, g, b);
     this.material.needsUpdate = true;
-   }
+  }
+
+  setBlendMode(blendMode: string) {
+    this.blendMode = blendMode;
+    if (this.material == null) return;
+    this.material.blending = THREE.CustomBlending;
+
+    this.material.blendEquation = THREE.AddEquation;
+    switch (this.blendMode) {
+      case "alpha":
+        this.material.blendSrc = THREE.OneFactor;
+        this.material.blendDst = THREE.OneMinusSrcAlphaFactor;
+        break;
+      case "multiply":
+        this.material.blendSrc = THREE.DstColorFactor;
+        this.material.blendDst = THREE.OneMinusSrcAlphaFactor;
+        break;
+      case "add":
+        this.material.blendSrc = THREE.SrcAlphaFactor;
+        this.material.blendDst = THREE.OneFactor;
+        break;
+      case "screen":
+        this.material.blendSrc = THREE.OneFactor;
+        this.material.blendDst = THREE.OneMinusSrcColorFactor;
+        break;
+      case "erase":
+        this.material.blendSrc = THREE.ZeroFactor;
+        this.material.blendDst = THREE.OneMinusSrcColorFactor;
+        break;
+      case "sub":
+        this.material.blendSrc = THREE.SrcAlphaFactor;
+        this.material.blendDst = THREE.OneFactor;
+        this.material.blendEquation = THREE.ReverseSubtractEquation;
+        break;
+      case "min":
+        this.material.blendSrc = THREE.ZeroFactor;
+        this.material.blendDst = THREE.ZeroFactor;
+        this.material.blendEquation = THREE.MinEquation;
+        break;
+      case "max":
+        this.material.blendSrc = THREE.ZeroFactor;
+        this.material.blendDst = THREE.ZeroFactor;
+        this.material.blendEquation = THREE.MaxEquation;
+        break;
+    }
+
+    this.material.needsUpdate = true;
+  }
 
   updateShape() {
     if (this.threeMesh == null) return;
@@ -132,6 +181,11 @@ export default class SpriteRenderer extends SupEngine.ActorComponent {
       this.material.transparent = false;
       this.material.depthWrite = true;
       this.material.opacity = 1;
+    }
+
+    if (this.material instanceof THREE.ShaderMaterial) {
+      const uniforms = (<THREE.ShaderMaterial>this.material).uniforms;
+      if (uniforms.opacity != null) uniforms.opacity.value = this.material.opacity;
     }
     this.material.needsUpdate = true;
   }
