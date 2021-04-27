@@ -17,6 +17,8 @@ export interface SpriteRendererConfigPub {
 
   materialType: string;
   shaderAssetId?: string;
+
+  blendMode: string;
 }
 
 export default class SpriteRendererConfig extends SupCore.Data.Base.ComponentConfig {
@@ -34,7 +36,8 @@ export default class SpriteRendererConfig extends SupCore.Data.Base.ComponentCon
     overrideOpacity: { type: "boolean", mutable: true },
     opacity: { type: "number?", min: 0, max: 1, mutable: true },
     materialType: { type: "enum", items: ["basic", "phong", "shader"], mutable: true },
-    shaderAssetId: { type: "string?", min: 0, mutable: true }
+    shaderAssetId: { type: "string?", min: 0, mutable: true },
+    blendMode: { type: "enum", items: ["alpha", "multiply", "add", "screen", "erase", "sub", "min", "max"], mutable: true },
   };
 
   static create() {
@@ -46,12 +49,13 @@ export default class SpriteRendererConfig extends SupCore.Data.Base.ComponentCon
       castShadow: false, receiveShadow: false,
       color: "ffffff",
       overrideOpacity: false, opacity: null,
-      materialType: "basic", shaderAssetId: null
+      materialType: "basic", shaderAssetId: null,
+      blendMode: "alpha"
     };
     return emptyConfig;
   }
 
-  static currentFormatVersion = 1;
+  static currentFormatVersion = 2;
   static migrate(pub: SpriteRendererConfigPub) {
     if (pub.formatVersion === SpriteRendererConfig.currentFormatVersion) return false;
 
@@ -72,6 +76,12 @@ export default class SpriteRendererConfig extends SupCore.Data.Base.ComponentCon
       // NOTE: Legacy stuff from Superpowers 0.4
       if (typeof pub.spriteAssetId === "number") pub.spriteAssetId = (pub.spriteAssetId as number).toString();
       if (typeof pub.animationId === "number") pub.animationId = (pub.animationId as number).toString();
+    }
+
+    if (pub.formatVersion === 1) {
+      pub.formatVersion = 2;
+
+      if (pub.blendMode == null) pub.blendMode = "alpha";
     }
 
     return true;

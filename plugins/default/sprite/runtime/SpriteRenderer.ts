@@ -10,6 +10,7 @@ export function setupComponent(player: SupRuntime.Player, component: any, config
   component.color.b = (hex & 255) / 255;
   component.horizontalFlip = config.horizontalFlip;
   component.verticalFlip = config.verticalFlip;
+  component.blendMode = config.blendMode;
 
   if (config.spriteAssetId != null) {
     const sprite = player.getOuterAsset(config.spriteAssetId);

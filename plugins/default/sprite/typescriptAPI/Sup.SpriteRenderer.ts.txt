@@ -1,5 +1,6 @@
 namespace Sup {
   let materialTypes = ["basic", "phong", "shader"];
+  let blendModeTypes = ["alpha", "multiply", "add", "screen", "erase", "sub", "min", "max"];
 
   export class SpriteRenderer extends Sup.ActorComponent {
     constructor(actor: Actor, pathOrAsset?: string|Sprite, materialIndex?: number, shaderPathOrAsset?: string|Shader) {
@@ -55,6 +56,16 @@ namespace Sup {
       return this;
     }
 
+    getBlendMode() {
+      return blendModeTypes.indexOf(this.__inner.blendMode);
+    }
+    setBlendMode(blendModeIndex: number) {
+      let mode: string;
+      mode = blendModeTypes[blendModeIndex];
+      this.__inner.setBlendMode(mode);
+      return this;
+    }
+
     setAnimation(animationName, looping) { this.__inner.setAnimation(animationName, looping); return this; }
     getAnimation() { return this.__inner.getAnimation(); }
     setAnimationFrameTime(frametime) { this.__inner.setAnimationFrameTime(frametime); return this; }
@@ -73,5 +84,6 @@ namespace Sup {
 
   export namespace SpriteRenderer {
     export enum MaterialType { Basic, Phong, Shader };
+    export enum BlendMode { Alpha, Multiply, Add, Screen, Erase, Substract, Min, Max };
   }
 }
