@@ -14,7 +14,6 @@ const engine: {
   selectionBoxComponent: SelectionBox;
   transformHandleComponent: TransformHandle;
   gridHelperComponent: GridHelper;
-  skyHelperComponent: SkyHelper;
 
   ambientLight: THREE.AmbientLight;
 } = <any>{};
@@ -35,7 +34,6 @@ engine.cameraControls = new SupEngine.editorComponentClasses["Camera3DControls"]
 engine.ambientLight = new THREE.AmbientLight(0xcfcfcf);
 
 const gridActor = new SupEngine.Actor(engine.gameInstance, "Grid", null, { layer: 0 });
-const skyActor = new SupEngine.Actor(engine.gameInstance, "Sky", engine.cameraActor, { layer: 0 });
 const selectionActor = new SupEngine.Actor(engine.gameInstance, "Selection Box", null, { layer: -1 });
 const transformHandlesActor = new SupEngine.Actor(engine.gameInstance, "Transform Handles", null, { layer: -1 });
 
@@ -75,9 +73,6 @@ export function start() {
 
   engine.gridHelperComponent = new SupEngine.editorComponentClasses["GridHelper"](gridActor, ui.gridSize, ui.gridStep);
   engine.gridHelperComponent.setVisible(false);
-
-  engine.skyHelperComponent = new SupEngine.editorComponentClasses["SkyHelper"](skyActor);
-  engine.skyHelperComponent.setVisible(true);
 
   hasStarted = true;
   onChangeActive();
