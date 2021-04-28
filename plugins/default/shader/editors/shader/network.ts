@@ -136,16 +136,32 @@ function onAssetTrashed() {
 }
 
 const gl = document.createElement("canvas").getContext("webgl") as WebGLRenderingContext;
+function unrollLoops(shader: string) {
+  let pattern = /#pragma unroll_loop[\s]+?for \( int i \= (\d+)\; i < (\d+)\; i \+\+ \) \{([\s\S]+?)(?=\})\}/g;
+
+  function replacer(match: string, start: string, end: string, snippet: string) {
+    let unroll = "";
+    for (let i = parseInt(start, 10); i < parseInt(end, 10); i++) {
+      unroll += snippet.replace(/\[ i \]/g, "[ " + i + " ]");
+    }
+    return unroll;
+  }
+
+  return shader.replace(pattern, replacer);
+}
+
 function replaceShaderChunk(shader: string) {
   shader = shader.replace(/#include +<([\w\d.]+)>/g, (match, include) => SupEngine.THREE.ShaderChunk[include]);
 
-  for (const lightNumString of ["NUM_DIR_LIGHTS", "NUM_SPOT_LIGHTS", "NUM_POINT_LIGHTS", "NUM_HEMI_LIGHTS"])
+  for (const lightNumString of ["NUM_DIR_LIGHTS", "NUM_SPOT_LIGHTS", "NUM_POINT_LIGHTS", "NUM_HEMI_LIGHTS", "NUM_RECT_AREA_LIGHTS"])
     shader = shader.replace(RegExp(lightNumString, "g"), "1");
 
+  shader = unrollLoops(shader);
   return shader;
 }
 
-const vertexStart = `precision mediump float;precision mediump int;
+const vertexStart = `precision mediump float;
+precision mediump int;
 #define SHADER_NAME ShaderMaterial
 #define VERTEX_TEXTURES
 #define GAMMA_FACTOR 2
@@ -219,6 +235,12 @@ precision mediump int;
 #define GAMMA_FACTOR 2
 uniform mat4 viewMatrix;
 uniform vec3 cameraPosition;
+
+// Decoding functions declaration to prevent wrong compilation error
+vec4 mapTexelToLinear( vec4 value ) { return value; }
+vec4 envMapTexelToLinear( vec4 value ) { return value; }
+vec4 emissiveMapTexelToLinear( vec4 value ) { return value; }
+vec4 linearToOutputTexel( vec4 value ) { return value; }
 `;
 const fragmentStartLength = fragmentStart.split("\n").length;
 
