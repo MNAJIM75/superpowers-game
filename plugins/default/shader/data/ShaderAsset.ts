@@ -83,7 +83,9 @@ export default class ShaderAsset extends SupCore.Data.Base.Asset {
       } else tab = "\t";
 
       const defaultVertexContent =
-`varying vec2 vUv;
+`#include <common>
+
+varying vec2 vUv;
 
 void main() {
 ${tab}vUv = uv;
@@ -91,17 +93,38 @@ ${tab}gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
 }
 `;
       const defaultFragmentContent =
-`uniform sampler2D map;
+`#include <common>
+
+uniform sampler2D map;
+uniform vec3 color;
+uniform float opacity;
 varying vec2 vUv;
 
 void main() {
-${tab}gl_FragColor = texture2D(map, vUv);
+${tab}vec4 diffuseColor = vec4(color, opacity);
+${tab}
+${tab}vec4 texelColor = texture2D(map, vUv);
+${tab}diffuseColor *= texelColor;
+${tab}
+${tab}#ifdef ALPHATEST
+${tab}${tab}if ( diffuseColor.a < ALPHATEST ) discard;
+${tab}#endif
+${tab}
+${tab}gl_FragColor = diffuseColor;
+${tab}
+${tab}#ifdef PREMULTIPLIED_ALPHA
+${tab}${tab}gl_FragColor.rgb *= gl_FragColor.a;
+${tab}#endif
 }
 `;
       this.pub = {
         formatVersion: ShaderAsset.currentFormatVersion,
 
-        uniforms: [{ id: "0", name: "map", type: "t", value: "map" }],
+        uniforms: [
+          { id: "0", name: "map", type: "t", value: "map" },
+          { id: "1", name: "color", type: "c", value: [1, 1, 1] },
+          { id: "2", name: "opacity", type: "f", value: 1 }
+        ],
         useLightUniforms: false,
         attributes: [],
         vertexShader: {

@@ -740,6 +740,7 @@ export function setCameraVerticalAxis(axis: string) {
   ui.cameraVerticalAxis = axis;
 
   engine.cameraRoot.setLocalEulerAngles(new THREE.Euler(axis === "Y" ? 0 : Math.PI / 2, 0, 0));
+  engine.gridHelperComponent.actor.setLocalEulerAngles(new THREE.Euler(axis === "Z" ? Math.PI / 2 : 0, 0, 0));
   ui.cameraVerticalAxisButton.textContent = axis;
 }
 

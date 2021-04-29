@@ -89,7 +89,7 @@ export function updateCameraMode() {
     engine.cameraControls = new SupEngine.editorComponentClasses["Camera2DControls"](engine.cameraActor, engine.cameraComponent, {
       zoomSpeed: 1.5,
       zoomMin: 0.1,
-      zoomMax: 10000,
+      zoomMax: 1000,
     });
   }
 
@@ -97,7 +97,10 @@ export function updateCameraMode() {
 
   if (ui.cameraMode === "3D") {
     gridActor.setLocalPosition(new THREE.Vector3(0, 0, 0));
-    gridActor.setLocalEulerAngles(new THREE.Euler(0, 0, 0));
+    if (ui.cameraVerticalAxis === "Z")
+      gridActor.setLocalEulerAngles(new THREE.Euler(Math.PI / 2, 0, 0));
+    else
+      gridActor.setLocalEulerAngles(new THREE.Euler(0, 0, 0));
     gridActor.layer = 0;
   } else {
     gridActor.setLocalPosition(new THREE.Vector3(0, 0, -500));
