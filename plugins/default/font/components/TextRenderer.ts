@@ -48,9 +48,11 @@ export default class TextRenderer extends SupEngine.ActorComponent {
       let mat = mesh.material as THREE.Material;
       if (this.opacity != null) {
         mat.transparent = true;
+        mat.depthWrite = false;
         mat.opacity = this.opacity;
       } else {
         mat.transparent = false;
+        mat.depthWrite = true;
         mat.opacity = 1;
       }
       mat.needsUpdate = true;
@@ -82,6 +84,7 @@ export default class TextRenderer extends SupEngine.ActorComponent {
     let width = 1;
     for (const text of texts) width = Math.max(width, ctx.measureText(text).width);
 
+    width += 10;
     // Arbitrary value that should be enough for most fonts
     // We might want to make it configurable in the future
     const heightBorder = fontSize * 0.3;
@@ -99,11 +102,11 @@ export default class TextRenderer extends SupEngine.ActorComponent {
     }
     else{
       this.texture.minFilter = SupEngine.THREE.LinearFilter;
-      const r = parseInt(color.substring(0, 2), 16);
+      /*const r = parseInt(color.substring(0, 2), 16);
       const g = parseInt(color.substring(2, 4), 16);
       const b = parseInt(color.substring(4, 6), 16);
       ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.01)`; // remove the black fringe
-      ctx.fillRect(0, 0, width, height);
+      ctx.fillRect(0, 0, width, height);*/
     }
     ctx.fillStyle = `#${color}`;
     ctx.font = `${fontSize}px ${this.font.name}`;
@@ -112,8 +115,8 @@ export default class TextRenderer extends SupEngine.ActorComponent {
     ctx.textAlign = this.options.alignment as CanvasTextAlign;
     let x = width / 2;
     switch (this.options.alignment) {
-      case "left" : x = 0; break;
-      case "right": x = width; break;
+      case "left" : x = 5; break;
+      case "right": x = width - 5; break;
     }
 
     for (let index = 0; index < texts.length; index++) {
@@ -130,8 +133,8 @@ export default class TextRenderer extends SupEngine.ActorComponent {
     this.threeMeshes[0] = new THREE.Mesh(geometry, material);
     this.setOpacity(this.opacity);
     switch (this.options.alignment) {
-      case "left":  this.threeMeshes[0].position.setX( width / 2 / this.font.pixelsPerUnit); break;
-      case "right": this.threeMeshes[0].position.setX(-width / 2 / this.font.pixelsPerUnit); break;
+      case "left":  this.threeMeshes[0].position.setX( (width - 10) / 2 / this.font.pixelsPerUnit); break;
+      case "right": this.threeMeshes[0].position.setX(-(width - 10) / 2 / this.font.pixelsPerUnit); break;
     }
     switch (this.options.verticalAlignment) {
       case "top":    this.threeMeshes[0].position.setY(-height / 2 / this.font.pixelsPerUnit); break;
