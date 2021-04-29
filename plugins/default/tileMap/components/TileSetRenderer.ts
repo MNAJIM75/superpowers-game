@@ -9,7 +9,7 @@ export default class TileSetRenderer extends SupEngine.ActorComponent {
 
   asset: TileSet;
 
-  private material = new THREE.MeshBasicMaterial({ alphaTest: 0.1, side: THREE.DoubleSide, transparent: true });
+  private material = new THREE.MeshBasicMaterial({ alphaTest: 0.1, side: THREE.DoubleSide });
   mesh: THREE.Mesh;
   gridRenderer: any;
   selectedTileActor: SupEngine.Actor;
