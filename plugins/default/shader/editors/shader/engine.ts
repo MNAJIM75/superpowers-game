@@ -87,6 +87,7 @@ export function setupPreview(options = { useDraft: false }) {
       return;
   }
   material = createShaderMaterial(data.shaderAsset.pub, { map: texture }, previewGeometry, options);
+  material.transparent = true;
   previewActor.threeObject.add(new THREE.Mesh(previewGeometry, material));
   gameInstance.update();
   gameInstance.draw();

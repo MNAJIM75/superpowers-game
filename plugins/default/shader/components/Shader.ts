@@ -80,7 +80,6 @@ options?: { useDraft?: boolean, defaultUniforms?: { [name: string]: { type: stri
   return new THREE.ShaderMaterial({
     uniforms,
     vertexShader, fragmentShader,
-    transparent: true,
     lights: asset.useLightUniforms
   });
 }

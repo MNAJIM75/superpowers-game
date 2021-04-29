@@ -140,7 +140,6 @@ export default class ModelRenderer extends SupEngine.ActorComponent {
         this.asset.textures,
         geometry
       );
-
     } else {
       let material: THREE.MeshBasicMaterial|THREE.MeshPhongMaterial;
       if (this.materialType === "basic") material = new THREE.MeshBasicMaterial();
@@ -214,9 +213,11 @@ export default class ModelRenderer extends SupEngine.ActorComponent {
 
     if (this.opacity != null) {
       this.material.transparent = true;
+      this.material.depthWrite = false;
       this.material.opacity = this.opacity;
     } else {
       this.material.transparent = false;
+      this.material.depthWrite = true;
       this.material.opacity = 1;
     }
     this.material.needsUpdate = true;

@@ -212,9 +212,10 @@ void main() {\n\
       this.viewport.width * canvas.width, this.viewport.height * canvas.height
     );
 
-    this.actor.gameInstance.threeRenderer.setClearColor(this.clearColor);
+    // this.actor.gameInstance.threeRenderer.setClearColor(this.clearColor);
     const target = this.usePostProcessing ? this.renderTarget : null;
-    if (target != null) this.actor.gameInstance.threeRenderer.clearTarget(target, true, true, true);
+    // if (target != null) this.actor.gameInstance.threeRenderer.clearTarget(target, true, true, true);
+    // this.actor.gameInstance.threeRenderer.setClearColor(0x000000, 0);
     if (this.layers.length > 0) {
       for (const layer of this.layers) {
         this.actor.gameInstance.setActiveLayer(layer);

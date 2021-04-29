@@ -137,7 +137,6 @@ export default class TileMapRenderer extends SupEngine.ActorComponent {
     (material as any).map = this.tileSet.data.texture;
     material.alphaTest = 0.1;
     material.side = THREE.DoubleSide;
-    material.transparent = true;
 
     const layerMesh = new THREE.Mesh(geometry, material);
     layerMesh.receiveShadow = this.receiveShadow;
