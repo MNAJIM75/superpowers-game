@@ -56,12 +56,14 @@ export function handleTileSetArea() {
   if (data.tileMapUpdater.tileMapAsset == null) return;
   if (data.tileMapUpdater.tileSetAsset == null) return;
   if (data.tileMapUpdater.tileSetAsset.pub.texture == null) return;
+  const input = tileSetArea.gameInstance.input;
+  const keys = (<any>window).KeyEvent;
 
   const tilesPerRow = data.tileMapUpdater.tileSetAsset.pub.texture.image.width / data.tileMapUpdater.tileSetAsset.pub.grid.width;
   const tilesPerColumn = data.tileMapUpdater.tileSetAsset.pub.texture.image.height / data.tileMapUpdater.tileSetAsset.pub.grid.height;
 
   const [ mouseX, mouseY ] = getTileSetGridPosition(tileSetArea.gameInstance, tileSetArea.cameraComponent);
-  if (tileSetArea.gameInstance.input.mouseButtons[0].wasJustPressed) {
+  if (input.mouseButtons[0].wasJustPressed && !input.keyboardButtons[keys.DOM_VK_ALT].isDown) {
     if (mouseX >= 0 && mouseX < tilesPerRow && mouseY >= 0 && mouseY < tilesPerColumn) {
       if (ui.fillToolButton.checked) {
         selectFillTool(mouseX, mouseY);
@@ -78,7 +80,7 @@ export function handleTileSetArea() {
     const startY = Math.min(tileSetArea.selectionStartPoint.y, y);
     const width = Math.abs(x - tileSetArea.selectionStartPoint.x) + 1;
     const height = Math.abs(y - tileSetArea.selectionStartPoint.y) + 1;
-    if (tileSetArea.gameInstance.input.mouseButtons[0].wasJustReleased) {
+    if (input.mouseButtons[0].wasJustReleased) {
       const layerData: (number|boolean)[][] = [];
       for (let y = height - 1; y >= 0; y--)
         for (let x = 0; x < width; x++)

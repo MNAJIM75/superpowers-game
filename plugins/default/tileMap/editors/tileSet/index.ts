@@ -322,8 +322,10 @@ function handleTilesetArea() {
 
   const pub = data.tileSetUpdater.tileSetAsset.pub;
   if (pub.texture == null) return;
+  const input = ui.gameInstance.input;
+  const keys = (<any>window).KeyEvent;
 
-  if (ui.gameInstance.input.mouseButtons[0].wasJustReleased) {
+  if (input.mouseButtons[0].wasJustReleased && !input.keyboardButtons[keys.DOM_VK_ALT].isDown) {
     const mousePosition = ui.gameInstance.input.mousePosition;
     const [ mouseX, mouseY ] = ui.cameraControls.getScenePosition(mousePosition.x, mousePosition.y);
     const x = Math.floor(mouseX);

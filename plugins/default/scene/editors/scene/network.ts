@@ -89,6 +89,8 @@ function startIfReady() {
 
     setCameraMode(data.sceneSettingsResource.pub.defaultCameraMode);
     setCameraVerticalAxis(data.sceneSettingsResource.pub.defaultVerticalAxis);
+    ui.gridCheckbox.checked = data.sceneSettingsResource.pub.showGridByDefault;
+    engine.gridHelperComponent.setVisible(ui.gridCheckbox.checked);
     setupInspectorLayers();
   }
 }

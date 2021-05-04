@@ -66,6 +66,13 @@ mapArea.patternBackgroundRenderer = new SupEngine.editorComponentClasses["FlatCo
 mapArea.duplicatingSelection = false;
 mapArea.cursorPoint = { x: -1, y: -1 };
 
+function inCameraPanning() : boolean {
+  const input = mapArea.gameInstance.input;
+  const keyEvent = (<any>window).KeyEvent;
+
+  return input.keyboardButtons[keyEvent.DOM_VK_ALT].isDown;
+}
+
 type TileData = ((number|boolean)[]|number);
 export function setupPattern(layerData: TileData[], width = 1, startX?: number, startY?: number) {
   mapArea.patternData = layerData;
@@ -362,7 +369,7 @@ function handleBrushMode(cursorHasMoved: boolean) {
     const yOffset = Math.abs(mapArea.cursorPoint.y - mapArea.lastTile.y) + 1;
 
     // Send line only on pressed to avoid weird brush + line issue
-    if (input.mouseButtons[0].wasJustPressed) {
+    if (input.mouseButtons[0].wasJustPressed && !inCameraPanning()) {
       const point = { x: 0, y: 0 };
       if (xOffset > yOffset) {
         point.x = xMin;
@@ -392,7 +399,7 @@ function handleBrushMode(cursorHasMoved: boolean) {
   } else {
     if (mapArea.lastTile != null && shiftKey.wasJustReleased)
       setupPattern([mapArea.lastTile.tile]);
-    if (input.mouseButtons[0].isDown) {
+    if (input.mouseButtons[0].isDown && !inCameraPanning()) {
       editMap(getEditsFromPattern(mapArea.cursorPoint));
       if (mapArea.patternData.length === 1 && lastTileX >= 0 && lastTileX < pub.width && lastTileY >= 0 && lastTileY < pub.height)
         mapArea.lastTile = { x: lastTileX, y: lastTileY, tile: (mapArea.patternData[0] as (number|boolean)[]).slice() };
@@ -442,7 +449,7 @@ function handleSelectionMode(cursorHasMoved: boolean) {
   // Selection with mouse
   if (cancelAction) clearSelection();
 
-  if (input.mouseButtons[0].wasJustPressed) {
+  if (input.mouseButtons[0].wasJustPressed && !inCameraPanning()) {
     // A pattern is already in the buffer
     if (!mapArea.patternActor.threeObject.visible) {
       if (mapArea.cursorPoint.x >= 0 && mapArea.cursorPoint.x < pub.width && mapArea.cursorPoint.y >= 0 && mapArea.cursorPoint.y < pub.height) {
@@ -456,7 +463,7 @@ function handleSelectionMode(cursorHasMoved: boolean) {
 
   if (mapArea.selectionStartPoint == null) return;
 
-  if (input.mouseButtons[0].isDown) {
+  if (input.mouseButtons[0].isDown && !inCameraPanning()) {
     // Clamp mouse values
     const x = Math.max(0, Math.min(pub.width - 1, mapArea.cursorPoint.x));
     const y = Math.max(0, Math.min(pub.height - 1, mapArea.cursorPoint.y));
@@ -538,6 +545,6 @@ export function selectEntireLayer() {
 }
 
 function handleEraserMode(cursorHasMoved: boolean) {
-  if (mapArea.gameInstance.input.mouseButtons[0].isDown)
+  if (mapArea.gameInstance.input.mouseButtons[0].isDown && !inCameraPanning())
     editMap([{ x: mapArea.cursorPoint.x, y: mapArea.cursorPoint.y, tileValue: 0 }]);
 }

@@ -102,11 +102,11 @@ export default class TextRenderer extends SupEngine.ActorComponent {
     }
     else{
       this.texture.minFilter = SupEngine.THREE.LinearFilter;
-      /*const r = parseInt(color.substring(0, 2), 16);
+      const r = parseInt(color.substring(0, 2), 16);
       const g = parseInt(color.substring(2, 4), 16);
       const b = parseInt(color.substring(4, 6), 16);
       ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.01)`; // remove the black fringe
-      ctx.fillRect(0, 0, width, height);*/
+      ctx.fillRect(0, 0, width, height);
     }
     ctx.fillStyle = `#${color}`;
     ctx.font = `${fontSize}px ${this.font.name}`;
@@ -126,7 +126,7 @@ export default class TextRenderer extends SupEngine.ActorComponent {
     const geometry = new THREE.PlaneBufferGeometry(width, height);
     const material = new THREE.MeshBasicMaterial({
       map: this.texture,
-      alphaTest: 0.01,
+      alphaTest: 0.02,
       side: THREE.DoubleSide
     });
 
