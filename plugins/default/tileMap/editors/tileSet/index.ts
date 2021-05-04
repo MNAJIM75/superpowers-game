@@ -47,7 +47,7 @@ function start() {
   ui.cameraComponent.setClearColor(0xbbbbbb);
   ui.cameraControls = new SupEngine.editorComponentClasses["Camera2DControls"](
     cameraActor, ui.cameraComponent,
-    { zoomSpeed: 1.5, zoomMin: 0.5, zoomMax: 25 },
+    { zoomSpeed: 1.5, zoomMin: 0.5, zoomMax: 50 },
     () => { data.tileSetUpdater.tileSetRenderer.gridRenderer.setOrthographicScale(ui.cameraComponent.orthographicScale); }
   );
 
@@ -102,6 +102,7 @@ function onAssetReceived(err: string, asset: any) {
   const pub = data.tileSetUpdater.tileSetAsset.pub;
 
   const maxDim = Math.max(pub.texture.image.width / pub.grid.width, pub.texture.image.height / pub.grid.height);
+  ui.cameraControls.setMultiplier(pub.grid.width);
   ui.cameraComponent.setOrthographicScale(maxDim);
   ui.cameraComponent.actor.setLocalPosition(new SupEngine.THREE.Vector3(
     pub.texture.image.width / pub.grid.width / 2.0,

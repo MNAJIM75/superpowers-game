@@ -258,10 +258,10 @@ export default class TileMapRenderer extends SupEngine.ActorComponent {
     }
 
     const image = this.tileSet.data.texture.image;
-    let left   = (tileX           * this.tileSet.data.grid.width + 0.2) / image.width;
-    let right  = ((tileX + 1)     * this.tileSet.data.grid.width - 0.2) / image.width;
-    let bottom = 1 - ((tileY + 1) * this.tileSet.data.grid.height - 0.2) / image.height;
-    let top    = 1 - (tileY       * this.tileSet.data.grid.height + 0.2) / image.height;
+    let left   = (tileX           * this.tileSet.data.grid.width + 0.05) / image.width;
+    let right  = ((tileX + 1)     * this.tileSet.data.grid.width - 0.05) / image.width;
+    let bottom = 1 - ((tileY + 1) * this.tileSet.data.grid.height - 0.05) / image.height;
+    let top    = 1 - (tileY       * this.tileSet.data.grid.height + 0.05) / image.height;
 
     if (flipX) [right, left] = [left, right];
     if (flipY) [top, bottom] = [bottom, top];
