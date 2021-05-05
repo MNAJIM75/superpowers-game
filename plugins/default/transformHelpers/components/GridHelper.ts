@@ -16,14 +16,14 @@ export default class GridHelper extends SupEngine.ActorComponent {
     if (this.gridHelper != null) {
       this.actor.threeObject.remove(this.gridHelper);
       this.gridHelper.geometry.dispose();
-      this.gridHelper.material.dispose();
+      (this.gridHelper.material as THREE.Material).dispose();
     }
 
     const actualSize = Math.ceil(size / step) * step;
 
     this.gridHelper = new THREE.GridHelper(actualSize, actualSize / step, new THREE.Color(1, 1, 1), new THREE.Color(1, 1, 1));
-    this.gridHelper.material.transparent = true;
-    this.gridHelper.material.opacity = 0.25;
+    (this.gridHelper.material as THREE.Material).transparent = true;
+    (this.gridHelper.material as THREE.Material).opacity = 0.25;
     this.actor.threeObject.add(this.gridHelper);
     this.gridHelper.visible = this.visible;
     this.gridHelper.updateMatrixWorld(false);

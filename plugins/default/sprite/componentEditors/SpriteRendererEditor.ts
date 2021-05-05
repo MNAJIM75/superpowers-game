@@ -151,8 +151,8 @@ export default class SpriteRendererEditor {
       "screen": "Screen",
       "erase": "Erase",
       "sub": "Substract",
-      "min": "Min",
-      "max": "Max"
+      "min": "Darken",
+      "max": "Lighten"
     }, config.blendMode);
     this.blendModeSelectBox.addEventListener("change", (event: any) => {
       this.editConfig("setProperty", "blendMode", event.target.value);

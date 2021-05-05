@@ -109,6 +109,10 @@ export default class SpriteRenderer extends SupEngine.ActorComponent {
   setBlendMode(blendMode: string) {
     this.blendMode = blendMode;
     if (this.material == null) return;
+    if (this.opacity == null) {
+      this.material.blending = THREE.NormalBlending;
+      return;
+    }
     this.material.blending = THREE.CustomBlending;
 
     this.material.blendEquation = THREE.AddEquation;
@@ -150,6 +154,10 @@ export default class SpriteRenderer extends SupEngine.ActorComponent {
         break;
     }
 
+    this.material.blendSrcAlpha = THREE.OneFactor;
+    this.material.blendDstAlpha = THREE.OneMinusSrcAlphaFactor;
+    this.material.blendEquationAlpha = THREE.AddEquation;
+
     this.material.needsUpdate = true;
   }
 
@@ -182,6 +190,7 @@ export default class SpriteRenderer extends SupEngine.ActorComponent {
       this.material.depthWrite = true;
       this.material.opacity = 1;
     }
+    this.setBlendMode(this.blendMode);
 
     if (this.material instanceof THREE.ShaderMaterial) {
       const uniforms = (<THREE.ShaderMaterial>this.material).uniforms;

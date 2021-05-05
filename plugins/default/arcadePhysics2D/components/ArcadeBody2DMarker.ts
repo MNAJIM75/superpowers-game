@@ -60,7 +60,7 @@ export default class ArcadeBody2DMarker extends SupEngine.ActorComponent {
   _clearRenderer() {
     this.markerActor.threeObject.remove(this.line);
     this.line.geometry.dispose();
-    this.line.material.dispose();
+    (this.line.material as THREE.Material).dispose();
     this.line = null;
   }
 

@@ -84,6 +84,6 @@ namespace Sup {
 
   export namespace SpriteRenderer {
     export enum MaterialType { Basic, Phong, Shader };
-    export enum BlendMode { Alpha, Multiply, Add, Screen, Erase, Substract, Min, Max };
+    export enum BlendMode { Alpha, Multiply, Add, Screen, Erase, Substract, Darken, Lighten };
   }
 }

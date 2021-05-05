@@ -41,6 +41,6 @@ declare namespace Sup {
 
   namespace SpriteRenderer {
     enum MaterialType { Basic, Phong, Shader }
-    enum BlendMode { Alpha, Multiply, Add, Screen, Erase, Substract, Min, Max }
+    enum BlendMode { Alpha, Multiply, Add, Screen, Erase, Substract, Darken, Lighten }
   }
 }

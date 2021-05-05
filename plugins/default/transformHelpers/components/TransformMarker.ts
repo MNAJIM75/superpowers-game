@@ -40,7 +40,7 @@ export default class TransformMarker extends SupEngine.ActorComponent {
   _destroy() {
     this.actor.threeObject.remove(this.line);
     this.line.geometry.dispose();
-    this.line.material.dispose();
+    (this.line.material as THREE.Material).dispose();
     this.line = null;
 
     super._destroy();
