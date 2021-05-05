@@ -23,7 +23,7 @@ cameraComponent.setOrthographicMode(true);
 cameraComponent.setOrthographicScale(10);
 cameraComponent.setClearColor(0xbbbbbb);
 animationArea.cameraControls = new SupEngine.editorComponentClasses["Camera2DControls"](cameraActor, cameraComponent,
-  { zoomSpeed: 1.5, zoomMin: 0.1, zoomMax: 10000 });
+  { zoomSpeed: 1.5, zoomMin: 0.5, zoomMax: 100 });
 
 const originActor = new SupEngine.Actor(animationArea.gameInstance, "Origin");
 originActor.setLocalPosition(new SupEngine.THREE.Vector3(0, 0, 1));
