@@ -89,7 +89,7 @@ varying vec2 vUv;
 
 void main() {
 ${tab}vUv = uv;
-${tab}gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
+${tab}gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }
 `;
       const defaultFragmentContent =

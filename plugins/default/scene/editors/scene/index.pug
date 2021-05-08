@@ -111,8 +111,8 @@ html
               th.label= t("sceneEditor:inspector.prefab")
               td
                 div
-                  input
-                  button Open
+                  input(type="text",readonly,style="cursor: pointer;")
+                  button= t("common:actions.select")
           .drop-asset-container(hidden)
             .drop-asset-text= t("sceneEditor:dropComponent")
 

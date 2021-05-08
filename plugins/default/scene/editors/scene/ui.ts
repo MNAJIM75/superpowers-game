@@ -33,7 +33,7 @@ const ui: {
   layerSelect: HTMLSelectElement;
   prefabRow: HTMLTableRowElement;
   prefabInput: HTMLInputElement;
-  prefabOpenElt: HTMLButtonElement;
+  prefabSelectElt: HTMLButtonElement;
 
   availableComponents: { [name: string]: string };
   componentEditors: { [id: string]: {
@@ -181,14 +181,56 @@ ui.layerSelect.addEventListener("change", onLayerChange);
 
 ui.prefabRow = ui.inspectorElt.querySelector(".prefab") as HTMLTableRowElement;
 ui.prefabInput = ui.inspectorElt.querySelector(".prefab input") as HTMLInputElement;
-ui.prefabInput.addEventListener("input", onPrefabInput);
+ui.prefabInput.addEventListener("click", (event) => {
+  if (ui.nodesTreeView.selectedNodes.length !== 1) return;
 
-ui.prefabOpenElt = ui.inspectorElt.querySelector(".prefab button") as HTMLButtonElement;
-ui.prefabOpenElt.addEventListener("click", (event) => {
-  const selectedNode = ui.nodesTreeView.selectedNodes[0];
-  const node = data.sceneUpdater.sceneAsset.nodes.byId[selectedNode.dataset["id"]];
-  const id = node.prefab.sceneAssetId;
-  SupClient.openEntry(id);
+  const nodeId = ui.nodesTreeView.selectedNodes[0].dataset["id"];
+
+  if (data.sceneUpdater.sceneAsset.nodes.byId[nodeId].prefab.sceneAssetId != null) {
+    SupClient.openEntry(data.sceneUpdater.sceneAsset.nodes.byId[nodeId].prefab.sceneAssetId);
+  } else {
+    new SupClient.Dialogs.FindAssetDialog(
+      data.projectClient.entries,
+      { "scene" : { pluginPath: "default/scene" } },
+      (assetId) => {
+        if (assetId != null) data.projectClient.editAsset(SupClient.query.asset, "setNodeProperty", nodeId, "prefab.sceneAssetId", assetId);
+      });
+  }
+});
+
+ui.prefabInput.addEventListener("dragover", (event) => {
+  event.preventDefault();
+});
+ui.prefabInput.addEventListener("drop", (event) => {
+  const entryId = event.dataTransfer.getData("application/vnd.superpowers.entry").split(",")[0];
+  if (typeof entryId !== "string") return;
+
+  const entry = data.projectClient.entries.byId[entryId];
+  if (entry == null || entry.type !== "scene") return;
+
+  if (ui.nodesTreeView.selectedNodes.length !== 1) return;
+
+  const nodeId = ui.nodesTreeView.selectedNodes[0].dataset["id"];
+
+  data.projectClient.editAsset(SupClient.query.asset, "setNodeProperty", nodeId, "prefab.sceneAssetId", entry.id);
+});
+
+ui.prefabSelectElt = ui.inspectorElt.querySelector(".prefab button") as HTMLButtonElement;
+ui.prefabSelectElt.addEventListener("click", (event) => {
+  if (ui.nodesTreeView.selectedNodes.length !== 1) return;
+
+  const nodeId = ui.nodesTreeView.selectedNodes[0].dataset["id"];
+
+  if (data.sceneUpdater.sceneAsset.nodes.byId[nodeId].prefab.sceneAssetId != null) {
+    data.projectClient.editAsset(SupClient.query.asset, "setNodeProperty", nodeId, "prefab.sceneAssetId", null);
+    return;
+  }
+  new SupClient.Dialogs.FindAssetDialog(
+    data.projectClient.entries,
+    { "scene" : { pluginPath: "default/scene" } },
+    (assetId) => {
+      if (assetId != null) data.projectClient.editAsset(SupClient.query.asset, "setNodeProperty", nodeId, "prefab.sceneAssetId", assetId);
+    });
 });
 
 for (const transformType in ui.transform) {
@@ -482,10 +524,10 @@ export function setupInspectorLayers() {
 export function setInspectorPrefabScene(sceneAssetId: string) {
   if (sceneAssetId != null && data.projectClient.entries.byId[sceneAssetId] != null) {
     ui.prefabInput.value = data.projectClient.entries.getPathFromId(sceneAssetId);
-    ui.prefabOpenElt.disabled = false;
+    ui.prefabSelectElt.textContent = SupClient.i18n.t(`common:actions.clear`);
   } else {
     ui.prefabInput.value = "";
-    ui.prefabOpenElt.disabled = true;
+    ui.prefabSelectElt.textContent = SupClient.i18n.t(`common:actions.select`);
   }
 }
 

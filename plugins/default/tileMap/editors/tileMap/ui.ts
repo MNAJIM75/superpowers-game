@@ -148,14 +148,6 @@ SupClient.setupHelpCallback(() => {
     window.parent.postMessage({ type: "openTool", name: "documentation", state: { section: "tileMap" } }, window.location.origin);
 });
 
-function onTileSetChange(event: Event) {
-  const value = (event.target as HTMLInputElement).value;
-  if (value === "") { data.projectClient.editAsset(SupClient.query.asset, "changeTileSet", null); return; }
-
-  const entry = SupClient.findEntryByPath(data.projectClient.entries.pub, value);
-  if (entry != null && entry.type === "tileSet") data.projectClient.editAsset(SupClient.query.asset, "changeTileSet", entry.id);
-}
-
 function onResizeMapClick() {
   const options = {
     initialValue: data.tileMapUpdater.tileMapAsset.pub.width.toString(),
