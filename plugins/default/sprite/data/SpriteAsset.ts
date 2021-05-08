@@ -338,7 +338,6 @@ export default class SpriteAsset extends SupCore.Data.Base.Asset {
           texture.wrapS = SupEngine.THREE.MirroredRepeatWrapping;
           texture.wrapT = SupEngine.THREE.MirroredRepeatWrapping;
         }
-        texture.premultiplyAlpha = true;
 
         const typedArray = new Uint8Array(buffer);
         const blob = new Blob([ typedArray ], { type: "image/*" });
