@@ -5,7 +5,7 @@ export default class SkyHelper extends SupEngine.ActorComponent {
   visible = true;
 
   constructor(actor: SupEngine.Actor) {
-    super(actor, "GridHelper");
+    super(actor, "SkyHelper");
 
     this.setup();
   }
