@@ -18,7 +18,7 @@ SupCore.system.serverBuild = (server: ProjectServer, buildPath: string, callback
   fs.mkdirSync(`${buildPath}/assets`);
   scriptNames.length = 0;
 
-  async.each(assetIdsToExport, (assetId, cb) => {
+  async.eachSeries(assetIdsToExport, (assetId, cb) => {
     server.data.assets.acquire(assetId, null, (err: Error, asset: SupCore.Data.Base.Asset) => {
       const entry = server.data.entries.byId[assetId];
       if (entry.type === "script") {
