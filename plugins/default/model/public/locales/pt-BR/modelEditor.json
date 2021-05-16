@@ -16,8 +16,8 @@
       "texture": "Textura",
       "filtering": {
         "title": "Filtragem",
-        "pixelated": "Pixelizado",
-        "smooth": "Suave"
+        "nearest": "Pixelizado",
+        "linear": "Suave"
       },
       "wrapping": {
         "title": "Wrapping",

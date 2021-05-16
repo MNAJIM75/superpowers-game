@@ -2,8 +2,8 @@
   "Sprite": {
     "label": "สไปรท์",
     "filtering": "ฟิลเตอร์",
-    "pixelated": "พิกเซล",
-    "smooth": "เรียบ",
+    "nearest": "พิกเซล",
+    "linear": "เรียบ",
     "framesPerSecond": "เฟรมต่อวินาที",
     "pixelsPerUnit": "พิกเซลต่อหน่วย",
     "alphaTesting": "ทดสอบอัลฟา"

@@ -2,8 +2,8 @@
   "Sprite": {
     "label": "Sprite",
     "filtering": "Filtragem",
-    "pixelated": "Pixelizado",
-    "smooth": "Suave",
+    "nearest": "Pixelizado",
+    "linear": "Suave",
     "framesPerSecond": "Quadros por segundo",
     "pixelsPerUnit": "Pixels por unidade",
     "alphaTesting": "Teste alfa"

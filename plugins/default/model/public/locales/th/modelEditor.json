@@ -16,8 +16,8 @@
       "texture": "เทกเจอร์",
       "filtering": {
         "title": "ฟิลเตอร์",
-        "pixelated": "พิกเซล",
-        "smooth": "เรียบ"
+        "nearest": "พิกเซล",
+        "linear": "เรียบ"
       },
       "wrapping": {
         "title": "ห่อ (Wrapping)",

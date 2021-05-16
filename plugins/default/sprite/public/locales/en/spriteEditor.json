@@ -30,8 +30,8 @@
         "pixelsPerUnit": "Pixels / unit",
         "filtering": {
           "title": "Filtering",
-          "pixelated": "Pixelated",
-          "smooth": "Smooth"
+          "nearest": "Nearest",
+          "linear": "Linear"
         },
         "wrapping": {
           "title": "Wrapping",

@@ -2,8 +2,8 @@
   "Sprite": {
     "label": "Sprite",
     "filtering": "Filtrering",
-    "pixelated": "Pixelerad",
-    "smooth": "Utjämnad",
+    "nearest": "Pixelerad",
+    "linear": "Utjämnad",
     "framesPerSecond": "Bilder per second",
     "pixelsPerUnit": "Pixlar per enhet",
     "alphaTesting": "Alpha test"

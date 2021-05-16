@@ -29,8 +29,8 @@
         "pixelsPerUnit": "Pixlar / enhet",
         "filtering": {
           "title": "Filtrering",
-          "pixelated": "Pixelerad",
-          "smooth": "Utjämnad"
+          "nearest": "Pixelerad",
+          "linear": "Utjämnad"
         },
         "wrapping": {
           "title": "Wrapping",

@@ -19,8 +19,8 @@ export default class SpriteSettingsEditor {
 
     this.filteringRow = SupClient.table.appendRow(tbody, SupClient.i18n.t("settingsEditors:Sprite.filtering"));
     this.fields["filtering"] = SupClient.table.appendSelectBox(this.filteringRow.valueCell, {
-      pixelated: SupClient.i18n.t("settingsEditors:Sprite.pixelated"),
-      smooth: SupClient.i18n.t("settingsEditors:Sprite.smooth")
+      pixelated: SupClient.i18n.t("settingsEditors:Sprite.nearest"),
+      smooth: SupClient.i18n.t("settingsEditors:Sprite.linear")
     });
 
     this.fpsRow = SupClient.table.appendRow(tbody, SupClient.i18n.t("settingsEditors:Sprite.framesPerSecond"));

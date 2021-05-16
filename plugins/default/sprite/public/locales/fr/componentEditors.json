@@ -1,19 +1,20 @@
 {
-  "spriteRenderer": {
+  "SpriteRenderer": {
     "sprite": "Sprite",
     "animation": "Animation",
     "animationNone": "(Aucune)",
-    "flip": "Retourner",
+    "flip": "Miroir",
     "shadow": {
       "title": "Ombre",
-      "cast": "Emet",
-      "receive": "Recoit"
+      "cast": "Projeter",
+      "receive": "Recevoir"
     },
     "color": "Couleur",
     "opacity": "Opacité",
     "transparent": "Transparent",
     "opaque": "Opaque",
     "material": "Matériau",
-    "shader": "Shader"
+    "shader": "Shader",
+    "blendMode": "Mode de fusion"
   }
 }

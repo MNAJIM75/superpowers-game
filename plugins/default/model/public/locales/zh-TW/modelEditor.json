@@ -16,8 +16,8 @@
       "texture": "材質",
       "filtering": {
         "title": "Filtering",
-        "pixelated": "Pixelated",
-        "smooth": "Smooth"
+        "nearest": "Pixelated",
+        "linear": "Smooth"
       },
       "wrapping": {
         "title": "Wrapping",

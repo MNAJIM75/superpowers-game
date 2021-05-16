@@ -4,7 +4,7 @@
     "tileMap": "Tilemap",
     "tileSet": "Tileset",
     "shadow": {
-      "title": "Ombres",
+      "title": "Ombre",
       "cast": "Projeter",
       "receive": "Recevoir"
     },

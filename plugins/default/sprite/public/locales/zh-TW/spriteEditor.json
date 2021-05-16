@@ -30,8 +30,8 @@
         "pixelsPerUnit": "像素 / 單位",
         "filtering": {
           "title": "過濾",
-          "pixelated": "像素化",
-          "smooth": "平滑"
+          "nearest": "像素化",
+          "linear": "平滑"
         },
         "wrapping": {
           "title": "Wrapping",

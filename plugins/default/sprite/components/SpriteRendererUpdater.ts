@@ -11,8 +11,8 @@ export default class SpriteRendererUpdater {
 
   materialType: string;
   shaderAssetId: string;
-  blendMode: string;
   shaderPub: any;
+  blendMode: string;
   overrideOpacity = false;
   opacity: number;
 

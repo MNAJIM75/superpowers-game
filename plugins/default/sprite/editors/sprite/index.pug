@@ -58,15 +58,11 @@ html
         tr
           th(colspan="2")= t("spriteEditor:sidebar.settings.rendering.title")
         tr
-          th= t("spriteEditor:sidebar.settings.rendering.pixelsPerUnit")
-          td
-            input(type="number",min="1").property-pixelsPerUnit
-        tr
           th= t("spriteEditor:sidebar.settings.rendering.filtering.title")
           td
             select.property-filtering
-              option(value="pixelated")= t("spriteEditor:sidebar.settings.rendering.filtering.pixelated")
-              option(value="smooth")= t("spriteEditor:sidebar.settings.rendering.filtering.smooth")
+              option(value="pixelated")= t("spriteEditor:sidebar.settings.rendering.filtering.nearest")
+              option(value="smooth")= t("spriteEditor:sidebar.settings.rendering.filtering.linear")
         tr
           th= t("spriteEditor:sidebar.settings.rendering.wrapping.title")
           td
@@ -74,6 +70,10 @@ html
               option(value="clampToEdge")= t("spriteEditor:sidebar.settings.rendering.wrapping.clampToEdge")
               option(value="repeat")= t("spriteEditor:sidebar.settings.rendering.wrapping.repeat")
               option(value="mirroredRepeat")= t("spriteEditor:sidebar.settings.rendering.wrapping.mirroredRepeat")
+        tr
+          th= t("spriteEditor:sidebar.settings.rendering.pixelsPerUnit")
+          td
+            input(type="number",min="1").property-pixelsPerUnit
         tr
           th= t("spriteEditor:sidebar.settings.rendering.opacity.title")
           td

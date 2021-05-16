@@ -29,8 +29,8 @@
         "pixelsPerUnit": "พิกเซล / หน่วย",
         "filtering": {
           "title": "ฟิลเตอร์",
-          "pixelated": "พิกเซล",
-          "smooth": "ราบ"
+          "nearest": "พิกเซล",
+          "linear": "ราบ"
         },
         "wrapping": {
           "title": "ห่อ (Wrapping)",

@@ -30,8 +30,8 @@
         "pixelsPerUnit": "Пиксели / единица",
         "filtering": {
           "title": "Фильтрация",
-          "pixelated": "Пикселизация",
-          "smooth": "Сглаживание"
+          "nearest": "Пикселизация",
+          "linear": "Сглаживание"
         },
         "wrapping": {
           "title": "Обертка",
