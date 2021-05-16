@@ -45,7 +45,8 @@ export default class Camera extends ActorComponent {
     this.computeAspectRatio();
     this.actor.gameInstance.on("resize", this.computeAspectRatio);
 
-    let size = this.actor.gameInstance.threeRenderer.getSize();
+    let size = new THREE.Vector2();
+    this.actor.gameInstance.threeRenderer.getSize(size);
     this.renderTarget = new THREE.WebGLRenderTarget(size.width, size.height);
     this.renderTarget.texture.magFilter = THREE.NearestFilter;
     this.renderTarget.texture.minFilter = THREE.NearestFilter;
@@ -116,7 +117,7 @@ void main() {\n\
     this.unifiedThreeCamera.type = isOrthographic ? "orthographic" : "perspective";
     this.unifiedThreeCamera.matrixWorld = this.threeCamera.matrixWorld;
     this.unifiedThreeCamera.projectionMatrix = this.threeCamera.projectionMatrix;
-
+    this.unifiedThreeCamera.projectionMatrixInverse = this.threeCamera.projectionMatrixInverse;
     this.projectionNeedsUpdate = true;
   }
 
@@ -214,16 +215,17 @@ void main() {\n\
 
     this.actor.gameInstance.threeRenderer.setClearColor(this.clearColor);
     const target = this.usePostProcessing ? this.renderTarget : null;
-    if (target != null) this.actor.gameInstance.threeRenderer.clearTarget(target, true, true, true);
+    this.actor.gameInstance.threeRenderer.setRenderTarget(target);
+    if (target != null) this.actor.gameInstance.threeRenderer.clear(true, true, true);
     if (this.layers.length > 0) {
       for (const layer of this.layers) {
         this.actor.gameInstance.setActiveLayer(layer);
-        this.actor.gameInstance.threeRenderer.render(this.actor.gameInstance.threeScene, this.threeCamera, target);
+        this.actor.gameInstance.threeRenderer.render(this.actor.gameInstance.threeScene, this.threeCamera);
       }
     } else {
       for (let layer = 0; layer < this.actor.gameInstance.layers.length; layer++) {
         this.actor.gameInstance.setActiveLayer(layer);
-        this.actor.gameInstance.threeRenderer.render(this.actor.gameInstance.threeScene, this.threeCamera, target);
+        this.actor.gameInstance.threeRenderer.render(this.actor.gameInstance.threeScene, this.threeCamera);
       }
     }
     this.actor.gameInstance.setActiveLayer(null);
@@ -241,7 +243,8 @@ void main() {\n\
         if (p.uniforms["mapSize"])
           p.uniforms["mapSize"].value = new THREE.Vector2(buf1.width, buf1.height);
         this.quadPass.material = p;
-        this.actor.gameInstance.threeRenderer.render(this.scenePass, this.camPass, buf2);
+        this.actor.gameInstance.threeRenderer.setRenderTarget(buf2);
+        this.actor.gameInstance.threeRenderer.render(this.scenePass, this.camPass);
 
         let tmp = buf1;
         buf1 = buf2;
@@ -251,6 +254,7 @@ void main() {\n\
       this.copyMat.uniforms["map"].value = buf1.texture;
 
       this.quadPass.material = this.copyMat;
+      this.actor.gameInstance.threeRenderer.setRenderTarget(null);
       this.actor.gameInstance.threeRenderer.render(this.scenePass, this.camPass);
     }
   }
