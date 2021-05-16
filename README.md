@@ -23,6 +23,7 @@ Make 2D and 3D games in live collaboration with [Superpowers](http://superpowers
 ## Roadmap / Ideas :
  - Improve Sup.Text performance & add more rendering options
  - Improve Behavior Editor: add more types (ie Array, simple interface) & Component reference
+ - Improve build size and compilation time, test this caching stuff : https://gist.github.com/Ikalou/b3d0637435bade661975a306a6a9a4e7
  - Add prefab override
  - Add skybox/background color picker in editor & at runtime
  - Add more 3d model importer: fbx, blend?

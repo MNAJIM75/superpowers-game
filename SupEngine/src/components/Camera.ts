@@ -231,7 +231,8 @@ void main() {\n\
     this.actor.gameInstance.setActiveLayer(null);
 
     if (this.usePostProcessing) {
-      this.actor.gameInstance.threeRenderer.clearTarget(this.tmpBuffer, true, true, true);
+      this.actor.gameInstance.threeRenderer.setRenderTarget(this.tmpBuffer);
+      this.actor.gameInstance.threeRenderer.clear(true, true, true);
       let buf1 = this.renderTarget;
       let buf2 = this.tmpBuffer;
 
