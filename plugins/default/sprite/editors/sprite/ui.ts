@@ -358,7 +358,7 @@ export function setupProperty(path: string, value: any) {
       spritesheetArea.spritesheet.textures["map"].minFilter = SupEngine.THREE.NearestFilter;
     } else {
       spritesheetArea.spritesheet.textures["map"].magFilter = SupEngine.THREE.LinearFilter;
-      spritesheetArea.spritesheet.textures["map"].minFilter = SupEngine.THREE.LinearMipMapLinearFilter;
+      spritesheetArea.spritesheet.textures["map"].minFilter = SupEngine.THREE.LinearMipmapLinearFilter;
     }
     spritesheetArea.spritesheet.textures["map"].needsUpdate = true;
   }

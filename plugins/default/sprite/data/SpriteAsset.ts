@@ -368,7 +368,7 @@ export default class SpriteAsset extends SupCore.Data.Base.Asset {
             texture.minFilter = THREE.NearestFilter;
           } else {
             texture.magFilter = THREE.LinearFilter;
-            texture.minFilter = THREE.LinearMipMapLinearFilter;
+            texture.minFilter = THREE.LinearMipmapLinearFilter;
           }
           texture.needsUpdate = true;
         }

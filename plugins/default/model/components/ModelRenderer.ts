@@ -107,7 +107,7 @@ export default class ModelRenderer extends SupEngine.ActorComponent {
 
     if (this.asset.attributes["position"] != null) {
       const buffer = new Float32Array(this.asset.attributes["position"]);
-      geometry.addAttribute("position", new THREE.BufferAttribute(buffer, 3));
+      geometry.setAttribute("position", new THREE.BufferAttribute(buffer, 3));
     }
     if (this.asset.attributes["index"] != null) {
       const buffer = new Uint16Array(this.asset.attributes["index"]);
@@ -115,23 +115,23 @@ export default class ModelRenderer extends SupEngine.ActorComponent {
     }
     if (this.asset.attributes["uv"] != null) {
       const buffer = new Float32Array(this.asset.attributes["uv"]);
-      geometry.addAttribute("uv", new THREE.BufferAttribute(buffer, 2));
+      geometry.setAttribute("uv", new THREE.BufferAttribute(buffer, 2));
     }
     if (this.asset.attributes["normal"] != null) {
       const buffer = new Float32Array(this.asset.attributes["normal"]);
-      geometry.addAttribute("normal", new THREE.BufferAttribute(buffer, 3));
+      geometry.setAttribute("normal", new THREE.BufferAttribute(buffer, 3));
     }
     if (this.asset.attributes["color"] != null) {
       const buffer = new Float32Array(this.asset.attributes["color"]);
-      geometry.addAttribute("color", new THREE.BufferAttribute(buffer, 3));
+      geometry.setAttribute("color", new THREE.BufferAttribute(buffer, 3));
     }
     if (this.asset.attributes["skinIndex"] != null) {
       const buffer = new Float32Array(this.asset.attributes["skinIndex"]);
-      geometry.addAttribute("skinIndex", new THREE.BufferAttribute(buffer, 4));
+      geometry.setAttribute("skinIndex", new THREE.BufferAttribute(buffer, 4));
     }
     if (this.asset.attributes["skinWeight"] != null) {
       const buffer = new Float32Array(this.asset.attributes["skinWeight"]);
-      geometry.addAttribute("skinWeight", new THREE.BufferAttribute(buffer, 4));
+      geometry.setAttribute("skinWeight", new THREE.BufferAttribute(buffer, 4));
     }
 
     if (this.materialType === "shader") {

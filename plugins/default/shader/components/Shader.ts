@@ -70,7 +70,7 @@ options?: { useDraft?: boolean, defaultUniforms?: { [name: string]: { type: stri
     for (let v = 0; v < triangleCount; v++) {
       for (let i = 0; i < itemSize; i++) values.push(Math.random());
     }
-    geometry.addAttribute(attribute.name, new THREE.BufferAttribute(new Float32Array(values), itemSize));
+    geometry.setAttribute(attribute.name, new THREE.BufferAttribute(new Float32Array(values), itemSize));
   }
 
   const useDraft = options != null && options.useDraft === true;
