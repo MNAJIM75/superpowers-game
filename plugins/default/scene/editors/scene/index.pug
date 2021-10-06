@@ -35,17 +35,6 @@ html
           .camera-2d-z(hidden)
             label(for="camera-2d-z") Z
             input#camera-2d-z(type="number",value="5")
-        .transform-mode
-          .title= t("sceneEditor:controls.transform.title")
-          div
-            input#transform-mode-translate(type="radio",name="transformMode",value="translate",checked)
-            label(for="transform-mode-translate",title="E")= t("sceneEditor:controls.transform.move")
-            input#transform-mode-rotate(type="radio",name="transformMode",value="rotate")
-            label(for="transform-mode-rotate",title="R")= t("sceneEditor:controls.transform.rotate")
-            input#transform-mode-scale(type="radio",name="transformMode",value="scale")
-            label(for="transform-mode-scale",title="T")= t("sceneEditor:controls.transform.scale")
-            input#transform-space(type="checkbox")
-            label(for="transform-space",title="L")= t("sceneEditor:controls.transform.local")
         .grid
           .title= t("sceneEditor:controls.grid.title")
           div
@@ -61,6 +50,12 @@ html
         canvas(tabindex="0")
         .drop-asset-container(hidden)
           .drop-asset-text= t("sceneEditor:dropActor")
+        .toolbar.transform-mode
+          button(value="translate")#transform-mode-translate.selected
+          button(value="rotate")#transform-mode-rotate
+          button(value="scale")#transform-mode-scale
+          label(for="transform-space")= t("sceneEditor:controls.transform.local")
+          input#transform-space(type="checkbox")
 
     .resize-handle.right
     .sidebar

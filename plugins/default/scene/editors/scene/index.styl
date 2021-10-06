@@ -58,6 +58,51 @@ body { display: flex; }
   input[type=range] { width: 80px; }
 }
 
+.toolbar {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  width: 32px;
+  background: #eee;
+  text-align: center;
+
+  button {
+    height: 32px;
+    color: #555;
+    background-image: none;
+    box-shadow: none;
+    border-radius: 0;
+    background-color: #ddd;
+    border: 0px;
+    margin: 0px;
+    padding: 5px 8px;
+    cursor: pointer;
+    outline: none;
+    
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 32px;
+    background-size: 16px;
+
+    &.selected {
+      background-color: #fff;
+    }
+    
+    &#transform-mode-translate {
+      background-image: url(images/translate.svg);
+    }
+    &#transform-mode-rotate {
+      background-image: url(images/rotate.svg);
+    }
+    &#transform-mode-scale {
+      background-image: url(images/scale.svg);
+    }
+  }
+  label {
+    font-size: 10px;
+  }
+}
+
 .sidebar {
   width: 250px;
   min-width: 200px;

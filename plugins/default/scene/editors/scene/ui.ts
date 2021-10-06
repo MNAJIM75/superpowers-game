@@ -108,16 +108,13 @@ document.addEventListener("keydown", (event) => {
 
   switch (event.keyCode) {
     case (window as any).KeyEvent.DOM_VK_E:
-      (document.getElementById(`transform-mode-translate`) as HTMLInputElement).checked = true;
-      engine.transformHandleComponent.setMode("translate");
+      setMode("translate");
       break;
     case (window as any).KeyEvent.DOM_VK_R:
-      (document.getElementById(`transform-mode-rotate`) as HTMLInputElement).checked = true;
-      engine.transformHandleComponent.setMode("rotate");
+      setMode("rotate");
       break;
     case (window as any).KeyEvent.DOM_VK_T:
-      (document.getElementById(`transform-mode-scale`) as HTMLInputElement).checked = true;
-      engine.transformHandleComponent.setMode("scale");
+      setMode("scale");
       break;
     case (window as any).KeyEvent.DOM_VK_L:
       const localElt = document.getElementById(`transform-space`) as HTMLInputElement;
@@ -257,7 +254,7 @@ ui.cameraSpeedSlider.value = engine.cameraControls.movementSpeed;
 ui.camera2DZ = document.getElementById("camera-2d-z") as HTMLInputElement;
 ui.camera2DZ.addEventListener("input", onChangeCamera2DZ);
 
-document.querySelector(".main .controls .transform-mode").addEventListener("click", onTransformModeClick);
+document.querySelector(".main .render-area .transform-mode").addEventListener("click", onTransformModeClick);
 
 ui.componentsElt = ui.inspectorElt.querySelector(".components") as HTMLDivElement;
 ui.availableComponents = {};
@@ -294,17 +291,25 @@ export function start() {
   ui.newPrefabButton.disabled = false;
 }
 
+function setMode(mode: string) {
+  const transformSpaceCheckbox = document.getElementById("transform-space") as HTMLInputElement;
+  transformSpaceCheckbox.disabled = mode === "scale";
+  engine.transformHandleComponent.setMode(mode);
+
+  (document.getElementById(`transform-mode-translate`) as HTMLInputElement).classList.remove("selected");
+  (document.getElementById(`transform-mode-rotate`) as HTMLInputElement).classList.remove("selected");
+  (document.getElementById(`transform-mode-scale`) as HTMLInputElement).classList.remove("selected");
+  (document.getElementById(`transform-mode-` + mode) as HTMLInputElement).classList.add("selected");
+}
+
 // Transform
 function onTransformModeClick(event: any) {
-  if (event.target.tagName !== "INPUT") return;
+  if (event.target.tagName !== "INPUT" && event.target.tagName !== "BUTTON") return;
 
-  if (event.target.id === "transform-space") {
+  if (event.target.id === "transform-space")
     engine.transformHandleComponent.setSpace(event.target.checked ? "local" : "world");
-  } else {
-    const transformSpaceCheckbox = document.getElementById("transform-space") as HTMLInputElement;
-    transformSpaceCheckbox.disabled = event.target.value === "scale";
-    engine.transformHandleComponent.setMode(event.target.value);
-  }
+  else
+    setMode(event.target.value);
 }
 
 // Grid
