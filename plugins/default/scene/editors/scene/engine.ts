@@ -1,5 +1,6 @@
 import { data } from "./network";
 import ui, { setupSelectedNode } from "./ui";
+import overlay, { renderOverlay } from "./axesGizmo";
 
 const THREE = SupEngine.THREE;
 
@@ -118,6 +119,7 @@ function tick(timestamp = 0) {
   accumulatedTime = timeLeft;
 
   if (updates > 0) engine.gameInstance.draw();
+  renderOverlay();
   animationFrame = requestAnimationFrame(tick);
 }
 

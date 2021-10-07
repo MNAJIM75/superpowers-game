@@ -462,12 +462,11 @@ export function setupOpacity(opacity: number) {
   if (opacity == null) {
     ui.opacitySelect.value = "opaque";
     ui.opacitySlider.parentElement.hidden = true;
-    data.modelUpdater.modelRenderer.setOpacity(1);
   } else {
     ui.opacitySelect.value = "transparent";
     ui.opacitySlider.parentElement.hidden = false;
     ui.opacitySlider.value = opacity.toString();
     ui.opacityNumber.value = opacity.toString();
-    data.modelUpdater.modelRenderer.setOpacity(opacity);
   }
+  data.modelUpdater.modelRenderer.setOpacity(opacity);
 }
