@@ -1,6 +1,6 @@
 import { data } from "./network";
 import ui, { setupSelectedNode } from "./ui";
-import overlay, { renderOverlay } from "./axesGizmo";
+import { renderOverlay, createAxes } from "./axesGizmo";
 
 const THREE = SupEngine.THREE;
 
@@ -33,6 +33,8 @@ engine.cameraComponent.setFarClippingPlane(510);
 engine.cameraControls = new SupEngine.editorComponentClasses["Camera3DControls"](engine.cameraActor, engine.cameraComponent);
 
 engine.ambientLight = new THREE.AmbientLight(0xcfcfcf);
+
+createAxes();
 
 const gridActor = new SupEngine.Actor(engine.gameInstance, "Grid", null, { layer: 0 });
 const selectionActor = new SupEngine.Actor(engine.gameInstance, "Selection Box", null, { layer: -1 });
