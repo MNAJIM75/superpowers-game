@@ -118,8 +118,10 @@ function tick(timestamp = 0) {
   const { updates, timeLeft } = engine.gameInstance.tick(accumulatedTime, update);
   accumulatedTime = timeLeft;
 
-  if (updates > 0) engine.gameInstance.draw();
-  renderOverlay();
+  if (updates > 0) {
+    engine.gameInstance.draw();
+    renderOverlay();
+  }
   animationFrame = requestAnimationFrame(tick);
 }
 
