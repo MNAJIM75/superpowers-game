@@ -29,6 +29,10 @@ export default class Camera2DControls extends ActorComponent {
 
   setIsLayerActive(active: boolean) { /* Nothing to render */ }
 
+  changeMode(mode: string) {
+    // useless for now
+  }
+
   setMultiplier(newMultiplier: number) {
     const newOrthographicScale = this.camera.orthographicScale * this.multiplier;
     this.multiplier = newMultiplier / 10;
@@ -52,8 +56,9 @@ export default class Camera2DControls extends ActorComponent {
     const keys = (<any>window).KeyEvent;
 
     // Move
-    if (input.mouseButtons[1].isDown ||
+    if (input.mouseButtons[1].isDown || input.mouseButtons[2].isDown ||
     (input.mouseButtons[0].isDown && input.keyboardButtons[keys.DOM_VK_ALT].isDown)) {
+      this.actor.gameInstance.threeRenderer.domElement.style.cursor = "grabbing";
       const mouseDelta = input.mouseDelta;
       mouseDelta.x /= this.actor.gameInstance.threeRenderer.domElement.width;
       mouseDelta.x *= this.camera.orthographicScale * this.camera.cachedRatio;
@@ -66,6 +71,7 @@ export default class Camera2DControls extends ActorComponent {
 
     // Zoom
     else {
+      this.actor.gameInstance.threeRenderer.domElement.style.cursor = null;
       const mousePosition = input.mousePosition;
       let newOrthographicScale: number;
       if (input.mouseButtons[5].isDown || input.keyboardButtons[keys.DOM_VK_ADD].wasJustPressed) {

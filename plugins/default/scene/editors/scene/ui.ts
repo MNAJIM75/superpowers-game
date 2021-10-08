@@ -3,6 +3,7 @@ import engine, { setupHelpers, updateCameraMode, focusActor } from "./engine";
 
 import { Node } from "../../data/SceneNodes";
 import { Component } from "../../data/SceneComponents";
+import * as sceneUserSettings from "../../data/SceneUserSettings";
 
 import * as TreeView from "dnd-tree-view";
 import * as ResizeHandle from "resize-handle";
@@ -289,6 +290,17 @@ export function start() {
   (document.querySelector(".render-area") as HTMLDivElement).hidden = false;
   ui.newActorButton.disabled = false;
   ui.newPrefabButton.disabled = false;
+
+  ui.gridCheckbox.checked = sceneUserSettings.pub.showGridByDefault;
+  engine.gridHelperComponent.setVisible(ui.gridCheckbox.checked);
+
+  ui.gridStep = sceneUserSettings.pub.defaultGridSize;
+  (document.getElementById("grid-step") as HTMLInputElement).value = ui.gridStep.toString();
+  engine.gridHelperComponent.setup(ui.gridSize, ui.gridStep);
+
+  sceneUserSettings.emitter.on("controlSchemes", () => {
+    engine.cameraControls.changeMode(sceneUserSettings.pub.controlSchemes);
+  });
 }
 
 function setMode(mode: string) {
@@ -776,6 +788,7 @@ export function setCameraMode(mode: string) {
   const axis = ui.cameraMode === "3D" ? ui.cameraVerticalAxis : "Y";
   engine.cameraRoot.setLocalEulerAngles(new THREE.Euler(axis === "Y" ? 0 : Math.PI / 2, 0, 0));
   updateCameraMode();
+  engine.cameraControls.changeMode(sceneUserSettings.pub.controlSchemes);
   ui.cameraModeButton.textContent = ui.cameraMode;
 }
 

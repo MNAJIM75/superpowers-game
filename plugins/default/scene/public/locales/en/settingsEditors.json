@@ -3,6 +3,8 @@
     "label": "Scene",
     "defaultCameraMode": "Default camera mode",
     "defaultCameraVerticalAxis": "Default camera vertical axis",
-    "showGridByDefault": "Show grid by default"
+    "showGridByDefault": "Show grid by default",
+    "defaultGridSize": "Default grid size",
+    "controlSchemes": "Navigation control scheme"
   }
 }

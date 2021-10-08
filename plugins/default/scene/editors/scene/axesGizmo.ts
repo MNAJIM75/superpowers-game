@@ -1,4 +1,5 @@
 import engine from "./engine";
+import ui from "./ui";
 
 const THREE = SupEngine.THREE;
 
@@ -12,6 +13,8 @@ const overlay: {
   negXAxisHelper: THREE.Sprite;
   negYAxisHelper: THREE.Sprite;
   negZAxisHelper: THREE.Sprite;
+
+  interceptor: HTMLDivElement;
 } = <any>{};
 export default overlay;
 
@@ -29,33 +32,29 @@ export function createAxes() {
   overlay.scene.add(yAxis);
   overlay.scene.add(zAxis);
 
-  overlay.posXAxisHelper = new THREE.Sprite( getSpriteMaterial( new THREE.Color("#ff3653"), "X" ) );
-  overlay.posXAxisHelper.userData.type = "posX";
-  overlay.posYAxisHelper = new THREE.Sprite( getSpriteMaterial( new THREE.Color("#8adb00"), "Y" ) );
-  overlay.posYAxisHelper.userData.type = "posY";
-  overlay.posZAxisHelper = new THREE.Sprite( getSpriteMaterial( new THREE.Color("#2c8fff"), "Z" ) );
-  overlay.posZAxisHelper.userData.type = "posZ";
-  overlay.negXAxisHelper = new THREE.Sprite( getSpriteMaterial( new THREE.Color("#ff3653") ) );
-  overlay.negXAxisHelper.userData.type = "negX";
-  overlay.negYAxisHelper = new THREE.Sprite( getSpriteMaterial( new THREE.Color("#8adb00") ) );
-  overlay.negYAxisHelper.userData.type = "negY";
-  overlay.negZAxisHelper = new THREE.Sprite( getSpriteMaterial( new THREE.Color("#2c8fff") ) );
-  overlay.negZAxisHelper.userData.type = "negZ";
-  overlay.posXAxisHelper.position.x = 1;
-  overlay.posYAxisHelper.position.y = 1;
-  overlay.posZAxisHelper.position.z = 1;
-  overlay.negXAxisHelper.position.x = - 1;
-  overlay.negXAxisHelper.scale.setScalar( 0.8 );
-  overlay.negYAxisHelper.position.y = - 1;
-  overlay.negYAxisHelper.scale.setScalar( 0.8 );
-  overlay.negZAxisHelper.position.z = - 1;
-  overlay.negZAxisHelper.scale.setScalar( 0.8 );
-  overlay.scene.add( overlay.posXAxisHelper );
-  overlay.scene.add( overlay.posYAxisHelper );
-  overlay.scene.add( overlay.posZAxisHelper );
-  overlay.scene.add( overlay.negXAxisHelper );
-  overlay.scene.add( overlay.negYAxisHelper );
-  overlay.scene.add( overlay.negZAxisHelper );
+  let posXAxisHelper = new THREE.Sprite(getSpriteMaterial(new THREE.Color("#ff3653"), "X"));
+  posXAxisHelper.userData.type = "posX";
+  let posYAxisHelper = new THREE.Sprite(getSpriteMaterial(new THREE.Color("#8adb00"), "Y"));
+  posYAxisHelper.userData.type = "posY";
+  let posZAxisHelper = new THREE.Sprite(getSpriteMaterial(new THREE.Color("#2c8fff"), "Z"));
+  posZAxisHelper.userData.type = "posZ";
+  let negXAxisHelper = new THREE.Sprite(getSpriteMaterial(new THREE.Color("#ff3653")));
+  negXAxisHelper.userData.type = "negX";
+  let negYAxisHelper = new THREE.Sprite(getSpriteMaterial(new THREE.Color("#8adb00")));
+  negYAxisHelper.userData.type = "negY";
+  let negZAxisHelper = new THREE.Sprite(getSpriteMaterial(new THREE.Color("#2c8fff")));
+  negZAxisHelper.userData.type = "negZ";
+  posXAxisHelper.position.x = 1;  posYAxisHelper.position.y = 1;  posZAxisHelper.position.z = 1;
+  negXAxisHelper.position.x = -1; negYAxisHelper.position.y = -1; negZAxisHelper.position.z = -1;
+  negXAxisHelper.scale.setScalar(0.8);
+  negYAxisHelper.scale.setScalar(0.8);
+  negZAxisHelper.scale.setScalar(0.8);
+  overlay.scene.add(posXAxisHelper); overlay.posXAxisHelper = posXAxisHelper;
+  overlay.scene.add(posYAxisHelper); overlay.posYAxisHelper = posYAxisHelper;
+  overlay.scene.add(posZAxisHelper); overlay.posZAxisHelper = posZAxisHelper;
+  overlay.scene.add(negXAxisHelper); overlay.negXAxisHelper = negXAxisHelper;
+  overlay.scene.add(negYAxisHelper); overlay.negYAxisHelper = negYAxisHelper;
+  overlay.scene.add(negZAxisHelper); overlay.negZAxisHelper = negZAxisHelper;
 
   let dom = engine.gameInstance.threeRenderer.domElement;
   let interceptor = document.createElement("div");
@@ -65,6 +64,7 @@ export function createAxes() {
   interceptor.style.height = "100px";
   interceptor.style.right = "0";
   interceptor.style.top = "0";
+  overlay.interceptor = interceptor;
 
   const mouse = new THREE.Vector2();
   const raycaster = new THREE.Raycaster;
@@ -140,12 +140,17 @@ export function renderOverlay() {
     overlay.negZAxisHelper.material.opacity = 1;
   }
 
-  engine.gameInstance.threeRenderer.clearDepth();
-  engine.gameInstance.threeRenderer.getViewport(viewport);
-  engine.gameInstance.threeRenderer.setViewport(viewport.z - 100, viewport.w - 100, 100, 100);
-  overlay.camera.setRotationFromQuaternion(engine.cameraComponent.threeCamera.quaternion);
-  overlay.camera.position.set(0, 0, 0);
-  overlay.camera.translateOnAxis(new THREE.Vector3(0, 0, 1), 5);
-  engine.gameInstance.threeRenderer.render(overlay.scene, overlay.camera);
-  engine.gameInstance.threeRenderer.setViewport(viewport);
+  if (ui.cameraMode === "3D") {
+    overlay.interceptor.hidden = false;
+    engine.gameInstance.threeRenderer.clearDepth();
+    engine.gameInstance.threeRenderer.getViewport(viewport);
+    engine.gameInstance.threeRenderer.setViewport(viewport.z - 100, viewport.w - 100, 100, 100);
+    overlay.camera.setRotationFromQuaternion(engine.cameraComponent.threeCamera.quaternion);
+    overlay.camera.position.set(0, 0, 0);
+    overlay.camera.translateOnAxis(new THREE.Vector3(0, 0, 1), 5);
+    engine.gameInstance.threeRenderer.render(overlay.scene, overlay.camera);
+    engine.gameInstance.threeRenderer.setViewport(viewport);
+  } else {
+    overlay.interceptor.hidden = true;
+  }
 }

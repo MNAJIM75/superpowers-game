@@ -10,7 +10,6 @@ import * as async from "async";
 const THREE = SupEngine.THREE;
 import { DuplicatedNode } from "../../data/SceneAsset";
 import SceneSettingsResource from "../../data/SceneSettingsResource";
-import * as sceneUserSettings from "../../data/SceneUserSettings";
 import GameSettingsResource from "../../../gameSettings/data/GameSettingsResource";
 import { Node } from "../../data/SceneNodes";
 import { Component } from "../../data/SceneComponents";
@@ -90,8 +89,6 @@ function startIfReady() {
 
     setCameraMode(data.sceneSettingsResource.pub.defaultCameraMode);
     setCameraVerticalAxis(data.sceneSettingsResource.pub.defaultVerticalAxis);
-    ui.gridCheckbox.checked = sceneUserSettings.pub.showGridByDefault;
-    engine.gridHelperComponent.setVisible(ui.gridCheckbox.checked);
     setupInspectorLayers();
   }
 }

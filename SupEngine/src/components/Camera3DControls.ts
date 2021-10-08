@@ -11,6 +11,8 @@ export default class Camera3DControls extends ActorComponent {
   camera: Camera;
   rotation: THREE.Euler;
   movementSpeed = 0.2;
+  mode = "superpowers";
+  direction: THREE.Vector3;
 
   constructor(actor: Actor, camera: Camera) {
     super(actor, "Camera3DControls");
@@ -19,38 +21,73 @@ export default class Camera3DControls extends ActorComponent {
     this.rotation = actor.getLocalEulerAngles(new THREE.Euler());
   }
 
+  changeMode(mode: string) {
+    this.mode = mode;
+  }
+
   setIsLayerActive(active: boolean) { /* Nothing to render */ }
 
   update() {
     const keyButtons = this.actor.gameInstance.input.keyboardButtons;
     const keyEvent = (<any>window).KeyEvent; // Workaround for unknown KeyEvent property on window object
 
-    if (!keyButtons[keyEvent.DOM_VK_CONTROL].isDown) {
-      tmpMovement.setX(
-        (keyButtons[keyEvent.DOM_VK_A].isDown || keyButtons[keyEvent.DOM_VK_Q].isDown) ? -this.movementSpeed :
-        ((keyButtons[keyEvent.DOM_VK_D].isDown) ? this.movementSpeed :
-        0));
+    switch (this.mode) {
+      case "superpowers":
+        if (!keyButtons[keyEvent.DOM_VK_CONTROL].isDown) {
+          tmpMovement.setX(
+            (keyButtons[keyEvent.DOM_VK_A].isDown || keyButtons[keyEvent.DOM_VK_Q].isDown) ? -this.movementSpeed :
+            ((keyButtons[keyEvent.DOM_VK_D].isDown) ? this.movementSpeed :
+            0));
 
-      tmpMovement.setZ(
-        (keyButtons[keyEvent.DOM_VK_W].isDown || keyButtons[keyEvent.DOM_VK_Z].isDown) ? -this.movementSpeed :
-        ((keyButtons[keyEvent.DOM_VK_S].isDown) ? this.movementSpeed :
-        0));
+          tmpMovement.setZ(
+            (keyButtons[keyEvent.DOM_VK_W].isDown || keyButtons[keyEvent.DOM_VK_Z].isDown) ? -this.movementSpeed :
+            ((keyButtons[keyEvent.DOM_VK_S].isDown) ? this.movementSpeed :
+            0));
 
-      tmpMovement.setY(
-        (keyButtons[keyEvent.DOM_VK_SPACE].isDown) ? this.movementSpeed :
-        ((keyButtons[keyEvent.DOM_VK_SHIFT].isDown) ? -this.movementSpeed :
-        0));
+          tmpMovement.setY(
+            (keyButtons[keyEvent.DOM_VK_SPACE].isDown) ? this.movementSpeed :
+            ((keyButtons[keyEvent.DOM_VK_SHIFT].isDown) ? -this.movementSpeed :
+            0));
 
-      tmpMovement.applyQuaternion(tmpQuaternion.setFromAxisAngle(forwardVector, this.rotation.y));
-      this.actor.moveLocal(tmpMovement);
-    }
+          tmpMovement.applyQuaternion(tmpQuaternion.setFromAxisAngle(forwardVector, this.rotation.y));
+          this.actor.moveLocal(tmpMovement);
+        }
 
-    // Camera rotation
-    if (this.actor.gameInstance.input.mouseButtons[1].isDown ||
-    (this.actor.gameInstance.input.mouseButtons[0].isDown && keyButtons[keyEvent.DOM_VK_ALT].isDown)) {
-      this.rotation.x = Math.min(Math.max(this.rotation.x - this.actor.gameInstance.input.mouseDelta.y / 250, -Math.PI / 2), Math.PI / 2);
-      this.rotation.y -= this.actor.gameInstance.input.mouseDelta.x / 250;
-      this.actor.setLocalEulerAngles(this.rotation);
+        // Camera rotation
+        if (this.actor.gameInstance.input.mouseButtons[1].isDown ||
+        (this.actor.gameInstance.input.mouseButtons[0].isDown && keyButtons[keyEvent.DOM_VK_ALT].isDown)) {
+          this.rotation.x = Math.min(Math.max(this.rotation.x - this.actor.gameInstance.input.mouseDelta.y / 250, -Math.PI / 2), Math.PI / 2);
+          this.rotation.y -= this.actor.gameInstance.input.mouseDelta.x / 250;
+          this.actor.setLocalEulerAngles(this.rotation);
+        }
+        break;
+      case "unity":
+        if (this.actor.gameInstance.input.mouseButtons[2].isDown) {
+          this.rotation.x = Math.min(Math.max(this.rotation.x - this.actor.gameInstance.input.mouseDelta.y / 250, -Math.PI / 2), Math.PI / 2);
+          this.rotation.y -= this.actor.gameInstance.input.mouseDelta.x / 250;
+          this.actor.setLocalEulerAngles(this.rotation);
+
+          tmpMovement.setX(
+            (keyButtons[keyEvent.DOM_VK_A].isDown || keyButtons[keyEvent.DOM_VK_Q].isDown) ? -this.movementSpeed :
+            ((keyButtons[keyEvent.DOM_VK_D].isDown) ? this.movementSpeed :
+            0));
+
+          tmpMovement.setZ(
+            (keyButtons[keyEvent.DOM_VK_W].isDown || keyButtons[keyEvent.DOM_VK_Z].isDown) ? -this.movementSpeed :
+            ((keyButtons[keyEvent.DOM_VK_S].isDown) ? this.movementSpeed :
+            0));
+
+          tmpMovement.setY(
+            (keyButtons[keyEvent.DOM_VK_SPACE].isDown) ? this.movementSpeed :
+            ((keyButtons[keyEvent.DOM_VK_SHIFT].isDown) ? -this.movementSpeed :
+            0));
+
+          let quat = new THREE.Quaternion();
+          this.actor.getLocalOrientation(quat);
+          tmpMovement.applyQuaternion(quat);
+          this.actor.moveLocal(tmpMovement);
+        }
+        break;
     }
   }
 }
