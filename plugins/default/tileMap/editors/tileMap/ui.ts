@@ -125,18 +125,17 @@ ui.mousePositionLabel = {
 document.addEventListener("keyup", (event) => {
   if ((event.target as HTMLInputElement).tagName === "INPUT") return;
 
-  const keyEvent = (window as any).KeyEvent;
-  switch (event.keyCode) {
-    case keyEvent.DOM_VK_B: selectBrushTool(); break;
-    case keyEvent.DOM_VK_F: selectFillTool(); break;
-    case keyEvent.DOM_VK_S: selectSelectionTool(); break;
-    case keyEvent.DOM_VK_E: selectEraserTool(); break;
-    case keyEvent.DOM_VK_G: ui.gridCheckbox.checked = !ui.gridCheckbox.checked; onChangeGridDisplay(); break;
-    case keyEvent.DOM_VK_I: ui.highlightCheckbox.checked = !ui.highlightCheckbox.checked; onChangeHighlight(); break;
-    case keyEvent.DOM_VK_H: flipTilesHorizontally(); break;
-    case keyEvent.DOM_VK_V: flipTilesVertically(); break;
-    case keyEvent.DOM_VK_R: rotateTiles(); break;
-    case keyEvent.DOM_VK_A:
+  switch (event.key) {
+    case "b": selectBrushTool(); break;
+    case "f": selectFillTool(); break;
+    case "s": selectSelectionTool(); break;
+    case "e": selectEraserTool(); break;
+    case "g": ui.gridCheckbox.checked = !ui.gridCheckbox.checked; onChangeGridDisplay(); break;
+    case "i": ui.highlightCheckbox.checked = !ui.highlightCheckbox.checked; onChangeHighlight(); break;
+    case "h": flipTilesHorizontally(); break;
+    case "v": flipTilesVertically(); break;
+    case "r": rotateTiles(); break;
+    case "a":
       if (event.ctrlKey) {
         selectSelectionTool();
         selectEntireLayer();

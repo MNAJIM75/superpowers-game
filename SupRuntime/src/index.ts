@@ -69,7 +69,7 @@ if (playerWindow != null) {
 const qs = querystring.parse(window.location.search.slice(1));
 
 document.body.addEventListener("keydown", (event) => {
-  if (event.keyCode === (<any>window)["KeyEvent"].DOM_VK_F12) {
+  if (event.key === "F12") {
     if (qs.project != null && playerWindow != null) playerWindow.webContents.toggleDevTools();
   }
 });

@@ -71,31 +71,31 @@ document.addEventListener("keydown", (event) => {
   }
   if (activeElement == null) return;
 
-  if (event.keyCode === 78 && (event.ctrlKey || event.metaKey)) { // Ctrl+N
+  if ((event.ctrlKey || event.metaKey) && event.key === "n") {
     event.preventDefault();
     event.stopPropagation();
     onNewNodeClick();
   }
 
-  if (event.keyCode === 80 && (event.ctrlKey || event.metaKey)) { // Ctrl+P
+  if ((event.ctrlKey || event.metaKey) && event.key === "p") {
     event.preventDefault();
     event.stopPropagation();
     onNewPrefabClick();
   }
 
-  if (event.keyCode === 113) { // F2
+  if (event.key === "F2") {
     event.preventDefault();
     event.stopPropagation();
     onRenameNodeClick();
   }
 
-  if (event.keyCode === 68 && (event.ctrlKey || event.metaKey)) { // Ctrl+D
+  if ((event.ctrlKey || event.metaKey) && event.key === "d") {
     event.preventDefault();
     event.stopPropagation();
     onDuplicateNodeClick();
   }
 
-  if (event.keyCode === 46) { // Delete
+  if (event.key === "Delete") {
     event.preventDefault();
     event.stopPropagation();
     onDeleteNodeClick();
@@ -107,28 +107,28 @@ document.addEventListener("keydown", (event) => {
   if (document.querySelector("body > .dialog") != null) return;
   if (ignoredTagNames.indexOf((event.target as HTMLInputElement).tagName) !== -1) return;
 
-  switch (event.keyCode) {
-    case (window as any).KeyEvent.DOM_VK_E:
+  switch (event.key) {
+    case "e":
       setMode("translate");
       break;
-    case (window as any).KeyEvent.DOM_VK_R:
+    case "r":
       setMode("rotate");
       break;
-    case (window as any).KeyEvent.DOM_VK_T:
+    case "t":
       setMode("scale");
       break;
-    case (window as any).KeyEvent.DOM_VK_L:
+    case "l":
       const localElt = document.getElementById(`transform-space`) as HTMLInputElement;
       localElt.checked = !localElt.checked;
       engine.transformHandleComponent.setSpace(localElt.checked ? "local" : "world");
       break;
 
-    case (window as any).KeyEvent.DOM_VK_G:
+    case "g":
       ui.gridCheckbox.checked = !ui.gridCheckbox.checked;
       engine.gridHelperComponent.setVisible(ui.gridCheckbox.checked);
       break;
 
-    case (window as any).KeyEvent.DOM_VK_F:
+    case "f":
       if (ui.nodesTreeView.selectedNodes.length !== 1) return;
       const nodeId = ui.nodesTreeView.selectedNodes[0].dataset["id"];
       focusActor(nodeId);

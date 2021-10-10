@@ -128,7 +128,7 @@ function setArrayUniformInputs(id: string, parentElt: HTMLDivElement, name: stri
 
 const newUniformInput = <HTMLInputElement>document.querySelector(".uniforms .new input");
 newUniformInput.addEventListener("keyup", (event: any) => {
-  if (event.keyCode === 13) {
+  if (event.key === "Enter") {
     data.projectClient.editAsset(SupClient.query.asset, "newUniform", event.target.value);
     event.target.value = "";
   }
@@ -176,7 +176,7 @@ export function setupAttribute(attribute: AttributePub) {
 
 const newAttributeInput = <HTMLInputElement>document.querySelector(".attributes .new input");
 newAttributeInput.addEventListener("keyup", (event: any) => {
-  if (event.keyCode === 13) {
+  if (event.key === "Enter") {
     data.projectClient.editAsset(SupClient.query.asset, "newAttribute", event.target.value);
     event.target.value = "";
   }

@@ -59,22 +59,22 @@ document.addEventListener("keydown", (event) => {
   }
   if (activeElement == null) return;
 
-  if (event.keyCode === 78 && (event.ctrlKey || event.metaKey)) { // Ctrl+N
+  if ((event.ctrlKey || event.metaKey) && event.key === "n") {
     event.preventDefault();
     onNewNodeClick();
   }
 
-  if (event.keyCode === 113) { // F2
+  if (event.key === "F2") {
     event.preventDefault();
     onRenameNodeClick();
   }
 
-  if (event.keyCode === 68 && (event.ctrlKey || event.metaKey)) { // Ctrl+D
+  if ((event.ctrlKey || event.metaKey) && event.key === "d") {
     event.preventDefault();
     onDuplicateNodeClick();
   }
 
-  if (event.keyCode === 46) { // Delete
+  if (event.key === "Delete") {
     event.preventDefault();
     onDeleteNodeClick();
   }

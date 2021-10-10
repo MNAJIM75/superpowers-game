@@ -110,7 +110,7 @@ function onAPILoaded() {
   let resultIndex = 0;
 
   document.addEventListener("keydown", (event) => {
-    if (event.ctrlKey && event.keyCode === 70 /* F */) {
+    if ((event.ctrlKey || event.metaKey) && event.key === "f") {
       searchElt.focus();
       searchElt.select();
       event.preventDefault();

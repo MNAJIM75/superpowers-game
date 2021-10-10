@@ -148,16 +148,16 @@ export function setupEditor(clientId: string) {
 
   SupClient.setupCollapsablePane(ui.errorPane, () => { ui.editor.codeMirrorInstance.refresh(); });
 
-  (<any>ui.editor.codeMirrorInstance).on("keyup", (instance: any, event: any) => {
+  (<any>ui.editor.codeMirrorInstance).on("keyup", (instance: any, event: KeyboardEvent) => {
     clearInfoPopup();
 
     // "("" character triggers the parameter hint
-    if (event.keyCode === 53 ||
-       (ui.parameterElement.parentElement != null && event.keyCode !== 27 && event.keyCode !== 38 && event.keyCode !== 40))
+    if (event.key === "(" ||
+       (ui.parameterElement.parentElement != null && event.key !== "Escape" && event.key !== "ArrowUp" && event.key !== "ArrowDown"))
           scheduleParameterHint();
 
     // Ignore Ctrl, Cmd, Escape, Return, Tab, arrow keys, F8
-    if (event.ctrlKey || event.metaKey || [27, 9, 13, 37, 38, 39, 40, 119, 16].indexOf(event.keyCode) !== -1) return;
+    if (event.ctrlKey || event.metaKey || ["Escape", "Tab", "Enter", "ArrowLeft", "ArrowUp", "ArrowRight", "ArrowDown", "F8", "Shift"].indexOf(event.key) !== -1) return;
 
     // If the completion popup is active, the hint() method will automatically
     // call for more autocomplete, so we don't need to do anything here.
